@@ -1,4 +1,4 @@
-### [Matrix Median](https://www.interviewbit.com/problems/matrix-median/)
+### [Matrix Median (Star Marked)](https://www.interviewbit.com/problems/matrix-median/)
 
 ```cpp
 int check(vector<vector<int>> &a, int n, int m, int val, int N){
@@ -337,7 +337,7 @@ int Solution::pow(int a, int b, int mod) {
 }
 ```
 
-### [Simple Queries](https://www.interviewbit.com/problems/simple-queries/)
+### [Simple Queries (Star Marked)](https://www.interviewbit.com/problems/simple-queries/)
 
 ```cpp
 #define mod 1000000007
@@ -394,7 +394,7 @@ vector<int> Solution::solve(vector<int> &A, vector<int> &B) {
 }
 ```
 
-### [Median of Array](https://www.interviewbit.com/problems/median-of-array/)
+### [Median of Array (Star Marked)](https://www.interviewbit.com/problems/median-of-array/)
 
 ```cpp
 double Solution::findMedianSortedArrays(const vector<int> &a, const vector<int> &b) {
