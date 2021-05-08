@@ -31,7 +31,7 @@ void Solution::setZeroes(vector<vector<int> > &a) {
 }
 ```
 
-### [First Missing Integer](https://www.interviewbit.com/problems/first-missing-integer/)
+### [First Missing Integer (star Marked)](https://www.interviewbit.com/problems/first-missing-integer/)
 
 ```cpp
 int Solution::firstMissingPositive(vector<int> &a) {

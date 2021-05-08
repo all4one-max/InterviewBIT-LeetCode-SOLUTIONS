@@ -1,39 +1,18 @@
-### [Min Steps in Infinite Grid](https://www.interviewbit.com/problems/min-steps-in-infinite-grid/)
+### [Prime Sum](https://www.interviewbit.com/problems/prime-sum/)
 
 ```cpp
-class Solution:
-    # @param A : list of integers
-    # @param B : list of integers
-    # @return an integer
-    def coverPoints(self, a, b):
-        x,y=a[0],b[0]
-        n=len(a)
-        ans=0
-        for i in range(1,n):
-            gx,gy=a[i],b[i]
-            mx,mn=max(abs(gx-x),abs(gy-y)),min(abs(gx-x),abs(gy-y))
-            ans+=mx
-            x,y=gx,gy
-        return ans
-```
+bool prime(int x) {
+    for(int i=2;i*i<=x;i++) {
+        if (x%i==0) return false;
+    }
+    if (x==1) return false;
+    return true;
+}
 
-### [Max Sum Contiguous Subarray](https://www.interviewbit.com/problems/max-sum-contiguous-subarray/)
-
-```cpp
-// kadance's Algo
-int Solution::maxSubArray(const vector<int> &a) {
-    int n=a.size();
-    int mx_sm_including=0;
-    int mx_sm=*max_element(a.begin(),a.end());
-       for(int i=0;i<n;i++) {
-        mx_sm_including += a[i];
-        if (mx_sm_including > mx_sm) mx_sm = mx_sm_including;
-        if (mx_sm_including < 0) {
-          mx_sm_including = 0;
-        }
-      }
-    return mx_sm;
-
+vector<int> Solution::primesum(int a) {
+    for(int i=2;i<(a/2+1);i++) {
+        if (prime(i) && prime(a-i)) return {i,a-i};
+    }
 }
 ```
 
@@ -94,7 +73,7 @@ vector<int> Solution::plusOne(vector<int> &a) {
 }
 ```
 
-### [Maximum Absolute Difference (star Marked)](https://www.interviewbit.com/problems/maximum-absolute-difference/)
+### [Maximum Absolute Difference](https://www.interviewbit.com/problems/maximum-absolute-difference/)
 
 ```cpp
 int Solution::maxArr(vector<int> &A) {
@@ -140,7 +119,7 @@ int Solution::solve(int n, vector<int> &b) {
 }
 ```
 
-### [Flip (star Marked)](https://www.interviewbit.com/problems/flip/)
+### [Flip](https://www.interviewbit.com/problems/flip/)
 
 ```cpp
 vector<int> Solution::flip(string a) {

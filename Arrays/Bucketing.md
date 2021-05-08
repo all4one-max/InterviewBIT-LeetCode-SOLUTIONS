@@ -1,4 +1,4 @@
-### [Triplets with Sum between given range](https://www.interviewbit.com/problems/triplets-with-sum-between-given-range/)
+### [Triplets with Sum between given range (star Marked)](https://www.interviewbit.com/problems/triplets-with-sum-between-given-range/)
 
 ```cpp
 public class Solution {
@@ -33,7 +33,7 @@ public int solve(ArrayList<String> A) {
 }
 ```
 
-### [Find Duplicate in Array](https://www.interviewbit.com/problems/find-duplicate-in-array/)
+### [Find Duplicate in Array (star Marked)](https://www.interviewbit.com/problems/find-duplicate-in-array/)
 
 ```cpp
 // Tortois method
@@ -54,7 +54,7 @@ int Solution::repeatedNumber(const vector<int> &a) {
 }
 ```
 
-### [Maximum Consecutive Gap](https://www.interviewbit.com/problems/maximum-consecutive-gap/)
+### [Maximum Consecutive Gap (star Marked)](https://www.interviewbit.com/problems/maximum-consecutive-gap/)
 
 ```cpp
 int Solution::maximumGap(const vector<int> &a) {

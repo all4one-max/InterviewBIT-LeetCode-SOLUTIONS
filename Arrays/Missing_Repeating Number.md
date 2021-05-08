@@ -1,4 +1,4 @@
-### [Repeat and Missing Number Array](https://www.interviewbit.com/problems/repeat-and-missing-number-array/)
+### [Repeat and Missing Number Array (star Marked)](https://www.interviewbit.com/problems/repeat-and-missing-number-array/)
 
 ```cpp
 vector<int> Solution::repeatedNumber(const vector<int> &a) {
@@ -21,7 +21,7 @@ vector<int> Solution::repeatedNumber(const vector<int> &a) {
 }
 ```
 
-### [N/3 Repeat Number](https://www.interviewbit.com/problems/n3-repeat-number/)
+### [N/3 Repeat Number (star Marked)](https://www.interviewbit.com/problems/n3-repeat-number/)
 
 ```cpp
 int Solution::repeatedNumber(const vector<int> &a) {

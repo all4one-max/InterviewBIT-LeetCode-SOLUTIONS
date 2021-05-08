@@ -71,7 +71,7 @@ int Solution::maximumGap(const vector<int> &a) {
 }
 ```
 
-### [Maximum Unsorted Subarray](https://www.interviewbit.com/problems/maximum-unsorted-subarray/)
+### [Maximum Unsorted Subarray (star Marked)](https://www.interviewbit.com/problems/maximum-unsorted-subarray/)
 
 ```cpp
 vector<int> Solution::subUnsort(vector<int> &a) {

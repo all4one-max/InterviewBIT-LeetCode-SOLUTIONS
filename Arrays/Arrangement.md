@@ -50,7 +50,7 @@ string Solution::largestNumber(const vector<int> &a) {
 }
 ```
 
-### [Rotate Matrix](https://www.interviewbit.com/problems/rotate-matrix/)
+### [Rotate Matrix (star Marked)](https://www.interviewbit.com/problems/rotate-matrix/)
 
 ```cpp
 void Solution::rotate(vector<vector<int> > &arr) {
@@ -78,7 +78,7 @@ void Solution::rotate(vector<vector<int> > &arr) {
 }
 ```
 
-### [Next Permutation](https://www.interviewbit.com/problems/next-permutation/)
+### [Next Permutation (star Marked)](https://www.interviewbit.com/problems/next-permutation/)
 
 ```cpp
 vector<int> Solution::nextPermutation(vector<int> &a) {
@@ -118,7 +118,7 @@ vector<int> Solution::nextPermutation(vector<int> &a) {
 }
 ```
 
-### [Find Permutation](https://www.interviewbit.com/problems/find-permutation/)
+### [Find Permutation (star Marked)](https://www.interviewbit.com/problems/find-permutation/)
 
 ```cpp
 vector<int> Solution::findPerm(const string s, int n) {

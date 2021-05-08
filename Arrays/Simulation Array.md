@@ -18,7 +18,7 @@ vector<int> Solution::getRow(int n) {
 }
 ```
 
-### [Spiral Order Matrix II](https://www.interviewbit.com/problems/spiral-order-matrix-ii/)
+### [Spiral Order Matrix II (star Marked)](https://www.interviewbit.com/problems/spiral-order-matrix-ii/)
 
 ```cpp
 vector<vector<int> > Solution::generateMatrix(int n) {
