@@ -16,138 +16,326 @@ vector<int> Solution::primesum(int a) {
 }
 ```
 
-### [Add One To Number](https://www.interviewbit.com/problems/add-one-to-number/)
+### [Sum of pairwise Hamming Distance](https://www.interviewbit.com/problems/sum-of-pairwise-hamming-distance/)
 
 ```cpp
-#define fo(i,n)        for (int i=0;i<n;i++)
-#define fo1(i, n)      for (int i = 1; i < n; i++)
-#define endl           "\n"
-#define MAX(a,b)       (a>b) ? a : b
-#define MIN(a,b)       (a>b) ? b : a
-#define fi             first
-#define se             second
-#define pb             push_back
-#define mp             make_pair
-#define all(v)         v.begin(), v.end()
-#define sz(v)          v.size()
-#define pii            pair<int, int>
-
-vector<int> Solution::plusOne(vector<int> &a) {
+int Solution::hammingDistance(const vector<int> &a) {
     int n=a.size();
-    int cnt=0,i=0;
-    while (i<n) {
-        if (a[i]==0) cnt++;
-        else break;
-        i++;
-    }
-    vector<int> ans;
-    if (cnt==n) {ans.pb(1);return ans;}
-    if (a[n-1]!=9) {
-        for(int i=cnt;i<(n-1);i++) {
-            ans.pb(a[i]);
+    vector<long long> dp(32,0);
+    for(int i=0;i<n;i++) {
+        for(int j=0;j<32;j++) {
+            if (a[i]&(1<<j)) dp[j]++;
         }
-        ans.pb(a[n-1]+1);
     }
-    else {
-        int carry=1;
-        ans.pb(0);
-        if (n==1) {ans.pb(1);reverse(ans.begin(),ans.end());return ans;}
-        for(int i=n-2;i>=cnt;i--) {
-            if (a[i]==9 && carry==1) {
-                ans.pb(0);
-                carry=1;
-                if (i==cnt) {
-                    ans.pb(1);
-                    break;
+    long long ans=0,mod=1000000007;
+    for(int i=0;i<32;i++) {
+        ans+=(2*dp[i]*(n-dp[i]));
+        ans%=mod;
+    }
+    return (int)ans;
+}
+```
+
+### [FizzBuzz](https://www.interviewbit.com/problems/fizzbuzz/)
+
+```cpp
+vector<string> Solution::fizzBuzz(int a) {
+    vector<string> arr(a,"0");
+    for(int i=1;i<=a;i++) {
+        string num=to_string(i);
+        if (!(i%3) && !(i%5)) arr[i-1]="FizzBuzz";
+        else if (!(i%3)) arr[i-1]="Fizz";
+        else if (!(i%5)) arr[i-1]="Buzz";
+        else arr[i-1]=num;
+    }
+    return arr;
+}
+```
+
+### [Power Of Two Integers](https://www.interviewbit.com/problems/power-of-two-integers/)
+
+```cpp
+int Solution::isPower(int num) {
+    if (num==1) return 1;
+    for(int i=2;i*i<=num;i++) {
+        int cpy=num;
+        while (cpy%i==0) {
+            cpy=cpy/i;
+            if (cpy==1) return 1;
+        }
+    }
+    return 0;
+}
+```
+
+### [Excel Column Number](https://www.interviewbit.com/problems/excel-column-number/)
+
+```cpp
+int Solution::titleToNumber(string A) {
+   int n=A.size();
+   int ans=0;
+   for(int i=0;i<n;i++) {
+       ans+=(int(A[i])-64)*pow(26,n-i-1);
+   }
+   return ans;
+}
+```
+
+### [Excel Column Title (Star Marked)](https://www.interviewbit.com/problems/excel-column-title/)
+
+```cpp
+string Solution::convertToTitle(int a) {
+    string ans="";
+    while (a) {
+        int r = a%26;
+        a=a/26;
+        // consider the cases of AZ and ZZ
+        if (r==0) a-=1;
+        // cout<<r<<"\n";
+        if (r==0) ans+='Z';
+        else {
+            r+=64;
+            ans+=char(r);
+        }
+    }
+    reverse(ans.begin(),ans.end());
+    return ans;
+}
+```
+
+### [Palindrome Integer](https://www.interviewbit.com/problems/palindrome-integer/)
+
+```cpp
+int Solution::isPalindrome(int n) {
+    int num=n;
+    if (n<0) return false;
+    int dig=0;
+    while (n) {
+        n/=10;
+        dig++;
+    }
+    int right=1,left=pow(10,dig-1),iter=0;
+    while (dig>0) {
+        int left_dig=(num/left)%10;
+        int right_dig=(num/right)%10;
+        if (left_dig!=right_dig) return false;
+        right*=10;left/=10;
+        dig-=2;
+        iter++;
+    }
+    return true;
+}
+```
+
+### [Reverse integer (Star Marked)](https://www.interviewbit.com/courses/programming/topics/math/)
+
+```cpp
+int Solution::reverse(int x) {
+    // solution without using strings
+    int rev = 0, sign = 1, digit;
+    if (x < 0) {
+        sign = -1;
+        x *= -1;
+    }
+    while (x > 0) {
+        digit = x%10;
+        // check for overflow here
+        if (rev > (INT_MAX / 10) || (rev == (INT_MAX / 10) && digit > (INT_MAX % 10))) {
+            return 0;
+        }
+        rev = rev * 10 + digit;
+        x/=10;
+    }
+    rev *= sign;
+        return rev;
+}
+```
+
+### [Greatest Common Divisor](https://www.interviewbit.com/problems/greatest-common-divisor/)
+
+```cpp
+int Solution::gcd(int a, int b) {
+    if (b==0) return a;
+    if (a%b==0) return b;
+    if (a>b) return gcd(b,a%b);
+    else return gcd(a,b%a);
+}
+```
+
+### [Palindrome Integer](https://www.interviewbit.com/problems/palindrome-integer/)
+
+```cpp
+int Solution::isPalindrome(int n) {
+    int num=n;
+    if (n<0) return false;
+    int dig=0;
+    while (n) {
+        n/=10;
+        dig++;
+    }
+    int right=1,left=pow(10,dig-1),iter=0;
+    while (dig>0) {
+        int left_dig=(num/left)%10;
+        int right_dig=(num/right)%10;
+        if (left_dig!=right_dig) return false;
+        right*=10;left/=10;
+        dig-=2;
+        iter++;
+    }
+    return true;
+}
+```
+
+### [Trailing Zeros in Factorial](https://www.interviewbit.com/problems/trailing-zeros-in-factorial/)
+
+```cpp
+int Solution::trailingZeroes(int n) {
+    int ans=0;
+    for(int i=5;i<=n;i*=5) {
+        ans+=n/i;
+    }
+    return ans;
+}
+```
+
+### [Sorted Permutation Rank (Star Marked)](https://www.interviewbit.com/problems/sorted-permutation-rank/)
+
+```cpp
+int fct(int num,int mod) {
+    int ans=1;
+    while (num>0) {
+        ans*=num;
+        ans%=mod;
+        num--;
+    }
+    return ans;
+}
+
+int get(vector<int> &avail,char c) {
+    int val=(int)c,cnt=0;
+    avail[val]=0;
+    for(int i=0;i<val;i++) {
+        if (avail[i]) cnt++;
+    }
+    return cnt;
+}
+
+int Solution::findRank(string a) {
+    int n=a.size();
+    int ans=1,mod=1000003;
+    vector<int> avail(256,0);
+    for(int i=0;i<n;i++) {
+        avail[(int)a[i]]=1;
+    }
+    for(int i=0;i<n;i++) {
+        int cnt=get(avail,a[i]);
+        ans+=(cnt%mod)*fct(n-i-1,mod);
+        ans%=mod;
+    }
+    return ans%mod;
+}
+```
+
+### [Largest Coprime Divisor (Star Marked)](https://www.interviewbit.com/problems/largest-coprime-divisor/)
+
+```cpp
+int Solution::cpFact(int A, int B) {
+    int x;
+    while((__gcd(B,A)!=1))
+    {
+    x=__gcd(B,A);
+    A=A/x;
+    }
+    return A;
+}
+```
+
+### [Sorted Permutation Rank with Repeats (Star Marked)](https://www.interviewbit.com/problems/sorted-permutation-rank-with-repeats/)
+
+```cpp
+#define ll long long int
+
+ll fme(ll a, ll b,ll mod) {
+  ll res = 1;
+  while (b) {
+    if (b & 1) res = (res * a) % mod;
+    a = (a * a) % mod;
+    b = b >> 1;
+  }
+  return res % mod;
+}
+
+ll modinv(ll a,ll mod) {return fme(a, mod - 2, mod);}
+
+ll get(vector<ll> &avail,char c,ll mod,ll num,vector<ll> &fact) {
+    ll val=(ll)c, cnt=0;
+    for(ll i=0;i<val;i++) {
+        if (avail[i]) {
+            avail[i]--;
+            ll cur = fact[num];
+            for(ll j=0;j<256;j++) {
+                if (avail[j]) {
+                    cur=cur*modinv(fact[avail[j]],mod);
+                    cur%=mod;
                 }
             }
-            else if (a[i]!=9 && carry==1) {
-                 ans.pb(a[i]+1);
-                 carry=0;
-            }
-            else ans.pb(a[i]);
+            cnt+=cur;
+            avail[i]++;
         }
-        reverse(ans.begin(),ans.end());
     }
-    return ans;
+    avail[val]--;
+    return cnt;
+}
+
+int Solution::findRank(string a) {
+    ll n=a.size();
+    ll fans=1,mod=1000003;
+    vector<ll> fact(mod+5, 1);
+    for (ll i = 1; i < (mod + 3); i++) {
+        fact[i] = (fact[i - 1] * i) % mod;
+    }
+    vector<ll> avail(256,0);
+    for(ll i=0;i<n;i++) {
+        avail[(ll)a[i]]++;
+    }
+    for(ll i=0;i<n;i++) {
+        ll cnt=get(avail,a[i],mod,n-i-1,fact);
+        fans+=cnt;
+        fans%=mod;
+    }
+    return fans%mod;
 }
 ```
 
-### [Maximum Absolute Difference](https://www.interviewbit.com/problems/maximum-absolute-difference/)
+### [Rearrange Array (Star Marked)](https://www.interviewbit.com/problems/rearrange-array/)
 
 ```cpp
-int Solution::maxArr(vector<int> &A) {
-    int max_1 = INT_MIN;
-    int max_2 = INT_MIN;
-    int min_1 = INT_MAX;
-    int min_2 = INT_MAX;
-    for(int i=0;i<A.size();i++)
-    {
-        if(A[i]+i>max_1) max_1 = A[i]+i ;
-        if (A[i]+i<min_1) min_1 = A[i]+i ;
-        if(A[i]-i>max_2) max_2 = A[i]-i ;
-        if (A[i]-i<min_2) min_2 = A[i]-i ;
+void Solution::arrange(vector<int> &A) {
+    // Do not write main() function.
+    // Do not read input, instead use the arguments to the function.
+    // Do not print the output, instead return values as specified
+    // Still have a doubt. Checkout www.interviewbit.com/pages/sample_codes/ for more details
+    int n=A.size();
+    for(int i=0;i<n;i++) {
+        A[i]+=((A[A[i]]%n)*n);
     }
-    return max((max_1-min_1),(max_2-min_2));
+    for(int i=0;i<n;i++) {
+        A[i]/=n;
+    }
+    return;
 }
 ```
 
-### [Partitions](https://www.interviewbit.com/problems/partitions/)
+### [Grid Unique Paths (Star Marked)](https://www.interviewbit.com/problems/grid-unique-paths/)
 
 ```cpp
-int Solution::solve(int n, vector<int> &b) {
-    vector<int> pref(n,0);
-    pref[0]=b[0];
-    map<int,int> mpp;
-    mpp[pref[0]]++;
-    for(int i=1;i<n;i++) {
-        pref[i]+=pref[i-1];
-        pref[i]+=b[i];
-        mpp[pref[i]]++;
+int Solution::uniquePaths(int m, int n) {
+    // (m+n-2) C (n-1) = (m+n-2)! / (m-1)! * (n-1)!
+    int ans=1;
+    for (int i = n; i < (m + n - 1); i++) {
+        ans *= i;
+        ans /= (i - n + 1);
     }
-    int ans=0;
-    for(int i=0;i<n;i++) {
-        int sm=pref[i];
-        // x 2*x 3*x
-        mpp[sm]--;
-        if (pref[n-1]==3*sm) {
-            if (sm==0 && mpp[sm]-1>=1) ans+=(mpp[sm]-1);
-            else if (sm!=0 && mpp[2*sm]) ans+=mpp[2*sm];
-        }
-    }
-    return ans;
-}
-```
-
-### [Flip](https://www.interviewbit.com/problems/flip/)
-
-```cpp
-vector<int> Solution::flip(string a) {
-    int n=a.size();
-
-    vector<int> ans;
-    int tot_cnt=0;
-    for(int i=0;i<n;i++) {
-        if (a[i]=='1') tot_cnt++;
-    }
-    int zero=0,one=0,mx=tot_cnt,note=1;
-    for(int i=0;i<n;i++) {
-        int cnt=tot_cnt;
-        if (a[i]=='1') one++;
-        else zero++;
-        if (zero<one) {
-            zero=0;one=0;
-            note=(i+2);
-        }
-        cnt+=(zero-one);
-        if (cnt>mx) {
-            ans.clear();
-            ans.push_back(note);
-            ans.push_back(i+1);
-            mx=cnt;
-        }
-    }
-    // cout<<mx;
     return ans;
 }
 ```
