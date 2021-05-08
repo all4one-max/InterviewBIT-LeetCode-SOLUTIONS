@@ -15,7 +15,7 @@ int Solution::numSetBits(unsigned int a) {
 }
 ```
 
-### [Reverse Bits](https://www.interviewbit.com/problems/reverse-bits/)
+### [Reverse Bits (Star Marked)](https://www.interviewbit.com/problems/reverse-bits/)
 
 ```cpp
 unsigned int Solution::reverse(unsigned int a) {
@@ -33,7 +33,7 @@ unsigned int Solution::reverse(unsigned int a) {
 }
 ```
 
-### [Divide Integers](https://www.interviewbit.com/problems/divide-integers/)
+### [Divide Integers (Star Marked)](https://www.interviewbit.com/problems/divide-integers/)
 
 ```cpp
 int Solution::divide(int x, int y) {
@@ -88,7 +88,7 @@ int Solution::findMinXor(vector<int> &a) {
 }
 ```
 
-### [Count Total Set Bits](https://www.interviewbit.com/problems/count-total-set-bits/)
+### [Count Total Set Bits (Star Marked)](https://www.interviewbit.com/problems/count-total-set-bits/)
 
 ```cpp
 int Solution::solve(int n) {
@@ -107,7 +107,7 @@ int Solution::solve(int n) {
 }
 ```
 
-### [Palindromic Binary Representation](https://www.interviewbit.com/problems/palindromic-binary-representation/)
+### [Palindromic Binary Representation (Star Marked)](https://www.interviewbit.com/problems/palindromic-binary-representation/)
 
 ```cpp
 int Solution::solve(int a) {
