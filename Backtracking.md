@@ -336,7 +336,7 @@ vector<vector<string> > Solution::partition(string a) {
 }
 ```
 
-### [Generate all Parentheses II](https://www.interviewbit.com/problems/generate-all-parentheses-ii/)
+### [Generate all Parentheses II (Star Marked)](https://www.interviewbit.com/problems/generate-all-parentheses-ii/)
 
 ```cpp
 void solve(int n, vector<string> &ans, string temp, int left, int right) {
@@ -362,6 +362,68 @@ vector<string> Solution::generateParenthesis(int n) {
     string temp = "";
     vector<string> ans;
     solve(n, ans, temp, 0, 0);
+    return ans;
+}
+```
+
+### [Permutations](https://www.interviewbit.com/problems/permutations/)
+
+```cpp
+#define fi             first
+#define se             second
+
+void solve(map<int,int> &freq, vector<vector<int>> &ans, vector<int> &temp, int cnt, int n) {
+    if(cnt == n) {
+        ans.push_back(temp);
+        return;
+    }
+
+    for(auto it : freq) {
+        if(it.se > 0) {
+            temp.push_back(it.fi);
+            freq[it.fi]--;
+            solve(freq, ans, temp, cnt + 1, n);
+            temp.pop_back();
+            freq[it.fi]++;
+        }
+    }
+
+    return;
+}
+
+vector<vector<int> > Solution::permute(vector<int> &a) {
+    map<int,int> freq;
+    for(auto it : a) freq[it]++;
+    vector<vector<int>> ans;
+    vector<int> temp;
+    solve(freq, ans, temp, 0, a.size());
+    return ans;
+}
+```
+
+### [Kth Permutation Sequence](https://www.interviewbit.com/problems/kth-permutation-sequence/)
+
+```cpp
+#include <numeric>
+using ll = long long;
+
+string Solution::getPermutation(int n, int k) {
+    vector<int> fact(n, -1);
+    fact[0] = 1;
+    for (int i = 1; i < n; i++) {
+        ll cur = 1LL * fact[i - 1] * i;
+        if (cur > k) break;
+        fact[i] = cur;
+    }
+    vector<int> v(n);
+    iota(v.begin(), v.end(), 1);
+    string ans; k--;
+    for (int i = n - 1; i >= 0; i--) {
+        int q = (fact[i] == -1) ? 0 : k / fact[i];
+        k = (fact[i] == -1) ? k : k % fact[i];
+        ans += to_string(v[q]);
+        v.erase(v.begin() + q);
+    }
     return ans;
 }
 ```
