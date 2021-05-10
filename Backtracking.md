@@ -401,7 +401,7 @@ vector<vector<int> > Solution::permute(vector<int> &a) {
 }
 ```
 
-### [Kth Permutation Sequence](https://www.interviewbit.com/problems/kth-permutation-sequence/)
+### [Kth Permutation Sequence (Star Marked)](https://www.interviewbit.com/problems/kth-permutation-sequence/)
 
 ```cpp
 #include <numeric>
@@ -425,5 +425,148 @@ string Solution::getPermutation(int n, int k) {
         v.erase(v.begin() + q);
     }
     return ans;
+}
+```
+
+### [Gray Code](https://www.interviewbit.com/problems/gray-code/)
+
+```cpp
+// Method 1 (using backtracking with set)
+int get_num(vector<int> &temp, int n) {
+    int num = 0;
+    for(int i = 0; i < n; i++) {
+        if(temp[i]) num+=(1<<i);
+    }
+    return num;
+}
+
+void solve(vector<int> &temp, vector<int> &ans, set<int> &st, int n) {
+    int num = get_num(temp, n);
+    if(st.find(num) != st.end()) return;
+    st.insert(num);
+    ans.push_back(num);
+
+    for(int i = 0; i < n; i++) {
+        if(temp[i] == 0) {
+            temp[i] = 1;
+            solve(temp, ans, st,n);
+            temp[i] = 0;
+        }
+        else {
+            temp[i] = 0;
+            solve(temp, ans, st, n);
+            temp[i] = 1;
+        }
+    }
+    return;
+}
+
+// Method 2 (gray_seq(n) = 0gray_seq(n - 1) + 1reverse_gray_seq(n - 1))
+vector<int> Solution::grayCode(int n) {
+    vector<int> temp(n, 0);
+    vector<int> ans;
+    set<int> st;
+    solve(temp, ans, st, n);
+    return ans;
+}
+
+
+vector<int> Solution::grayCode(int n) {
+    vector<int> ans = {0, 1};
+    for(int i = 1; i < n; i++) { // now for length >=2 and <=n
+        int sz = ans.size();
+        for(int j = sz - 1; j >= 0; j--) {
+            ans.push_back((1<<i) + ans[j]);
+        }
+    }
+    return ans;
+}
+```
+
+### [NQueens](https://www.interviewbit.com/problems/nqueens/)
+
+```cpp
+int canPlace(int i, int j, vector<string> &temp, int n) {
+    for(int x = 0; x < n; x++) {
+        for(int y = 0; y < n; y++) {
+            if(i + j == x + y && temp[x][y] == 'Q') return 0;
+            if(i - j == x - y && temp[x][y] == 'Q') return 0;
+        }
+    }
+    for(int x = 0; x < n; x++) if(x != i && temp[x][j] == 'Q') return 0;
+    return 1;
+}
+
+void place(int index, int k ,int n, vector<vector<string>> &ans, vector<string> &temp) {
+    if(k == n) {
+        ans.push_back(temp);
+        return;
+    }
+
+    for(int j = 0; j < n; j++) {
+        if(temp[index][j] == '.' && canPlace(index, j, temp, n)) {
+            temp[index][j] = 'Q';
+            place(index + 1, k + 1, n, ans, temp);
+            temp[index][j] = '.';
+        }
+    }
+
+    return;
+}
+
+vector<vector<string> > Solution::solveNQueens(int n) {
+    vector<vector<string>> ans;
+    vector<string> temp;
+    for(int i = 0; i < n; i++) {
+        string s(n, '.');
+        temp.push_back(s);
+    }
+    place(0, 0, n, ans, temp);
+    return ans;
+}
+```
+
+### [Sudoko](https://www.interviewbit.com/problems/sudoku/)
+
+```cpp
+int check(int i, int j, vector<vector<char> > &a, int k) {
+    for(int y = 0; y < 9; y++) if(a[i][y] == (k + '0')) return 0;
+    for(int x = 0; x < 9; x++) if(a[x][j] == (k + '0')) return 0;
+    int x = 3 * (i / 3);
+    int y = 3 * (j / 3);
+    for(int u = x; u < (x + 3); u++) {
+        for(int v = y; v < (y + 3); v++) {
+            if(a[u][v] == (k + '0')) return 0;
+        }
+    }
+    return 1;
+}
+
+bool solve_sudoko(int i, int j, vector<vector<char> > &a) {
+    if(i == 9) return true;
+
+    bool solved;
+    if(a[i][j] != '.') {
+        if(j == 8) solved = solve_sudoko(i + 1, 0, a);
+        else solved = solve_sudoko(i, j + 1, a);
+        if(solved) return true;
+        return false;
+    }
+    for(int k = 1; k <= 9; k++) {
+        if(check(i, j, a, k)) {
+            a[i][j] = (k + '0');
+            if(j == 8) solved = solve_sudoko(i + 1, 0, a);
+            else solved = solve_sudoko(i, j + 1, a);
+            if(solved) return true;
+            a[i][j] = '.';
+        }
+    }
+
+    return false;
+}
+
+void Solution::solveSudoku(vector<vector<char> > &a) {
+    bool solved = solve_sudoko(0, 0, a);
+    return;
 }
 ```
