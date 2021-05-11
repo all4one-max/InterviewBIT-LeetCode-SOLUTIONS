@@ -236,3 +236,260 @@ vector<vector<int> > Solution::anagrams(const vector<string> &a) {
     return ans;
 }
 ```
+
+### [Equal](https://www.interviewbit.com/problems/equal/)
+
+```cpp
+vector<int> Solution::equal(vector<int> &a) {
+    int n = a.size();
+    unordered_map<int, vector<int>> mp;
+    for(int i = 0; i < n; i++) {
+        for(int j = i + 1; j < n; j++) {
+            if(mp[a[i] + a[j]].size() == 0) {
+                mp[a[i] + a[j]].push_back(i);
+                mp[a[i] + a[j]].push_back(j);
+            }
+        }
+    }
+    vector<int> ans = {};
+    for(int i = 0; i < n; i++) {
+        for(int j = i + 1; j < n; j++) {
+            if(mp[a[i] + a[j]].size()) {
+                if(mp[a[i] + a[j]][0] < i && mp[a[i] + a[j]][1] != i && mp[a[i] + a[j]][1] != j) {
+                    if(ans.size() == 0) {
+                        ans = mp[a[i] + a[j]];
+                        ans.push_back(i);
+                        ans.push_back(j);
+                    }
+                    else{
+                        int a1 = mp[a[i] + a[j]][0], b1 = mp[a[i] + a[j]][1];
+                        int c1 = i, d1 = j;
+                        if(a1 < ans[0]) ans = {a1, b1, c1, d1};
+                        else if (a1 == ans[0] && b1 < ans[1]) ans = {a1, b1, c1, d1};
+                        else if (a1 == ans[0] && b1 == ans[1] && c1 < ans[2]) ans = {a1, b1, c1, d1};
+                        else if (a1 == ans[0] && b1 == ans[1] && c1 == ans[2] && d1 < ans[3]) ans = {a1, b1, c1, d1};
+                    }
+                }
+            }
+        }
+    }
+    return ans;
+}
+```
+
+### [Copy List (Star Marked)](https://www.interviewbit.com/problems/copy-list/)
+
+```cpp
+/**
+ * Definition for singly-linked list.
+ * struct RandomListNode {
+ *     int label;
+ *     RandomListNode *next, *random;
+ *     RandomListNode(int x) : label(x), next(NULL), random(NULL) {}
+ * };
+ */
+RandomListNode* Solution::copyRandomList(RandomListNode* head) {
+
+    RandomListNode* origCur =NULL;
+    RandomListNode* cloneCur =NULL;
+
+    unordered_map <RandomListNode*,RandomListNode*> map;
+
+    origCur = head;
+    while(origCur)
+    {
+        cloneCur = new RandomListNode(origCur->label);
+        map[origCur] = cloneCur;
+        origCur = origCur->next;
+    }
+
+    origCur = head;
+
+    while(origCur)
+    {
+        map[origCur]->next = map[origCur->next];
+        map[origCur]->random = map[origCur->random];
+        origCur = origCur->next;
+    }
+
+    return map[head];
+}
+```
+
+### [Window String (Star Marked)](https://www.interviewbit.com/problems/window-string/)
+
+```cpp
+#define fi             first
+#define se             second
+
+string Solution::minWindow(string s, string t) {
+    unordered_map<char, int> mt;
+    for(auto it : t) mt[it]++;
+    unordered_map<char, int> ms;
+    int n = s.size();
+    int i = 0, j = 0;
+    int cnt = 0, val = mt.size();
+    ms[s[0]]++; if(mt[s[0]] == 1) cnt++;
+    int ans = 1e9, left = -1, right = -1;
+    while(i < n && j < n) {
+        if(cnt == val) {
+            int len = (j - i + 1);
+            if(ans > len) {
+                ans = len;
+                left = i;
+                right = j;
+            }
+            if(i == j) {
+                j++;
+                if(j < n && mt[s[j]]) {
+                    if(ms[s[j]] + 1 == mt[s[j]]) cnt++;
+                    ms[s[j]]++;
+                }
+            }
+            else {
+                if(mt[s[i]]) {
+                    if(ms[s[i]] == mt[s[i]]) cnt--;
+                    ms[s[i]]--;
+                }
+                i++;
+            }
+        }
+        else {
+            j++;
+            if(j < n && mt[s[j]]) {
+                if(ms[s[j]] + 1 == mt[s[j]]) cnt++;
+                ms[s[j]]++;
+            }
+        }
+    }
+    if(left == -1) return "";
+    return s.substr(left, ans);
+}
+```
+
+### [Longest Substring Without Repeat](https://www.interviewbit.com/problems/longest-substring-without-repeat/)
+
+```cpp
+int Solution::lengthOfLongestSubstring(string a) {
+    int n = a.size();
+    unordered_map<char, int> mp;
+    int i = 0, j = 0;
+    int len = 1, ans = 1;
+    mp[a[0]] = 1;
+    while(i < n && j < n) {
+        j++;
+        if(j < n) {
+            if(mp[a[j]] == 1) {
+                while(i<n && a[i] != a[j]) {
+                    len--;
+                    mp[a[i]]--;
+                    i++;
+                }
+                i++;
+                len = (j - i + 1);
+                ans = max(ans, len);
+            }
+            else {
+                len++;
+                ans = max(ans, len);
+                mp[a[j]] = 1;
+            }
+        }
+    }
+    return ans;
+}
+```
+
+### [Fraction (Star Marked)](https://www.interviewbit.com/problems/fraction/)
+
+```cpp
+string Solution::fractionToDecimal(int x, int y) {
+    long long a = (long long) x; long long b = (long long) y;
+    int flag = 0;
+    if((a>0 && b<0) || (a<0 && b>0)) flag = 1;
+    a = abs(a); b = abs(b);
+    long long integer_part = a/b;
+    string s = to_string(integer_part);
+    if(flag) s = "-" + s;
+    long long rem = a%b;
+    if(rem == 0) return s;
+    s = s + ".";
+    long long pos = s.size();
+    map<long long, long long> mp;
+    while(true) {
+        if(mp[rem] != 0) {
+            long long rep = mp[rem];
+            string pre = s.substr(0, rep);
+            string rest = s.substr(rep);
+            string ret = pre + "(" + rest + ")";
+            return ret;
+        }
+        mp[rem] = pos;
+        rem *= 10;
+        long long vl = rem/b;
+        rem = rem%b;
+        string add = to_string(vl);
+        s += add;
+        pos += add.size();
+        if(rem == 0) break;
+    }
+    return s;
+}
+```
+
+### [Points on the Straight Line](https://www.interviewbit.com/problems/points-on-the-straight-line/)
+
+```cpp
+int Solution::maxPoints(vector<int> &x, vector<int> &y) {
+    int n = x.size();
+    if(n == 0) return 0;
+    if(n == 1) return 1;
+    int ans = 2;
+    for(int i = 0; i < n; i++) {
+        map<double, int> mp;
+        int cur_max = 0, same_points = 0;
+        for(int j = i + 1; j < n; j++) {
+            double num = (y[j] - y[i]);
+            double den = (x[j] - x[i]);
+            if(num == 0 && den == 0) {
+                same_points++;
+                continue;
+            }
+            double slope;
+            if(den != 0) slope = ((double) num/den);
+            else slope = 1e12;
+            mp[slope]++;
+            cur_max = max(cur_max, mp[slope]);
+        }
+        ans = max(ans, cur_max + same_points + 1);
+    }
+    return ans;
+}
+```
+
+### [Substring Concatenation](https://www.interviewbit.com/problems/substring-concatenation/)
+
+```cpp
+vector<int> Solution::findSubstring(string s, const vector<string> &b) {
+    int word_len = b[0].size(), num_words = b.size();
+    unordered_map<string, int> mpb;
+    for(auto it : b) mpb[it]++;
+    int i = 0, j = 0, count = 0;
+    int n = mpb.size();
+    int m = s.size();
+    vector<int> ans;
+    for(int i = 0; i < m; i++) {
+        if(i + word_len * num_words > m) break;
+        unordered_map<string, int> mpa;
+        int count = 0;
+        for(int j = i; j < (i + word_len * num_words); j+=word_len) {
+            string word = s.substr(j, word_len);
+            mpa[word]++;
+            if(mpb[word] && mpa[word] == mpb[word]) count++;
+            if(!mpb[word]) break;
+        }
+        if(count == n) ans.push_back(i);
+    }
+    return ans;
+}
+```
