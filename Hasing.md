@@ -470,7 +470,7 @@ int Solution::maxPoints(vector<int> &x, vector<int> &y) {
 ### [Substring Concatenation (Star Marked)](https://www.interviewbit.com/problems/substring-concatenation/)
 
 ```cpp
-// Do refere the leetcode for constraints
+// Do refer the leetcode for constraints, the question is easy if the constraints were given
 vector<int> Solution::findSubstring(string s, const vector<string> &b) {
     int word_len = b[0].size(), num_words = b.size();
     unordered_map<string, int> mpb;
