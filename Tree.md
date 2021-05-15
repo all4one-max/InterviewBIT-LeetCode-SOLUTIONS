@@ -100,10 +100,9 @@ int Solution::kthsmallest(TreeNode* a, int b) {
 }
 ```
 
-### [Kth Smallest Element In Tree](https://www.interviewbit.com/problems/kth-smallest-element-in-tree/)
+### [2-Sum Binary Tree (Star Marked)](https://www.interviewbit.com/problems/2sum-binary-tree/)
 
 ```cpp
-// Method 1 (storing the in-order traversal itself)
 /**
  * Definition for binary tree
  * struct TreeNode {
@@ -113,21 +112,373 @@ int Solution::kthsmallest(TreeNode* a, int b) {
  *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
  * };
  */
- void in_order(TreeNode* a, vector<int> &v) {
-     if(a == NULL) return;
-     if(!a->left && !a->right) {
-         v.push_back(a->val);
-         return;
-     }
-     in_order(a->left, v);
-     v.push_back(a->val);
-     in_order(a->right, v);
-     return;
- }
+stack<TreeNode*> next_small;
+stack<TreeNode*> next_great;
 
-int Solution::kthsmallest(TreeNode* a, int b) {
-    vector<int> v;
-    in_order(a, v);
-    return v[b - 1];
+void push_left(TreeNode* root) {
+    if(!root) return;
+    next_small.push(root);
+    push_left(root->left);
+}
+
+void push_right(TreeNode* root) {
+    if(!root) return;
+    next_great.push(root);
+    push_right(root->right);
+}
+
+int Solution::t2Sum(TreeNode* root, int b) {
+    while(!next_small.empty()) next_small.pop();
+    while(!next_great.empty()) next_great.pop();
+    push_left(root); push_right(root);
+    while(!next_small.empty() && !next_great.empty()) {
+        if(next_small.top()->val >= next_great.top()->val) break;
+        if(next_small.top()->val + next_great.top()->val == b) return 1;
+        else if(next_small.top()->val + next_great.top()->val > b) {
+            TreeNode* node = next_great.top(); next_great.pop();
+            push_right(node->left);
+        }
+        else if(next_small.top()->val + next_great.top()->val < b) {
+            TreeNode* node = next_small.top(); next_small.pop();
+            push_left(node->right);
+        }
+    }
+    return 0;
+}
+```
+
+### [BST Iterator (Star Marked)](https://www.interviewbit.com/problems/bst-iterator/)
+
+```cpp
+/**
+ * Definition for binary tree
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+ stack<TreeNode*> st;
+
+void push_left(TreeNode* root) {
+    if(!root) return;
+    st.push(root);
+    push_left(root->left);
+    return;
+}
+
+BSTIterator::BSTIterator(TreeNode *root) {
+    while(!st.empty()) st.pop();
+    push_left(root);
+}
+
+/** @return whether we have a next smallest number */
+bool BSTIterator::hasNext() {
+    if(st.empty()) return false;
+    return true;
+}
+
+/** @return the next smallest number */
+int BSTIterator::next() {
+    TreeNode* node = st.top(); st.pop();
+    push_left(node->right);
+    return node->val;
+}
+
+/**
+ * Your BSTIterator will be called like this:
+ * BSTIterator i = BSTIterator(root);
+ * while (i.hasNext()) cout << i.next();
+ */
+```
+
+### [Recover Binary Search Tree (Star Marked)](https://www.interviewbit.com/problems/recover-binary-search-tree/)
+
+```cpp
+// Method 1 (O(n) space)
+/**
+ * Definition for binary tree
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+void in_order(TreeNode* root, vector<int> &inorder) {
+    if(!root) return;
+    in_order(root->left, inorder);
+    inorder.push_back(root->val);
+    in_order(root->right, inorder);
+    return;
+}
+
+vector<int> Solution::recoverTree(TreeNode* a) {
+    vector<int> inorder;
+    in_order(a, inorder);
+    vector<int> ans;
+    int note = -1, ind = -1;
+    int n = inorder.size();
+    for(int i = inorder.size() - 1; i >= 0; i--) {
+        if((i!=0 && inorder[i] < inorder[i - 1]) || (i == 0 && i + 1 < n && inorder[i + 1] < inorder[i])) {
+            note = inorder[i];
+            ind = i;
+            ans.push_back(inorder[i]);
+            break;
+        }
+    }
+    for(int i = 0; i < n; i++) {
+        if(i != ind) {
+            if(inorder[i] >= inorder[ind - 1]) {
+                if((ind != n - 1 && inorder[i] <= inorder[ind + 1]) || (ind == n - 1)) {
+                    ans.push_back(inorder[i]);
+                    break;
+                }
+            }
+        }
+    }
+    sort(ans.begin(), ans.end());
+    return ans;
+}
+
+// Method 2 (Using Morris Inorder Traversal which uses constant space)
+// Morris Inorder Traversal
+
+vector<int> Solution::recoverTree(TreeNode* root) {
+    vector<int> inorder;
+    TreeNode* cur = root;
+    while(cur) {
+        if(!cur->left) {
+            inorder.push_back(cur->val);
+            cur = cur->right;
+        }
+        else {
+            TreeNode* inorder_predecessor = cur->left;
+            while(inorder_predecessor->right && inorder_predecessor->right != cur) inorder_predecessor = inorder_predecessor->right;
+            if(inorder_predecessor->right == NULL) {
+                inorder_predecessor->right = cur;
+                cur = cur->left;
+            }
+            else {
+                inorder_predecessor->right = NULL;
+                inorder.push_back(cur->val);
+                cur = cur->right;
+            }
+
+        }
+    }
+    if(inorder.size() == 1) return {};
+    int ind = -1;
+    for(int i = inorder.size() - 1; i >= 0; i--) {
+        if((i != 0 && inorder[i] < inorder[i - 1])) {
+            ind = i;
+            break;
+        }
+    }
+    if(ind == -1) return {};
+    vector<int> ans;
+    int n = inorder.size();
+    ans.push_back(inorder[ind]);
+    for(int i = 0; i < n; i++) {
+        if(i != ind) {
+            if(inorder[i] >= inorder[ind - 1]) {
+                if((ind != n - 1 && inorder[i] <= inorder[ind + 1]) || (ind == n - 1)) {
+                    ans.push_back(inorder[i]);
+                    break;
+                }
+            }
+        }
+    }
+    if(ans[0] > ans[1]) swap(ans[0], ans[1]);
+    return ans;
+}
+```
+
+### [Path to a Given Node](https://www.interviewbit.com/problems/path-to-given-node/)
+
+```cpp
+/**
+ * Definition for binary tree
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+bool dfs(TreeNode* root, vector<int> &ans, int b) {
+    if(root->val == b) {
+        ans.push_back(b);
+        return true;
+    }
+    if(root->left && dfs(root->left, ans, b)) {
+        ans.push_back(root->val);
+        return true;
+    }
+    if(root->right && dfs(root->right, ans, b)) {
+        ans.push_back(root->val);
+        return true;
+    }
+    return false;
+}
+
+vector<int> Solution::solve(TreeNode* root, int b) {
+    vector<int> ans;
+    bool path = dfs(root, ans, b);
+    reverse(ans.begin(), ans.end());
+    return ans;
+}
+```
+
+### [Remove Half Nodes](https://www.interviewbit.com/problems/remove-half-nodes/)
+
+```cpp
+/**
+ * Definition for binary tree
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+TreeNode* remove_half_node(TreeNode* root) {
+    if(!root) return root;
+    TreeNode* lft = NULL; TreeNode* rht = NULL;
+    if(root->left) lft = remove_half_node(root->left);
+    if(root->right) rht = remove_half_node(root->right);
+    if(!root->left && !root->right) return root;
+    if(root->left && root->right) {
+        root->left = lft;
+        root->right = rht;
+        return root;
+    }
+    if(root->left) return lft;
+    return rht;
+}
+
+TreeNode* Solution::solve(TreeNode* root) {
+    TreeNode* root = remove_half_node(root);
+    return root;
+}
+```
+
+### [Inorder Traversal using stacks](https://www.interviewbit.com/problems/inorder-traversal/)
+
+```cpp
+vector<int> Solution::inorderTraversal(TreeNode* root) {
+    stack<TreeNode*> st; st.push(root);
+    while(true) {
+        TreeNode* node = st.top();
+        if(node->left) st.push(node->left);
+        else break;
+    }
+    vector<int> inorder;
+    while(!st.empty()) {
+        TreeNode* node = st.top(); st.pop(); inorder.push_back(node->val);
+        if(node->right) {
+            st.push(node->right);
+            while(true) {
+                TreeNode* nod = st.top();
+                if(nod->left) st.push(nod->left);
+                else break;
+            }
+        }
+    }
+    return inorder;
+}
+```
+
+### [PreOrder Traversal using stacks](https://www.interviewbit.com/problems/preorder-traversal/)
+
+```cpp
+/**
+ * Definition for binary tree
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+vector<int> Solution::preorderTraversal(TreeNode* root) {
+    stack<TreeNode*> st;
+    st.push(root);
+    vector<int> pre_order;
+    while(!st.empty()) {
+        TreeNode* node = st.top(); st.pop();
+        pre_order.push_back(node->val);
+        if(node->right) st.push(node->right);
+        if(node->left) st.push(node->left);
+    }
+    return pre_order;
+}
+```
+
+### [PostOrder Traversal using stacks](https://www.interviewbit.com/problems/postorder-traversal/)
+
+```cpp
+// Method 1 (removing the right subtree after putting the right subtree root in the stack)
+/**
+ * Definition for binary tree
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+vector<int> Solution::postorderTraversal(TreeNode* root) {
+    stack<TreeNode*> st; st.push(root);
+    while(true) {
+        TreeNode* node = st.top();
+        if(node->left) st.push(node->left);
+        else break;
+    }
+    vector<int> post_order;
+    while(!st.empty()) {
+        TreeNode* node = st.top();
+        if(node->right) {
+            TreeNode* right = node->right;
+            node->right = NULL;
+            st.push(right);
+            while(true) {
+                TreeNode* nod = st.top();
+                if(nod->left) st.push(nod->left);
+                else break;
+            }
+        }
+        else {
+            post_order.push_back(node->val);
+            st.pop();
+        }
+    }
+    return post_order;
+}
+
+// Method 2 (without modifying the tree)
+/**
+ * Definition for binary tree
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+vector<int> Solution::postorderTraversal(TreeNode* root) {
+    stack<pair<TreeNode*, int>> st; st.push({root, 0});
+    vector<int> post_order;
+    while(!st.empty()) {
+        pair<TreeNode*, int> p = st.top(); st.pop();
+        if(p.second == 1 || (!p.first->left && !p.first->right)) post_order.push_back(p.first->val);
+        else {
+            st.push({p.first, 1});
+            if(p.first->right) st.push({p.first->right, 0});
+            if(p.first->left) st.push({p.first->left, 0});
+        }
+    }
+    return post_order;
 }
 ```
