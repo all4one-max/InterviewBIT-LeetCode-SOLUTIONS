@@ -1,4 +1,4 @@
-### [Valid BST from Preorder](https://www.interviewbit.com/problems/valid-bst-from-preorder/)
+### [Valid BST from Preorder (Star Marked)](https://www.interviewbit.com/problems/valid-bst-from-preorder/)
 
 ```cpp
 // Method 1 (O(n^2) using recursion)
@@ -361,6 +361,136 @@ TreeNode* remove_half_node(TreeNode* root) {
 TreeNode* Solution::solve(TreeNode* root) {
     TreeNode* root = remove_half_node(root);
     return root;
+}
+```
+
+### [Balanced Binary Tree](https://www.interviewbit.com/problems/balanced-binary-tree/)
+
+```cpp
+/**
+ * Definition for binary tree
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+pair<int, int> check(TreeNode* root) {
+    if(!root) return {0, 1};
+    pair<int, int> p1 = check(root->left); pair<int, int> p2 = check(root->right);
+    if(abs(p1.first - p2.first) <= 1 && p1.second && p2.second) return {1 + max(p1.first, p2.first) ,1};
+    else return {1 + max(p1.first, p2.first) ,0};
+}
+
+int Solution::isBalanced(TreeNode* root) {
+    pair<int, int> p = check(root);
+    if(p.second) return 1;
+    return 0;
+}
+```
+
+### [Merge 2 Binary Tree](https://www.interviewbit.com/problems/merge-two-binary-tree/)
+
+```cpp
+/**
+ * Definition for binary tree
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+TreeNode* merge(TreeNode* r1, TreeNode* r2) {
+    if(!r1 && !r2) return NULL;
+    if(!r1 && r2) return r2;
+    if(r1 && !r2) return r1;
+    r1->val += r2->val;
+    r1->left = merge(r1->left, r2->left);
+    r1->right = merge(r1->right, r2->right);
+    return r1;
+}
+
+TreeNode* Solution::solve(TreeNode* r1, TreeNode* r2) {
+    TreeNode* root = merge(r1, r2);
+    return root;
+}
+```
+
+### [Symmetric Binary Tree](https://www.interviewbit.com/problems/symmetric-binary-tree/)
+
+```cpp
+/**
+ * Definition for binary tree
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+int check(TreeNode* r1, TreeNode* r2) {
+    if(!r1 && !r2) return 1;;
+    if((!r1 && r2) || (r1 && !r2) || (r1->val != r2->val)) return 0;
+    if(check(r1->left, r2->right) && check(r1->right, r2->left)) return 1;
+    return 0;
+}
+
+int Solution::isSymmetric(TreeNode* root) {
+    return check(root, root);
+}
+```
+
+### [Identical Binary Trees](https://www.interviewbit.com/problems/identical-binary-trees/)
+
+```cpp
+/**
+ * Definition for binary tree
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+int check(TreeNode* r1, TreeNode* r2) {
+    if(!r1 && !r2) return 1;
+    if((!r1 && r2) || (r1 && !r2) || (r1->val != r2->val)) return 0;
+    if(check(r1->left, r2->left) && check(r1->right, r2->right)) return 1;
+    return 0;
+}
+
+int Solution::isSameTree(TreeNode* r1, TreeNode* r2) {
+    return check(r1, r2);
+}
+```
+
+### [Vertical Order traversal of Binary Tree (Star Marked)](https://www.interviewbit.com/problems/vertical-order-traversal-of-binary-tree/)
+
+```cpp
+/**
+ * Definition for binary tree
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+vector<vector<int> > Solution::verticalOrderTraversal(TreeNode* root) {
+    if(!root) return {};
+    vector<int> ans[20001];
+    queue<pair<TreeNode*, int>> q; q.push({root, 10001});
+    while(!q.empty()) {
+        pair<TreeNode*, int> p = q.front(); q.pop();
+        ans[p.second].push_back(p.first->val);
+        if(p.first->left) q.push({p.first->left, p.second - 1});
+        if(p.first->right) q.push({p.first->right, p.second + 1});
+    }
+    vector<vector<int>> ret;
+    for(int i = 0; i < 20001; i++) if(ans[i].size()) ret.push_back(ans[i]);
+    return ret;
 }
 ```
 
