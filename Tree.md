@@ -494,6 +494,39 @@ vector<vector<int> > Solution::verticalOrderTraversal(TreeNode* root) {
 }
 ```
 
+### [Diagonal Traversal (Star Marked)](https://www.interviewbit.com/problems/diagonal-traversal/)
+
+```cpp
+/**
+ * Definition for binary tree
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+vector<int> ans[100005];
+void preorder(TreeNode* root, int ind) {
+    if(!root) return;
+    ans[ind].push_back(root->val);
+    preorder(root->left, ind - 1);
+    preorder(root->right, ind);
+    return;
+}
+
+vector<int> Solution::solve(TreeNode* root) {
+    for(int i = 0; i < 100005; i++) ans[i].clear();
+    preorder(root, 100000);
+    vector<int> ret;
+    for(int i = 100004; i >= 0; i--) {
+        auto it = ans[i];
+        if(it.size()) for(auto it2 : it) ret.push_back(it2);
+    }
+    return ret;
+}
+```
+
 ### [Inorder Traversal using stacks](https://www.interviewbit.com/problems/inorder-traversal/)
 
 ```cpp
@@ -610,5 +643,188 @@ vector<int> Solution::postorderTraversal(TreeNode* root) {
         }
     }
     return post_order;
+}
+```
+
+### [Right view of Binary tree](https://www.interviewbit.com/problems/right-view-of-binary-tree/)
+
+```cpp
+/**
+ * Definition for binary tree
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+vector<int> Solution::solve(TreeNode* root) {
+    // he asks for the last node of each level
+    deque<TreeNode*> q; q.push_back(root);
+    vector<int> ans;
+    while(true) {
+        deque<TreeNode*> q2;
+        ans.push_back(q.back()->val);
+        while(!q.empty()) {
+            TreeNode* node = q.front(); q.pop_front();
+            if(node->left) q2.push_back(node->left);
+            if(node->right) q2.push_back(node->right);
+        }
+        q = q2;
+        if(q.empty()) break;
+    }
+    return ans;
+}
+```
+
+### [Cousins in Binary Tree](https://www.interviewbit.com/problems/cousins-in-binary-tree/)
+
+```cpp
+/**
+ * Definition for binary tree
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+vector<int> Solution::solve(TreeNode* root, int b) {
+    if(b == root->val) return {};
+    vector<int> parent(100005, -1);
+    queue<TreeNode*> q; q.push(root);
+    vector<int> ans;
+    int found = 0;
+    while(true) {
+        queue<TreeNode*> q2;
+        while(!q.empty()) {
+            TreeNode* node = q.front(); q.pop();
+            if(node->left) {
+                parent[node->left->val] = node->val;
+                if(node->left->val == b) found = 1;
+                q2.push(node->left);
+            }
+            if(node->right) {
+                parent[node->right->val] = node->val;
+                if(node->right->val == b) found = 1;
+                q2.push(node->right);
+            }
+        }
+        while(!q2.empty()) {
+            TreeNode* node = q2.front(); q2.pop();
+            if(found && parent[node->val] != parent[b]) ans.push_back(node->val);
+            q.push(node);
+        }
+        if(found) return ans;
+        if(q.empty()) break;
+
+    }
+}
+```
+
+### [ZigZag Level Order Traversal BT](https://www.interviewbit.com/problems/zigzag-level-order-traversal-bt/)
+
+```cpp
+/**
+ * Definition for binary tree
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+vector<vector<int> > Solution::zigzagLevelOrder(TreeNode* root) {
+    vector<vector<int>> ans;
+    queue<TreeNode*> q; q.push(root); int cur = 0;
+    while(!q.empty()) {
+        int n = q.size();
+        vector<int> lvl_ans;
+        while(n) {
+            TreeNode* node = q.front(); q.pop();
+            lvl_ans.push_back(node->val);
+            if(node->left) q.push(node->left);
+            if(node->right) q.push(node->right);
+            n--;
+        }
+        if(cur) reverse(lvl_ans.begin(), lvl_ans.end());
+        cur = 1 - cur;
+        ans.push_back(lvl_ans);
+    }
+    return ans;
+}
+```
+
+### [Populate Next Right Pointers Tree (Star Marked)](https://www.interviewbit.com/problems/populate-next-right-pointers-tree/)
+
+```cpp
+// Method 1 (using level order traversal and not constant space solution)
+/**
+ * Definition for binary tree with next pointer.
+ * struct TreeLinkNode {
+ *  int val;
+ *  TreeLinkNode *left, *right, *next;
+ *  TreeLinkNode(int x) : val(x), left(NULL), right(NULL), next(NULL) {}
+ * };
+ */
+void Solution::connect(TreeLinkNode* root) {
+    deque<TreeLinkNode*> q; q.push_back(root);
+    while(true) {
+        int n = q.size(); deque<TreeLinkNode*> q2;
+        TreeLinkNode* last = NULL;
+        while(!q.empty()) {
+            TreeLinkNode* node = q.back(); q.pop_back();
+            node->next = last; last = node;
+            if(node->right) q2.push_front(node->right);
+            if(node->left) q2.push_front(node->left);
+        }
+        q = q2;
+        if(q.empty()) break;
+    }
+    return;
+}
+
+// Method 2 (using constant space)
+/**
+ * Definition for binary tree with next pointer.
+ * struct TreeLinkNode {
+ *  int val;
+ *  TreeLinkNode *left, *right, *next;
+ *  TreeLinkNode(int x) : val(x), left(NULL), right(NULL), next(NULL) {}
+ * };
+ */
+void Solution::connect(TreeLinkNode* root) {
+    TreeLinkNode* cur = root;
+    TreeLinkNode* prev = NULL;
+    TreeLinkNode* next_lvl_node = NULL;
+    while(cur) {
+        if(prev) {
+            if(cur->left) prev->next = cur->left;
+            else if(cur->right) prev->next = cur->right;
+        }
+        if(cur->left && cur->right) {
+            if(!next_lvl_node) next_lvl_node = cur->left;
+            cur->left->next = cur->right;
+            prev = cur->right;
+        }
+        else if(cur->left) {
+            if(!next_lvl_node) next_lvl_node = cur->left;
+            prev = cur->left;
+        }
+        else if(cur->right) {
+            if(!next_lvl_node) next_lvl_node = cur->right;
+            prev = cur->right;
+        }
+        if(cur->next) cur = cur->next;
+        else {
+            if(prev) prev->next = NULL;
+            if(next_lvl_node) {
+                cur = next_lvl_node;
+                prev = NULL; next_lvl_node = NULL;
+            }
+            else break;
+        }
+    }
+    return;
 }
 ```
