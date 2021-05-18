@@ -1114,3 +1114,149 @@ TreeNode* Solution::invertTree(TreeNode* root) {
     return Invert(root);
 }
 ```
+
+### [Max Depth of Binary Tree](https://www.interviewbit.com/problems/max-depth-of-binary-tree/)
+
+```cpp
+/**
+ * Definition for binary tree
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+int solve(TreeNode* root) {
+    if(!root) return 0;
+    int ans = 1;
+    int left = solve(root->left); int right = solve(root->right);
+    ans = max(ans + left, ans + right);
+    return ans;
+}
+
+int Solution::maxDepth(TreeNode* root) {
+    return solve(root);
+}
+```
+
+### [Sum Root to Leaf Numbers](https://www.interviewbit.com/problems/max-depth-of-binary-tree/)
+
+```cpp
+/**
+ * Definition for binary tree
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+int sum = 0;
+void solve(TreeNode* root, int num) {
+    if(!root) return;
+    if(!root->left && !root->right) {
+        int ans = num + root->val;
+        ans %= 1003; sum = sum + ans; sum %= 1003;
+    }
+    solve(root->left, ((num + root->val)*10)%1003);
+    solve(root->right, ((num + root->val)*10)%1003);
+    return;
+}
+
+int Solution::sumNumbers(TreeNode* a) {
+    if(!a) return 0;
+    if(!a->left && !a->right) return a->val;
+    sum = 0;
+    solve(a, 0);
+    return sum;
+}
+```
+
+### [Path Sum](https://www.interviewbit.com/problems/max-depth-of-binary-tree/)
+
+```cpp
+/**
+ * Definition for binary tree
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+int solve(TreeNode* root, int cur_sm, int sm) {
+    if(!root) return 0;
+    if(!root->left && !root->right) {
+        if((cur_sm + root->val) == sm) return 1;
+        return 0;
+    }
+    if(solve(root->left, (cur_sm + root->val), sm)) return 1;
+    if(solve(root->right, (cur_sm + root->val), sm)) return 1;
+    return 0;
+}
+
+int Solution::hasPathSum(TreeNode* a, int b) {
+    return solve(a, 0, b);
+}
+```
+
+### [Min Depth of Binary Tree](https://www.interviewbit.com/problems/min-depth-of-binary-tree/)
+
+```cpp
+/**
+ * Definition for binary tree
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+int mn = 1e9;
+void solve(TreeNode* root, int lvl) {
+    if(!root) return;
+    if(!root->left && !root->right) mn = min(mn, lvl + 1);
+    if(root->left) solve(root->left, lvl + 1);
+    if(root->right) solve(root->right, lvl + 1);
+    return;
+}
+
+int Solution::minDepth(TreeNode* root) {
+    mn = 1e9;
+    solve(root, 0);
+    return mn;
+}
+```
+
+### [Root to Leaf Paths With Sum](https://www.interviewbit.com/problems/root-to-leaf-paths-with-sum/)
+
+```cpp
+/**
+ * Definition for binary tree
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+void solve(TreeNode* root, int cur_sm, int sm, vector<int> &temp, vector<vector<int>> &ans) {
+    if(!root) return;
+    temp.push_back(root->val);
+    if(!root->left && !root->right) {
+        if(cur_sm + root->val == sm) ans.push_back(temp);
+    }
+    if(root->left) solve(root->left, cur_sm + root->val, sm, temp, ans);
+    if(root->right) solve(root->right, cur_sm + root->val, sm, temp, ans);
+    temp.pop_back();
+    return;
+}
+
+vector<vector<int> > Solution::pathSum(TreeNode* a, int b) {
+    vector<vector<int>> ans;
+    vector<int> temp;
+    solve(a, 0, b, temp, ans);
+    return ans;
+}
+```
