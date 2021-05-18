@@ -828,3 +828,289 @@ void Solution::connect(TreeLinkNode* root) {
     return;
 }
 ```
+
+### [Populate Next Right Pointers Tree (Star Marked)](https://www.interviewbit.com/problems/populate-next-right-pointers-tree/)
+
+```python
+// Method 1 (Brute force python)
+from collections import defaultdict
+class Solution:
+	# @param A : string
+	# @param B : list of strings
+	# @return a list of integers
+    def solve(self, a, b):
+        d = {}
+        s = ""
+        cnt = 0
+        for i in range(len(a)):
+            ele = a[i]
+            if ele == '_' or i == len(a) - 1:
+                if i == len(a) - 1:
+                    s += ele
+                d[s] = 1
+                cnt+=1
+                s = ""
+            else:
+                s += ele
+        li = defaultdict(list)
+
+        for i in range(len(b)):
+            ele = b[i]
+            s = ""
+            count = 0
+            for j in range(len(ele)):
+                ele2 = ele[j]
+                if ele2 == '_' or j == len(ele) - 1:
+                    if j == len(ele) - 1:
+                        s += ele2
+                    if d.get(s, -1) != -1:
+                        count += 1
+                    s = ""
+                else:
+                    s += ele2
+            li[count].append(i)
+
+        ans = list()
+        for i in range(cnt, -1, -1):
+            if len(li[i]) != 0:
+                for ele in li[i]:
+                    ans.append(ele)
+        return ans
+
+```
+
+### [Inorder Traversal of Cartesian Tree](https://www.interviewbit.com/problems/inorder-traversal-of-cartesian-tree/)
+
+```cpp
+/**
+ * Definition for binary tree
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+TreeNode* recur(vector<int> &a ,int i, int n) {
+    if(n - i < 0) return NULL;
+    int mx = -1, note = -1;
+    for(int j = i; j <= n; j++) {
+        if(a[j] > mx) {
+            mx = a[j];
+            note = j;
+        }
+    }
+    TreeNode* root = new TreeNode(mx);
+    root->left = recur(a, i, note - 1);
+    root->right = recur(a, note + 1, n);
+    return root;
+}
+
+TreeNode* Solution::buildTree(vector<int> &a) {
+    int n = a.size();
+    return recur(a, 0, n - 1);
+}
+```
+
+### [Inorder Traversal of Cartesian Tree](https://www.interviewbit.com/problems/inorder-traversal-of-cartesian-tree/)
+
+```cpp
+/**
+ * Definition for binary tree
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+TreeNode* balanceBST(const vector<int> &a, int i, int n) {
+    if(n - i < 0) return NULL;
+    int mid = (i + n)/2;
+
+    TreeNode* root = new TreeNode(a[mid]);
+    root->left = balanceBST(a, i, mid - 1);
+    root->right = balanceBST(a, mid + 1, n);
+
+    return root;
+}
+
+TreeNode* Solution::sortedArrayToBST(const vector<int> &a) {
+    int n = a.size();
+    return balanceBST(a, 0, n - 1);
+}
+```
+
+### [Construct Binary Tree From Inorder And Preorder (Star Marked)](https://www.interviewbit.com/problems/construct-binary-tree-from-inorder-and-preorder/)
+
+```cpp
+// Method 1 (Using Recursion)
+/**
+ * Definition for binary tree
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+TreeNode* solve(int pi, int pn, int ii, int in, vector<int> &a, vector<int> &b) {
+    if(pn - pi < 0) return NULL;
+    int pos = -1;
+    for(int i = ii; i <= in; i++) {
+        if(a[pi] == b[i]) {
+            pos = i;
+            break;
+        }
+    }
+    int on_the_left = pos - ii;
+    int on_the_right = in - pos;
+
+    TreeNode* root = new TreeNode(a[pi]);
+    root->left = solve(pi + 1, pi + on_the_left, pos - on_the_left, pos - 1, a, b);
+    root->right = solve(pi + on_the_left + 1, pn, pos + 1, pn, a, b);
+    return root;
+}
+
+TreeNode* Solution::buildTree(vector<int> &a, vector<int> &b) {
+    int n = a.size();
+    return solve(0, n - 1, 0, n - 1, a, b);
+}
+
+// Method 2 (iterative method, logic was easy to think but implementation was tough)
+/**
+ * Definition for binary tree
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+TreeNode* Solution::buildTree(vector<int> &a, vector<int> &b) {
+    int n = a.size();
+    int i = 0, inorder_next = 0; TreeNode* root = NULL;
+    stack<TreeNode*> st; unordered_map<int, int> mp; TreeNode* last = NULL;
+    while(inorder_next < n) {
+        while(i < n) {
+            TreeNode* node = new TreeNode(a[i]);
+            if(!last && !st.empty()) st.top()->left = node;
+            else if(last) {
+                last->right = node;
+                last = NULL;
+            }
+            if(!root) root = node;
+            st.push(node); mp[node->val] = 1;
+            if(a[i] == b[inorder_next]) {i++; break;}
+            i++;
+        }
+        while(inorder_next < n && mp[b[inorder_next]]) {
+            mp[b[inorder_next]] = 0;
+            last = st.top(); st.pop();
+            inorder_next++;
+        }
+    }
+    return root;
+}
+```
+
+### [Binary Tree From Inorder And Postorder](https://www.interviewbit.com/problems/binary-tree-from-inorder-and-postorder/)
+
+```cpp
+// Method 1 (Using Recursion)
+/**
+ * Definition for binary tree
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+TreeNode* solve(int ii, int in, int pi, int pn, vector<int> &a, vector<int> &b) {
+    if(in - ii < 0) return NULL; int pos = -1;
+    for(int i = in; i >= ii; i--) {
+        if(a[i] == b[pn]) {
+            pos = i;
+            break;
+        }
+    }
+    TreeNode* root = new TreeNode(b[pn]);
+    int on_the_left = pos - ii;
+    root->left = solve(ii, pos - 1, pi, pi + on_the_left - 1, a, b);
+    root->right = solve(pos + 1, in, pi + on_the_left, pn - 1, a, b);
+    return root;
+}
+
+TreeNode* Solution::buildTree(vector<int> &a, vector<int> &b) {
+    int n = a.size();
+    return  solve(0, n - 1, 0, n - 1, a, b);
+}
+
+//  Method 2 (iteratively)
+/**
+ * Definition for binary tree
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+TreeNode* Solution::buildTree(vector<int> &a, vector<int> &b) {
+    int n = a.size();
+    stack<TreeNode*> st; unordered_map<int, int> mp;
+    int i = n - 1, inorder_next = n - 1; TreeNode* root = NULL; TreeNode* last = NULL;
+    while(inorder_next >= 0) {
+        while(i >= 0) {
+            TreeNode* node = new TreeNode(b[i]);
+            if(!last && !st.empty()) st.top()->right = node;
+            if(last) {
+                last->left = node;
+                last = NULL;
+            }
+            if(!root) root = node;
+            st.push(node); mp[node->val] = 1;
+            if(b[i] == a[inorder_next]) {
+                i--;
+                break;
+            }
+            i--;
+        }
+        while(inorder_next >= 0 && mp[a[inorder_next]]) {
+            last = st.top(); st.pop();
+            mp[a[inorder_next]] = 0;
+            inorder_next--;
+        }
+    }
+    return root;
+}
+```
+
+### [Invert the Binary Tree](https://www.interviewbit.com/problems/invert-the-binary-tree/)
+
+```cpp
+/**
+ * Definition for binary tree
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+TreeNode* Invert(TreeNode* root) {
+    if(!root) return NULL;
+    if(!root->left && !root->right) return root;
+    TreeNode* temp = root->left;
+    if(root->right) root->left = Invert(root->right);
+    else root->left = NULL;
+    if(temp) root->right = Invert(temp);
+    else root->right = NULL;
+    return root;
+}
+
+TreeNode* Solution::invertTree(TreeNode* root) {
+    return Invert(root);
+}
+```
