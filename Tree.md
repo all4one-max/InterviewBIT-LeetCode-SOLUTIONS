@@ -829,54 +829,120 @@ void Solution::connect(TreeLinkNode* root) {
 }
 ```
 
-### [Populate Next Right Pointers Tree (Star Marked)](https://www.interviewbit.com/problems/populate-next-right-pointers-tree/)
+### [Hotel Reviews (Star Marked)](https://www.interviewbit.com/problems/hotel-reviews/)
 
-```python
-// Method 1 (Brute force python)
-from collections import defaultdict
-class Solution:
-	# @param A : string
-	# @param B : list of strings
-	# @return a list of integers
-    def solve(self, a, b):
-        d = {}
-        s = ""
-        cnt = 0
-        for i in range(len(a)):
-            ele = a[i]
-            if ele == '_' or i == len(a) - 1:
-                if i == len(a) - 1:
-                    s += ele
-                d[s] = 1
-                cnt+=1
-                s = ""
-            else:
-                s += ele
-        li = defaultdict(list)
+```cpp
+// using trie
+struct trie_node {
+    unordered_map<char, trie_node*> m;
+    char c;
+    bool terminal; // we have added this because if abb and abba are both present
+    // as words then how will we know whether we have a particular word or not
+    trie_node(char x) {
+        c = x;
+        terminal = false;
+    }
+};
 
-        for i in range(len(b)):
-            ele = b[i]
-            s = ""
-            count = 0
-            for j in range(len(ele)):
-                ele2 = ele[j]
-                if ele2 == '_' or j == len(ele) - 1:
-                    if j == len(ele) - 1:
-                        s += ele2
-                    if d.get(s, -1) != -1:
-                        count += 1
-                    s = ""
-                else:
-                    s += ele2
-            li[count].append(i)
+void insert(string s, trie_node* head) {
+    if(s.size() == 0) {
+        head->terminal = true;
+        return;
+    }
+    if(!head->m[s[0]]) {
+        trie_node* new_node = new trie_node(s[0]);
+        head->m[s[0]] = new_node;
+    }
+    insert(s.substr(1), head->m[s[0]]);
+    return;
+}
 
-        ans = list()
-        for i in range(cnt, -1, -1):
-            if len(li[i]) != 0:
-                for ele in li[i]:
-                    ans.append(ele)
-        return ans
+int check(string s, trie_node* head) {
+    if(s.size() == 0) {
+        if(head->terminal) return 1;
+        return 0;
+    }
+    if(!head->m[s[0]]) return 0;
+    if (check(s.substr(1), head->m[s[0]])) return 1;
+    return 0;
+}
 
+vector<int> Solution::solve(string a, vector<string> &b) {
+    int n = a.size();
+    string s;
+    trie_node* head = new trie_node('?');
+    for(int i = 0; i < n; i++) {
+        if(a[i] == '_' || (i == n - 1)) {
+            if(i == n - 1) s.push_back(a[i]);
+            insert(s, head);
+            s = "";
+        }
+        else s.push_back(a[i]);
+    }
+    map<int, vector<int>> mp;
+    for(int i = 0; i < b.size(); i++) {
+        string s;
+        int count = 0;
+        for(int j = 0; j < b[i].size(); j++) {
+            if(b[i][j] == '_' || (j == b[i].size() - 1)) {
+                if((j == b[i].size() - 1)) s.push_back(b[i][j]);
+                if(check(s, head)) count++;
+                s = "";
+            }
+            else s.push_back(b[i][j]);
+        }
+        mp[count].push_back(i);
+    }
+    vector<int> ans;
+    for(auto it = mp.rbegin(); it != mp.rend(); it++) {
+        for(auto ind : it->second) ans.push_back(ind);
+    }
+    return ans;
+}
+```
+
+### [Shortest Unique Prefix](https://www.interviewbit.com/problems/shortest-unique-prefix/)
+
+```cpp
+// using trie
+struct trie_node {
+    unordered_map<char, trie_node*> m;
+    char c;
+    int count;
+    trie_node(char x) {
+        c = x;
+        count = 1;
+    }
+};
+
+void insert(string word, trie_node* head) {
+    for(int i = 0; i < word.size(); i++) {
+        if(!head->m[word[i]]) {
+            trie_node* new_node = new trie_node(word[i]);
+            head->m[word[i]] = new_node;
+        }
+        else head->m[word[i]]->count++;
+        head = head->m[word[i]];
+    }
+    return;
+}
+
+string get_pref(string word, trie_node* head) {
+    string pref;
+    for(int i = 0; i < word.size(); i++) {
+        pref.push_back(word[i]);
+        if(head->m[word[i]]->count == 1) return pref;
+        else head = head->m[word[i]];
+    }
+}
+
+vector<string> Solution::prefix(vector<string> &a) {
+    trie_node* head = new trie_node('?');
+    for(auto word : a) insert(word, head);
+    vector<string> ans;
+    for(auto word : a) ans.push_back(get_pref(word, head));
+    return ans;
+}
 ```
 
 ### [Inorder Traversal of Cartesian Tree](https://www.interviewbit.com/problems/inorder-traversal-of-cartesian-tree/)
@@ -1257,6 +1323,185 @@ vector<vector<int> > Solution::pathSum(TreeNode* a, int b) {
     vector<vector<int>> ans;
     vector<int> temp;
     solve(a, 0, b, temp, ans);
+    return ans;
+}
+```
+
+### [Least Common Ancestor](https://www.interviewbit.com/problems/least-common-ancestor/)
+
+```cpp
+/**
+ * Definition for binary tree
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+bool solve(TreeNode* root, int vl, vector<int> &path) {
+    if(!root) return false;
+    if(root->val == vl) {
+        path.push_back(root->val);
+        return true;
+    }
+    path.push_back(root->val);
+    if(solve(root->left, vl, path)) return true;
+    if(solve(root->right, vl, path)) return true;
+    path.pop_back();
+    return false;
+}
+
+int Solution::lca(TreeNode* root, int b, int c) {
+    vector<int> path_to_b, path_to_c;
+    bool grb = solve(root, b, path_to_b); bool grb2 = solve(root, c, path_to_c);
+    if(!grb || !grb2) return -1;
+    int n = path_to_b.size(), m = path_to_c.size();
+    int mn = min(n, m);
+    int ans, i = 0;
+    while(i < mn) {
+        if(path_to_b[i] == path_to_c[i]) ans = path_to_b[i];
+        else break;
+        i++;
+    }
+    return ans;
+}
+```
+
+### [Flatten Binary Tree to Linked List (Star Marked)](https://www.interviewbit.com/problems/flatten-binary-tree-to-linked-list/)
+
+```cpp
+// Method 1 (Using Recursion)
+/**
+ * Definition for binary tree
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+TreeNode* solve(TreeNode* root) {
+    if(!root) return NULL;
+    if(!root->left && !root->right) return root;
+    TreeNode* rec_left = solve(root->left);
+    root->left = NULL;
+    TreeNode* save = root->right;
+    root->right = rec_left;
+    TreeNode* save_root = root;
+    TreeNode* rec_right = solve(save);
+    while(root->right) root = root->right;
+    root->right = rec_right;
+    return save_root;
+}
+
+TreeNode* Solution::flatten(TreeNode* root) {
+    solve(root);
+    return root;
+}
+
+// Method 2 (Using Iterative Solution)
+/**
+ * Definition for binary tree
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+TreeNode* Solution::flatten(TreeNode* node) {
+    TreeNode* root = node;
+    while(root) {
+        if(root->left) {
+            TreeNode* temp = root->left;
+            while(temp->right) temp = temp->right;
+            temp->right = root->right;
+            root->right = root->left;
+            root->left = NULL;
+            root = root->right;
+        }
+        else root = root->right;
+    }
+    return node;
+}
+```
+
+### [Order of People Heights (Star Marked)](https://www.interviewbit.com/problems/order-of-people-heights/)
+
+```cpp
+// Method 1 (O(n**2) solution)
+vector<int> Solution::order(vector<int> &a, vector<int> &b) {
+    int n = a.size();
+    vector<int> ans(n, 0);
+    vector<int> avail(n, 1);
+    for(int i = 0; i < n; i++) {
+        int mn = 1e9, pos = -1;
+        for(int j = 0; j < n; j++) {
+            if(avail[j] && b[j] == 0 && mn > a[j]) {
+                pos = j;
+                mn = a[j];
+            }
+        }
+        for(int j = 0; j < n; j++) {
+            if(avail[j] && mn > a[j]) b[j]--;
+        }
+        avail[pos] = 0;
+        ans[i] = mn;
+    }
+    return ans;
+}
+
+// Method 2 (Using Segment Tree)
+bool comp(array<int, 2> a1, array<int, 2> a2) {
+    if(a1[0] <= a2[0]) return true;
+    return false;
+}
+
+void buildTree(vector<int> &tree, int idx, int tl, int tr) {
+    if(tl == tr) {
+        tree[idx] = 1;
+        return;
+    }
+    int tm = (tl + tr)/2;
+    buildTree(tree, 2*idx, tl, tm);
+    buildTree(tree, 2*idx + 1, tm + 1, tr);
+    tree[idx] = tree[2*idx] + tree[2*idx + 1];
+    return;
+}
+
+int query(vector<int> &tree, int count, int idx, int tl, int tr) {
+    if(tl == tr) return tl;
+    int tm = (tl + tr)/2;
+    if(count > tree[2*idx]) return query(tree, count - tree[2*idx], 2*idx + 1, tm + 1, tr);
+    else return query(tree, count, 2*idx, tl, tm);
+}
+
+void update(vector<int> &tree, int pos, int idx, int tl, int tr) {
+    if(tl == tr) {
+        tree[idx] = 0;
+        return;
+    }
+    int tm = (tl + tr)/2;
+    if(pos > tm) update(tree, pos, 2*idx + 1, tm + 1, tr);
+    else update(tree, pos, 2*idx, tl, tm);
+    tree[idx] = tree[2*idx] + tree[2*idx + 1];
+    return;
+}
+
+vector<int> Solution::order(vector<int> &a, vector<int> &b) {
+    int n = a.size();
+    vector<array<int, 2>> arr;
+    for(int i = 0; i < n; i++) arr.push_back({a[i], b[i] + 1});
+    sort(arr.begin(), arr.end(), comp);
+    vector<int> ans(n, 0);
+    vector<int> tree(4*n, 0);
+    buildTree(tree, 1, 0, n - 1);
+    for(int i = 0; i < n; i++) {
+        int pos = query(tree, arr[i][1], 1, 0, n - 1);
+        ans[pos] = arr[i][0];
+        update(tree, pos, 1, 0, n - 1);
+    }
     return ans;
 }
 ```
