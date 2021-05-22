@@ -99,3 +99,187 @@ int Solution::numDistinct(string a, string b) {
     return dp[0][0];
 }
 ```
+
+### [Regular Expression Match (Star Marked)](https://www.interviewbit.com/problems/regular-expression-match/)
+
+```cpp
+// Method 1 (O(n*m) space and time)
+int Solution::isMatch(const string a, const string b) {
+    int n = a.size(), m = b.size(); vector<vector<int>> dp(n + 1, vector<int> (m + 1, 0));
+    dp[n][m] = 1;
+    for(int j = m - 1; j >= 0; j--) {
+        if(b[j] == '*') dp[n][j] = 1;
+        else break;
+    }
+    for(int i = n - 1; i >= 0; i--) {
+        for(int j = m - 1; j >= 0; j--) {
+            if(a[i] == b[j]) dp[i][j] = dp[i + 1][j + 1];
+            else {
+                if(b[j] == '?') dp[i][j] = dp[i + 1][j + 1];
+                else if(b[j] == '*') dp[i][j] = (dp[i + 1][j] || dp[i + 1][j + 1] || dp[i][j + 1]);
+            }
+        }
+    }
+    return dp[0][0];
+}
+
+// Method 2 (O(n*m) time and O(m) space)
+int Solution::isMatch(const string a, const string b) {
+    int n = a.size(), m = b.size(); vector<int> dplast(m + 1, 0); dplast[m] = 1;
+    vector<int> dpcur(m + 1, 0);
+    for(int j = m - 1; j >= 0; j--) {
+        if(b[j] == '*') dplast[j] = 1;
+        else break;
+    }
+    for(int i = n - 1; i >= 0; i--) {
+        fill(dpcur.begin(), dpcur.end(), 0);
+        for(int j = m - 1; j >= 0; j--) {
+            if(a[i] == b[j]) dpcur[j] = dplast[j + 1];
+            else {
+                if(b[j] == '?') dpcur[j] = dplast[j + 1];
+                else if(b[j] == '*') dpcur[j] = (dplast[j] || dplast[j + 1] || dpcur[j + 1]);
+            }
+        }
+        dplast = dpcur;
+    }
+    return dpcur[0];
+}
+```
+
+### [Regular Expression II (Star Marked)](https://www.interviewbit.com/problems/regular-expression-ii/)
+
+```cpp
+int Solution::isMatch(const string a, const string b) {
+    int n = a.size(), m = b.size(); vector<vector<int>> dp(n + 1, vector<int> (m + 1, 0));
+    dp[n][m] = 1;
+    for(int i = m - 1; i >= 0; i--) {
+        if(b[i] == '*') dp[n][i] = 1;
+        else break;
+    }
+    for(int i = n - 1; i >= 0; i--) {
+        for(int j = m - 1; j >= 0; j--) {
+            if(a[i] == b[j]) {
+                if(j + 1 < m) {
+                    if(b[j + 1] == '*') dp[i][j] = (dp[i + 1][j + 1] || dp[i + 1][j] || dp[i][j + 1]);
+                    else dp[i][j] = dp[i + 1][j + 1];
+                }
+                else dp[i][j] = dp[i + 1][j + 1];
+            }
+            else {
+                if(b[j] == '*') dp[i][j] = dp[i][j + 1];
+                else if(b[j] == '.') {
+                    dp[i][j] = dp[i + 1][j + 1];
+                    if(j + 1 < m  && b[j + 1] == '*') dp[i][j] = (dp[i][j] || dp[i + 1][j]);
+                }
+                else {
+                    if(j + 1 < m && b[j + 1] == '*') dp[i][j] = dp[i][j + 1];
+                }
+            }
+        }
+    }
+    return dp[0][0];
+}
+```
+
+### [Interleaving Strings](https://www.interviewbit.com/problems/interleaving-strings/)
+
+```cpp
+int Solution::isInterleave(string a, string b, string c) {
+    int n = a.size(), m = b.size(), o = c.size();
+    vector<vector<vector<int>>> dp(n + 1, vector<vector<int>> (m + 1, vector<int> (o + 1, 0)));
+    if(a[n - 1] == c[o - 1]) dp[n - 1][m][o - 1] = 1;
+    if(b[m - 1] == c[o - 1]) dp[n][m - 1][o - 1] = 1;
+    dp[n][m][o] = 1;
+    for(int i = n; i >= 0; i--) {
+        for(int j = m; j >= 0; j--) {
+            for(int k = o - 1; k >= 0; k--) {
+                if(i == n) {
+                    if(b[j] == c[k]) dp[i][j][k] = dp[i][j + 1][k + 1];
+                }
+                else if (j == m) {
+                    if(a[i] == c[k]) dp[i][j][k] = dp[i + 1][j][k + 1];
+                }
+                else if(i != n && j != m && (n - i) + (m - j) == (o - k)) {
+                    if(a[i] == c[k]) {
+                        dp[i][j][k] = dp[i + 1][j][k + 1];
+                    }
+                    if(b[j] == c[k]) dp[i][j][k] = (dp[i][j][k] || dp[i][j + 1][k + 1]);
+                }
+            }
+        }
+    }
+    return dp[0][0][0];
+}
+```
+
+### [Length of Longest Subsequence](https://www.interviewbit.com/problems/length-of-longest-subsequence/)
+
+```cpp
+int Solution::longestSubsequenceLength(const vector<int> &a) {
+    int n = a.size(); vector<int> dp(n + 1, 1);
+    if(n == 0) return 0;
+    vector<int> dp2(n + 1, 1);
+    for(int i = 0; i < n; i++) {
+        for(int j = 0; j < i; j++) {
+            if(a[i] > a[j]) dp[i] = max(dp[i], 1 + dp[j]);
+        }
+    }
+    for(int i = n - 1; i >= 0; i--) {
+        for(int j = n - 1; j > i; j--) {
+            if(a[i] > a[j]) dp2[i] = max(dp2[i], 1 + dp2[j]);
+        }
+    }
+    int ans = 1;
+    for(int i = 0; i < n; i++) ans = max(ans, dp[i] + dp2[i] - 1);
+    return ans;
+}
+```
+
+### [Smallest sequence with given Primes (Star Marked)](https://www.interviewbit.com/problems/smallest-sequence-with-given-primes/)
+
+```cpp
+// Method 1 (using priority queue O(DlogD))
+vector<int> Solution::solve(int A, int B, int C, int D) {
+    //min heap
+    priority_queue<int, vector<int>, greater<int>> pq;
+    pq.push(A); pq.push(B); pq.push(C);
+    unordered_map<int, int> mp; // used to check if element exists or not
+    vector<int> res;
+
+    while(D > 0){
+        if(mp[pq.top()]){ // if ele already exists, no use so kick it and continue
+            pq.pop();
+            continue;
+        }
+        // top of pq always has min ele of all, so try combinations with it
+        // and then kick it out
+        if(!mp[pq.top()*A]) pq.push(pq.top()*A);
+
+        if(!mp[pq.top()*B]) pq.push(pq.top()*B);
+
+        if(!mp[pq.top()*C]) pq.push(pq.top()*C);
+
+        D--;
+        mp[pq.top()]++;
+        res.push_back(pq.top());
+        pq.pop();
+    }
+    return res; // will already be in sorted order as we used reverse priorityQ (minHeap)
+}
+
+// Mehotd 2 (O(D) solution)
+vector<int> Solution::solve(int A, int B, int C, int D) {
+    vector<int> ans;
+    ans.push_back(1);
+    int i=0,j=0,k=0;
+    while(D--){
+        int x=min(ans[i]*A,min(ans[j]*B,ans[k]*C));
+        if(x==ans[i]*A) i++;
+        if(x==ans[j]*B) j++;
+        if(x==ans[k]*C) k++;
+        ans.push_back(x);
+    }
+    ans.erase(ans.begin());
+    return ans;
+}
+```
