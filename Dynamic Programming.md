@@ -100,6 +100,12 @@ int Solution::numDistinct(string a, string b) {
 }
 ```
 
+### [Scramble String (Star Marked)](https://www.interviewbit.com/problems/scramble-string/)
+
+```cpp
+
+```
+
 ### [Regular Expression Match (Star Marked)](https://www.interviewbit.com/problems/regular-expression-match/)
 
 ```cpp

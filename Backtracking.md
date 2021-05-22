@@ -417,10 +417,15 @@ string Solution::getPermutation(int n, int k) {
     }
     vector<int> v(n);
     iota(v.begin(), v.end(), 1);
-    string ans; k--;
+    string ans;
     for (int i = n - 1; i >= 0; i--) {
-        int q = (fact[i] == -1) ? 0 : k / fact[i];
-        k = (fact[i] == -1) ? k : k % fact[i];
+        int q = 0;
+        if(fact[i]!=-1) {
+            int num=fact[i];
+            if(k%num==0) q = (k/num) - 1;
+            else q = (k/num);
+            k = k - q*num;
+        }
         ans += to_string(v[q]);
         v.erase(v.begin() + q);
     }
