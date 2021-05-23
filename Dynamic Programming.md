@@ -103,7 +103,47 @@ int Solution::numDistinct(string a, string b) {
 ### [Scramble String (Star Marked)](https://www.interviewbit.com/problems/scramble-string/)
 
 ```cpp
+int recur(string a, string b, map<pair<string, string>, int> &mp) {
+    int n = a.size() - 1;
+    if(n == 0) {
+        if(a == b) mp[{a, b}] = 1;
+        else mp[{a, b}] = 0;
+        return mp[{a, b}];
+    }
+    for(int k = 0; k < n; k++) {
+        string s1 = a.substr(0, k + 1), s2 = a.substr(k + 1);
+        if(s2 + s1 == b) {
+            mp[{a, b}] = 1;
+            return 1;
+        }
+    }
+    for(int k = 0; k < n; k++) {
+        string a1 = a.substr(0, k + 1), a2 = a.substr(k + 1);
+        string b1 = b.substr(0, k + 1), b2 = b.substr(k + 1);
+        string b3 = b.substr(n - k), b4 = b.substr(0, n - k);
+        if(mp.find({a1, b1}) == mp.end()) mp[{a1, b1}] = recur(a1, b1, mp);
+        if(mp.find({a2, b2}) == mp.end()) mp[{a2, b2}] = recur(a2, b2, mp);
+        if(mp[{a1, b1}] && mp[{a2, b2}]) {
+            mp[{a, b}] = 1;
+            return 1;
+        }
+        if(mp.find({a1, b3}) == mp.end()) mp[{a1, b3}] = recur(a1, b3, mp);
+        if(mp.find({a2, b4}) == mp.end()) mp[{a2, b4}] = recur(a2, b4, mp);
+        if(mp[{a1, b3}] && mp[{a2, b4}]) {
+            mp[{a, b}] = 1;
+            return 1;
+        }
+    }
+    mp[{a, b}] = 0;
+    return 0;
+}
 
+int Solution::isScramble(const string a, const string b) {
+    int n = a.size(), m = b.size();
+    if(n != m) return 0;
+    map<pair<string, string>, int> mp;
+    return recur(a, b, mp);
+}
 ```
 
 ### [Regular Expression Match (Star Marked)](https://www.interviewbit.com/problems/regular-expression-match/)
@@ -286,6 +326,105 @@ vector<int> Solution::solve(int A, int B, int C, int D) {
         ans.push_back(x);
     }
     ans.erase(ans.begin());
+    return ans;
+}
+```
+
+### [Largest area of rectangle with permutations (Star Marked)](https://www.interviewbit.com/problems/largest-area-of-rectangle-with-permutations/)
+
+```cpp
+int calc(vector<int> row) {
+    sort(row.begin(), row.end());
+    int n = row.size();
+    int ans = row[n - 1], width = 2;
+    for(int i = n - 2; i >= 0; i--) {
+        ans = max(ans, row[i]*width);
+        width++;
+    }
+    return ans;
+}
+
+int Solution::solve(vector<vector<int> > &a) {
+    int n = a.size(), m = a[0].size();
+    vector<int> row = a[0];
+    int ans = calc(row);
+    for(int i = 1; i < n; i++) {
+        for(int j = 0; j < m; j++) {
+            if(a[i][j] == 0) row[j] = 0;
+            else row[j]++;
+        }
+        ans = max(ans, calc(row));
+    }
+    return ans;
+}
+```
+
+### [Ways to Decode](https://www.interviewbit.com/problems/ways-to-decode/)
+
+```cpp
+int recur(string &a, int ind, vector<int> &dp) {
+    int n = a.size();
+    if(ind == n) {
+        dp[n] = 1;
+        return 1;
+    }
+    if(a[ind] == '0') {
+        dp[ind] = 0;
+        return 0;
+    }
+    int ans;
+    if(dp[ind + 1] == -1) {
+        ans = recur(a, ind + 1, dp);
+        dp[ind + 1] = ans%1000000007;
+    }
+    else ans = dp[ind + 1];
+    ans %= 1000000007;
+    if((n - ind) > 1) {
+        int num = (a[ind] - '0')*10 + (a[ind + 1] - '0');
+        if(num <= 26) {
+            if(dp[ind + 2] == -1) {
+                int gt = recur(a, ind + 2, dp);
+                dp[ind + 2] = gt%1000000007;
+                ans += gt;
+            }
+            else ans += dp[ind + 2];
+        }
+    }
+    ans %= 1000000007;
+    dp[ind] = ans;
+    return ans;
+}
+
+int Solution::numDecodings(string a) {
+    int n = a.size();
+    vector<int> dp(n + 1, -1);
+    return recur(a, 0, dp);
+}
+```
+
+### [Stairs](https://www.interviewbit.com/problems/stairs/)
+
+```cpp
+int Solution::climbStairs(int a) {
+    vector<int> dp(a + 1, 0); dp[1] = 1; dp[2] = 2;
+    for(int i = 3; i <= a; i++) dp[i] += (dp[i - 1] + dp[i -2]);
+    return dp[a];
+}
+```
+
+### [Longest Increasing Subsequences](https://www.interviewbit.com/problems/longest-increasing-subsequence/)
+
+```cpp
+int Solution::lis(const vector<int> &a) {
+    int n = a.size();
+    vector<int> dp(n + 1, 1);
+    for(int i = n - 1; i >= 0; i--) {
+        for(int j = n -1; j > i; j--) {
+            if(a[j] > a[i]) dp[i] = max(dp[i], 1 + dp[j]);
+        }
+    }
+    int ans = dp[0];
+    for(int i = 1; i < n; i++) ans = max(ans, dp[i]);
     return ans;
 }
 ```
