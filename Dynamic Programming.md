@@ -428,3 +428,149 @@ int Solution::lis(const vector<int> &a) {
     return ans;
 }
 ```
+
+### [Jump Game Array](https://www.interviewbit.com/problems/jump-game-array/)
+
+```cpp
+// Method 1 (DP giver MLE)
+int recur(int ind, int n, vector<int> &a, vector<vector<int>> &dp) {
+    if(ind == n - 1) return 1;
+    if(a[ind] == 0) return 0;
+
+    for(int k = 1; k <= a[ind]; k++) {
+        if(ind + k < n) {
+            int rec;
+            if(dp[ind][k] == -1) {
+                rec = recur(ind + k, n, a, dp);
+                dp[ind][k] = rec;
+            }
+            else rec = dp[ind][rec];
+            if(rec == 1) return 1;
+        }
+    }
+    return 0;
+}
+
+int Solution::canJump(vector<int> &a) {
+    int n = a.size(); vector<vector<int>> dp(n + 1, vector<int> (31, -1));
+    return recur(0, n, a, dp);
+
+}
+
+// Method 2(using Greedy)
+int Solution::canJump(vector<int> &a) {
+    int n = a.size();
+    int i = 0; int max_reach = 0;
+    while(i <= max_reach) {
+        max_reach = max(i + a[i], max_reach);
+        if(max_reach >= n - 1) return 1;
+        i++;
+    }
+    return 0;
+}
+```
+
+### [Min Jumps Array (Star Marked)](https://www.interviewbit.com/problems/min-jumps-array/)
+
+```cpp
+// Method 1 (from a given point i the maximum position we can reach is i + 50000 so if there is no way to reach n in
+// between [n - 50000, n] then there won't be any point from which I can reach n. So to get the minimum jumps
+// I am taking the first point in the given range which will reach N as this would be sufficient enough)
+
+int Solution::jump(vector<int> &a) {
+    int n = a.size() - 1; int i = max(0, n - 50000);
+    if(n == 0) return 0;
+    int ans = 0;
+    while(i >= 0) {
+        int found = 0;
+        for(int j = i; j < n; j++) {
+            if(j + a[j] >= n) {
+                n = j;
+                i = max(0, n - 50000);
+                ans++;
+                found = 1;
+                if(j == 0) return ans;
+                break;
+            }
+        }
+        if(!found) return -1;
+    }
+    return ans;
+}
+
+// Method 2 (storing the maximum possible jump from a point)
+int Solution::jump(vector<int> &A) {
+    if(A.size()==1)return 0;
+    vector<int> aux=A;
+    for (int i=1;i<A.size();i++){
+        A[i]=max(A[i],A[i-1]-1);
+    }
+
+    int pos=0;
+    int count=0;
+    while(true){
+        pos+=A[pos];
+        count++;
+        if(pos>=A.size()-1) return count;
+        else if(A[pos]==0) return -1;
+    }
+}
+```
+
+### [Longest Arithmetic Progression (Star Marked)](https://www.interviewbit.com/problems/longest-arithmetic-progression/)
+
+```cpp
+// In Method 1 and Method 2 dp[i][j] = maximum length of arithmetic sequence starting at position i and havin common
+// difference as cd
+// Method 1 (O(n^2logn) Gives TLE in InterviewBit but AC in Leetcode while using map<pair<int, int>, int> dp;)
+int Solution::solve(const vector<int> &a) {
+    int n = a.size();
+    map<pair<int, int>, int> dp;
+    int ans = 1;
+    for(int i = n - 1; i >= 0; i--) {
+        for(int j = i + 1; j < n; j++) {
+            int cd = a[j] - a[i];
+            if(dp.find({j, cd}) == dp.end()) dp[{j, cd}] = 1;
+            dp[{i, cd}] = max(dp[{i, cd}], 1 + dp[{j, cd}]);
+            ans = max(ans, dp[{i, cd}]);
+        }
+    }
+    return ans;
+}
+
+// Method 2 (O(n^2) AC in both sites using unordered_map<int, int> dp[n];)
+int Solution::solve(const vector<int> &a) {
+    int n = a.size();
+    unordered_map<int, int> dp[n];
+    int ans = 1;
+    for(int i = n - 1; i >= 0; i--) {
+        for(int j = i + 1; j < n; j++) {
+            int cd = a[j] - a[i];
+            if(dp[j][cd] == 0) dp[j][cd] = 1;
+            dp[i][cd] = max(dp[i][cd], 1 + dp[j][cd]);
+            ans = max(ans, dp[i][cd]);
+        }
+    }
+    return ans;
+}
+
+// Method 3 (O(n^2) AC dp[i][j] = max length if a[i] is first element and a[j] is second element)
+int Solution::solve(const vector<int> &a) {
+    int n = a.size();
+    if(n < 3) return n;
+    vector<vector<int>> dp(n + 1, vector<int> (n + 1, -1));
+    unordered_map<int, int> mp; int ans = 2;
+    for(int sec = n - 1; sec >= 0; sec--) {
+        for(int fir = sec - 1; fir >= 0; fir--) {
+            int x = 2*a[sec] - a[fir];
+            dp[fir][sec] = 2;
+            if(mp.find(x) == mp.end()) continue;
+            int pos = mp[x];
+            dp[fir][sec] = max(dp[fir][sec], 1 + dp[sec][pos]);
+            ans = max(ans, dp[fir][sec]);
+        }
+        mp[a[sec]] = sec;
+    }
+    return ans;
+}
+```
