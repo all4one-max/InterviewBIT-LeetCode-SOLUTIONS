@@ -574,3 +574,156 @@ int Solution::solve(const vector<int> &a) {
     return ans;
 }
 ```
+
+### [Kth Manhattan Distance Neighbourhood](https://www.interviewbit.com/problems/kth-manhattan-distance-neighbourhood/)
+
+```cpp
+vector<vector<int> > Solution::solve(int a, vector<vector<int> > &b) {
+    int n = b.size(), m = b[0].size();
+    vector<vector<vector<int>>> dp(n + 1, vector<vector<int>> (m + 1, vector<int> (a + 1, 0)));
+    for(int i = 0; i < n; i++) {
+        for(int j = 0; j < m; j++) dp[i][j][0] = b[i][j];
+    }
+    for(int k = 1; k <= a; k++) {
+        for(int i = 0; i < n; i++) {
+            for(int  j = 0; j < m; j++) {
+                dp[i][j][k] = max(dp[i][j][k], dp[i][j][k - 1]);
+                if(j + 1 < m) dp[i][j][k] = max(dp[i][j][k], dp[i][j + 1][k - 1]);
+                if(i + 1 < n) dp[i][j][k] = max(dp[i][j][k], dp[i + 1][j][k - 1]);
+                if(j - 1 >= 0) dp[i][j][k] = max(dp[i][j][k], dp[i][j - 1][k - 1]);
+                if(i - 1 >= 0) dp[i][j][k] = max(dp[i][j][k], dp[i - 1][j][k - 1]);
+            }
+        }
+    }
+    vector<vector<int>> ans(n, vector<int> (m, 0));
+    for(int i = 0; i < n; i++) {
+        for(int j = 0; j < m; j++) ans[i][j] = dp[i][j][a];
+    }
+    return ans;
+}
+```
+
+### [Best Time to Buy and Sell Stock with Transaction Fee](https://leetcode.com/problems/best-time-to-buy-and-sell-stock-with-transaction-fee/)
+
+```cpp
+class Solution {
+public:
+    int maxProfit(vector<int>& a, int fee) {
+        int n = a.size();
+        int ans = 0;
+        vector<int> dp(n + 1, 0);
+        int mx = -1e9;
+        for(int i = n - 1; i >= 0; i--) {
+            dp[i] = max(dp[i], mx - a[i]);
+            if(i + 1 < n) mx = max(mx, dp[i + 1] + a[i] - fee);
+            else mx = a[i] - fee;
+            dp[i] = max(dp[i], dp[i + 1]);
+        }
+        return dp[0];
+    }
+};
+```
+
+### [Best Time to Buy and Sell Stock with Cooldown](https://leetcode.com/problems/best-time-to-buy-and-sell-stock-with-cooldown/)
+
+```cpp
+class Solution {
+public:
+    int maxProfit(vector<int>& a) {
+        int n = a.size();
+        int ans = 0;
+        vector<int> dp(n + 1, 0);
+        int mx = -1e9;
+        for(int i = n - 1; i >= 0; i--) {
+            dp[i] = max(dp[i], mx - a[i]);
+            if(i + 2 < n) mx = max(mx, dp[i + 2] + a[i]);
+            else mx = max(mx, a[i]);
+            dp[i] = max(dp[i], dp[i + 1]);
+        }
+        return dp[0];
+    }
+};
+```
+
+### [Best Time to Buy and Sell Stock atmost B times (Star Marked)](https://www.interviewbit.com/problems/best-time-to-buy-and-sell-stock-atmost-b-times/)
+
+```cpp
+int Solution::solve(vector<int> &a, int k) {
+    int n = a.size();
+    k = min(k, n/2);
+    vector<vector<int>> dp(n + 1, vector<int> (k + 1, 0));
+    for(int i = 1; i <= k; i++) {
+        int mx = -1e9;
+        for(int j = n - 1; j >= 0; j--) {
+            dp[j][i] = max(dp[j][i], mx - a[j]);
+            if(j + 1 < n) mx = max(mx, dp[j + 1][i - 1] + a[j]);
+            else mx = a[j];
+            if(j + 1 < n) dp[j][i] = max(dp[j][i], dp[j + 1][i]);
+        }
+
+    }
+    return dp[0][k];
+}
+```
+
+### [Best Time to Buy and Sell Stock III](https://www.interviewbit.com/problems/best-time-to-buy-and-sell-stocks-iii/)
+
+```cpp
+int Solution::maxProfit(const vector<int> &a) {
+    int n = a.size();
+    if(n == 0) return 0;
+    vector<int> buy(n, 0); vector<int> sell(n, 0);
+    int mx = a[n - 1];
+    int ans = 0;
+    for(int i = n -2; i >= 0; i--) {
+        buy[i] = max(0, mx - a[i]);
+        ans = max(ans, buy[i]);
+        mx = max(mx, a[i]);
+    }
+    int mn = a[0];
+    for(int i = 1; i < n; i++) {
+        sell[i] = max(0, a[i] - mn);
+        ans = max(ans, sell[i]);
+        mn = min(mn, a[i]);
+    }
+    vector<int> pref_sell(sell);
+    for(int i = 1; i < n; i++) pref_sell[i] = max(pref_sell[i], pref_sell[i - 1]);
+    for(int i = n - 1; i >= 1; i--) ans = max(ans, buy[i] + pref_sell[i - 1]);
+    return ans;
+}
+```
+
+### [Maximum Path in Triangle](https://www.interviewbit.com/problems/maximum-path-in-triangle/)
+
+```cpp
+int Solution::solve(vector<vector<int> > &a) {
+    int n = a.size(); vector<vector<int>> dp(n + 1, vector<int> (n + 1, 0));
+    for(int i = n - 1; i >= 0; i--) dp[n - 1][i] = a[n - 1][i];
+    for(int i = n - 2; i >= 0; i--) {
+        for(int j = n - 1; j >= 0; j--) {
+            if(a[i][j] != 0) {
+                dp[i][j] = max(dp[i][j], a[i][j] + max(dp[i + 1][j], dp[i + 1][j + 1]));
+            }
+        }
+    }
+    return dp[0][0];
+}
+```
+
+### [Unique Paths in a Grid](https://www.interviewbit.com/problems/unique-paths-in-a-grid/)
+
+```cpp
+int Solution::uniquePathsWithObstacles(vector<vector<int> > &a) {
+    int n = a.size(), m = a[0].size(); vector<vector<int>> dp(n + 1, vector<int> (m + 1, 0));
+    if(a[n - 1][m - 1] == 0) dp[n - 1][m - 1] = 1;
+    for(int i = n - 1; i >= 0; i--) {
+        for(int j = m - 1; j >= 0; j--) {
+            if(a[i][j] == 0) {
+                if(i == n - 1 && j == m - 1) continue;
+                dp[i][j] += (dp[i + 1][j] + dp[i][j + 1]);
+            }
+        }
+    }
+    return dp[0][0];
+}
+```
