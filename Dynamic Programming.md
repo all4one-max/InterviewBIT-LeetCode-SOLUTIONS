@@ -603,7 +603,7 @@ vector<vector<int> > Solution::solve(int a, vector<vector<int> > &b) {
 }
 ```
 
-### [Best Time to Buy and Sell Stock with Transaction Fee](https://leetcode.com/problems/best-time-to-buy-and-sell-stock-with-transaction-fee/)
+### [Best Time to Buy and Sell Stock with Transaction Fee LeetCode](https://leetcode.com/problems/best-time-to-buy-and-sell-stock-with-transaction-fee/)
 
 ```cpp
 class Solution {
@@ -624,7 +624,7 @@ public:
 };
 ```
 
-### [Best Time to Buy and Sell Stock with Cooldown](https://leetcode.com/problems/best-time-to-buy-and-sell-stock-with-cooldown/)
+### [Best Time to Buy and Sell Stock with Cooldown LeetCode](https://leetcode.com/problems/best-time-to-buy-and-sell-stock-with-cooldown/)
 
 ```cpp
 class Solution {
