@@ -1,6 +1,7 @@
 ### [Matrix Median (Star Marked)](https://www.interviewbit.com/problems/matrix-median/)
 
 ```cpp
+// Method 1 (Not So smart solution)
 int check(vector<vector<int>> &a, int n, int m, int val, int N){
     int cnt=0,cnt2=0;
     for(int i=0;i<n;i++) {
@@ -90,6 +91,25 @@ int Solution::findMedian(vector<vector<int>> &a) {
         if (ret==(N/2-1) && found) return low;
     }
     return high;
+}
+
+// Method 2 (smart solution)
+int Solution::findMedian(vector<vector<int> > &a) {
+    int n = a.size(),m = a[0].size();
+    int mi = 1, ma = 1e9;
+    int ind = ((n*m) + 1)/2;
+    while(mi<ma)
+    {
+        int mid = mi + (ma - mi)/2;
+        int count = 0;
+        for(int i = 0;i < n; i++)
+        {
+            count = count + upper_bound(a[i].begin(), a[i].end(), mid) - a[i].begin();
+        }
+        if(count < ind) mi = mid + 1;
+        else ma = mid;
+    }
+    return mi;
 }
 ```
 

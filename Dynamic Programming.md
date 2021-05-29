@@ -575,6 +575,53 @@ int Solution::solve(const vector<int> &a) {
 }
 ```
 
+### [Ways to color a 3xN Board (Star Makred)](https://www.interviewbit.com/problems/ways-to-color-a-3xn-board/)
+
+```cpp
+// Method 1 (Using DP O(n * 36 * 36) Time and O(n * 4 * 4 * 4) space)
+int valid(array<int, 3> a1, array<int, 3> a2) {
+    for(int i = 0; i < 3; i++) {
+        if(a1[i] == a2[i]) return 0;
+    }
+    return 1;
+}
+
+int Solution::solve(int n) {
+    vector<vector<vector<vector<int>>>> dp(n + 1, vector<vector<vector<int>>> (4, vector<vector<int>> (4, vector<int> (4, 0))));
+    vector<array<int, 3>> v;
+    for(int i = 0; i <= 3; i++) {
+        for(int j = 0; j <= 3; j++) {
+            if(j != i) {
+                for(int k = 0; k <= 3; k++) {
+                    if(k != j){
+                        dp[n - 1][i][j][k] = 1;
+                        v.push_back({i, j, k});
+                    }
+                }
+            }
+        }
+    }
+    // v.size() = 36
+    int mod = 1000000007;
+    for(int i = n - 2; i >= 0; i--) {
+        for(auto it : v) {
+            for(auto it2 : v) {
+                if (valid(it, it2)) {
+                    dp[i][it[0]][it[1]][it[2]] += dp[i + 1][it2[0]][it2[1]][it2[2]];
+                    dp[i][it[0]][it[1]][it[2]] %= mod;
+                }
+            }
+        }
+    }
+    int ans = 0;
+    for(auto it : v) {
+        ans += dp[0][it[0]][it[1]][it[2]];
+        ans %= mod;
+    }
+    return ans;
+}
+```
+
 ### [Kth Manhattan Distance Neighbourhood](https://www.interviewbit.com/problems/kth-manhattan-distance-neighbourhood/)
 
 ```cpp
