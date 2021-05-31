@@ -179,13 +179,73 @@ int Solution::mice(vector<int> &a, vector<int> &b) {
 }
 ```
 
-### [Gas Station](https://www.interviewbit.com/problems/gas-station/)
+### [Gas Station (Star Marked)](https://www.interviewbit.com/problems/gas-station/)
 
 ```cpp
-int Solution::mice(vector<int> &a, vector<int> &b) {
-    sort(a.begin(), a.end()); sort(b.begin(), b.end()); int n = a.size();
-    int ans = 0;
-    for(int i = 0; i < n; i++) ans = max(ans, abs(a[i] - b[i]));
+int Solution::canCompleteCircuit(const vector<int> &a, const vector<int> &b) {
+    int n = a.size();
+    int tank = 0, start = 0, total = 0;
+    for(int i = 0; i < n; i++) {
+        tank += (a[i] - b[i]); total += (a[i] - b[i]);
+        if(tank < 0) {
+            start = i + 1;
+            tank = 0;
+        }
+    }
+    if(total < 0) return -1;
+    return start;
+}
+```
+
+### [Disjoint Intervals](https://www.interviewbit.com/problems/disjoint-intervals/)
+
+```cpp
+bool comp(vector<int> &v1, vector<int> &v2) {
+    if(v1[0] < v2[0]) return true;
+    else if(v1[0] > v2[0]) return false;
+    if(v1[1] < v2[1]) return true;
+    return false;
+}
+
+int Solution::solve(vector<vector<int> > &a) {
+    int n = a.size();
+    sort(a.begin(), a.end(), comp);
+    int l = a[0][0], r = a[0][1], ans = 1;
+    for(int i = 1; i < n; i++) {
+        if(a[i][0] == l && a[i][1] == r) continue;
+        if(a[i][0] == l) continue;
+        else {
+            if(a[i][0] > r) {
+                l = a[i][0];
+                r = a[i][1];
+                ans++;
+            }
+            else {
+                if(a[i][1] < r) r = a[i][1];
+            }
+        }
+    }
     return ans;
+}
+```
+
+### [Largest Permutation](https://www.interviewbit.com/problems/largest-permutation/)
+
+```cpp
+vector<int> Solution::solve(vector<int> &a, int b) {
+    unordered_map<int, int> mp; int n = a.size();
+    for(int i = 0; i < n; i++) mp[a[i]] = i;
+    int val = n;
+    for(int i = 0; i < n; i++) {
+        if(a[i] != val && b) {
+            int ind = mp[val];
+            swap(a[i], a[ind]);
+            mp[a[ind]] = ind;
+            mp[val] = i;
+            b--;
+        }
+        val--;
+    }
+    return a;
 }
 ```
