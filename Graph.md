@@ -302,6 +302,47 @@ int Solution::solve(int a, vector<vector<int> > &b) {
 }
 ```
 
+### [Possibility of finishing all courses given pre-requisites](https://www.interviewbit.com/problems/possibility-of-finishing-all-courses-given-prerequisites/)
+
+```cpp
+int cycle;
+
+void dfs(int v, vector<int> &visited, vector<int> &rec_stack, array<vector<int>, 60010> &adj) {
+    rec_stack[v] = 1;
+    visited[v] = 1;
+    for(auto it : adj[v]) {
+        if(!visited[it]) {
+            dfs(it, visited, rec_stack, adj);
+            if(cycle) return;
+        }
+        else {
+            if(rec_stack[it]) {
+                cycle = 1;
+                return;
+            }
+        }
+    }
+    rec_stack[v] = 0;
+    return;
+}
+
+int Solution::solve(int a, vector<int> &b, vector<int> &c) {
+    array<vector<int>, 60010> adj;
+    int n = b.size();
+    for(int i = 0; i < n; i++) adj[b[i]].push_back(c[i]);
+    vector<int> visited(a + 5);
+    vector<int> rec_stack(a + 5);
+    for(int i = 1; i <= a; i++) {
+        if(!visited[i]) {
+            cycle = 0;
+            dfs(i, visited, rec_stack, adj);
+            if(cycle) return 0;
+        }
+    }
+    return 1;
+}
+```
+
 ### [Largest Distance between nodes of a Tree](https://www.interviewbit.com/problems/largest-distance-between-nodes-of-a-tree/)
 
 ```cpp
@@ -337,6 +378,107 @@ int Solution::solve(vector<int> &a) {
     }
     auto ret = dfs(adj, 1, -1);
     return ret.second;
+}
+```
+
+### [Delete Edge!](https://www.interviewbit.com/problems/delete-edge/)
+
+```cpp
+long long ans, sum;
+
+int dfs(int v, int p, array<vector<int>, 100005> &adj, vector<int> &a) {
+    int cur_sm = a[v - 1];
+    for(auto it : adj[v]) {
+        if(it != p) {
+            cur_sm += dfs(it, v, adj, a);
+            cur_sm %= 1000000007;
+        }
+    }
+    int rest = (sum - cur_sm + 1000000007) % 1000000007;
+    ans = max(ans, ((long long)cur_sm * rest) % 1000000007);
+    return cur_sm;
+}
+
+int Solution::deleteEdge(vector<int> &a, vector<vector<int> > &b) {
+    sum = 0; for(int i = 0; i < a.size(); i++) sum += a[i];
+    array<vector<int>, 100005> adj;
+    for(int i = 0; i < b.size(); i++) {
+        adj[b[i][0]].push_back(b[i][1]);
+        adj[b[i][1]].push_back(b[i][0]);
+    }
+    ans = 0;
+    dfs(1, -1, adj, a);
+    ans %= 1000000007;
+    ans = (int)ans;
+    return ans;
+}
+```
+
+### [Capture Regions on Board](https://www.interviewbit.com/problems/capture-regions-on-board/)
+
+```cpp
+vector<array<int, 2>> mov = {{0, -1}, {1, 0}, {0, 1}, {-1, 0}};
+void dfs(int i, int j, vector<vector<int>> &visited, vector<vector<char> > &a) {
+    int n = a.size(), m = a[0].size();
+    visited[i][j] = 1;
+    a[i][j] = 'Y';
+    for(auto it : mov) {
+        int nx = i + it[0], ny = j + it[1];
+        if(nx >= 0 && nx < n && ny >= 0 && ny < m) {
+            if(!visited[nx][ny] && a[nx][ny] == 'O') dfs(nx, ny, visited, a);
+        }
+    }
+    return;
+}
+
+void Solution::solve(vector<vector<char> > &a) {
+    int n = a.size(), m = a[0].size();
+    vector<vector<int>> visited(n + 5, vector<int> (m + 5, 0));
+    for(int i = 0; i < n; i++) {
+        for(int j = 0; j < m; j++) {
+            if((i == 0 || i == n - 1 || j == 0 || j == m - 1) && a[i][j] == 'O' && !visited[i][j]) dfs(i, j, visited, a);
+        }
+    }
+    for(int i = 0; i < n; i++) {
+        for(int j = 0; j < m; j++) {
+            if(a[i][j] == 'O') a[i][j] = 'X';
+            if(a[i][j] == 'Y') a[i][j] = 'O';
+        }
+    }
+}
+```
+
+### [Word Search Board](https://www.interviewbit.com/problems/word-search-board/)
+
+```cpp
+vector<array<int, 2>> mov = {{0, - 1}, {1, 0}, {0, 1}, {-1, 0}};
+
+int dfs(int x, int y, int cur, string &b, int n, vector<string> &a) {
+    int m = a.size(), k = a[0].size();
+    if(cur == n) return 1;
+    for(auto it : mov) {
+        int nx = x + it[0], ny = y + it[1];
+        if(nx >= 0 && nx < m && ny >= 0 && ny < k) {
+            if(a[nx][ny] == b[cur]) {
+                int ret = dfs(nx, ny, cur + 1, b, n, a);
+                if(ret) return 1;
+            }
+        }
+    }
+    return 0;
+}
+
+int Solution::exist(vector<string> &a, string b) {
+    int n = b.size();
+    for(int i = 0; i < a.size(); i++) {
+        for(int j = 0; j < a[0].size(); j++) {
+            if(a[i][j] == b[0]) {
+                if(n == 1) return 1;
+                if(dfs(i, j, 1, b, n, a)) return 1;
+            }
+        }
+    }
+    return 0;
 }
 ```
 
@@ -422,6 +564,61 @@ int Solution::solve(string a, string b, vector<string> &c) {
             }
         }
     }
-    return -1;
+}
+```
+
+### [Word Ladder II (Star Marked)](https://www.interviewbit.com/problems/word-ladder-ii/)
+
+```cpp
+void getAns(string a, string cur, vector<vector<string>> &ans, vector<string> &temp, unordered_map<string, vector<string>> &parent) {
+    if(cur == a) {
+        reverse(temp.begin(), temp.end());
+        ans.push_back(temp);
+        reverse(temp.begin(), temp.end());
+        return;
+    }
+    for(auto it : parent[cur]) {
+        temp.push_back(it);
+        getAns(a, it, ans, temp, parent);
+        temp.pop_back();
+    }
+    return;
+}
+
+vector<vector<string> > Solution::findLadders(string a, string b, vector<string> &c) {
+    int n = c.size();
+    queue<string> q; q.push(a);
+    vector<int> visited(n + 5, 0);
+    unordered_map<string, int> mp;
+    for(int i = 0; i < n; i++) mp[c[i]] = i + 1;
+    if(mp.find(a) != mp.end()) visited[mp[a]] = 1;
+    if(mp.find(b) == mp.end()) mp[b] = n + 1;
+    unordered_map<string, vector<string>> parent;
+    unordered_map<string, int> distance; distance[a] = 0;
+    while(!q.empty()) {
+        auto v = q.front(); q.pop();
+        if(v == b) break;
+        for(int i = 0; i < v.size(); i++) {
+            string cpy(v);
+            for(int j = 0; j < 26; j++) {
+                cpy[i] = 'a' + j;
+                if(cpy != v && mp.find(cpy) != mp.end()) {
+                    if(!visited[mp[cpy]]) {
+                        visited[mp[cpy]] = 1;
+                        q.push(cpy);
+                        parent[cpy].push_back(v);
+                        distance[cpy] = distance[v] + 1;
+                    }
+                    else {
+                        if(distance[v] + 1 == distance[cpy]) parent[cpy].push_back(v);
+                    }
+                }
+            }
+        }
+    }
+    vector<vector<string>> ans;
+    vector<string> temp = {b};
+    getAns(a, b, ans, temp, parent);
+    return ans;
 }
 ```
