@@ -343,6 +343,36 @@ int Solution::solve(int a, vector<int> &b, vector<int> &c) {
 }
 ```
 
+### [Black Shapes](https://www.interviewbit.com/problems/black-shapes/)
+
+```cpp
+vector<array<int, 2>> mov = {{0, -1}, {1, 0}, {0, 1}, {-1, 0}};
+void dfs(int x, int y, vector<vector<int>> &vis, vector<string> &a) {
+    int n = a.size(), m = a[0].size();
+    vis[x][y] = 1;
+    for(auto it : mov) {
+        int nx = x + it[0], ny = y + it[1];
+        if(nx >= 0 && nx < n && ny >= 0 && ny < m && !vis[nx][ny] && a[nx][ny] == 'X') dfs(nx, ny, vis, a);
+    }
+    return;
+}
+
+int Solution::black(vector<string> &a) {
+    int n = a.size(), m = a[0].size();
+    vector<vector<int>> vis(n + 5, vector<int> (m + 5, 0));
+    int comp = 0;
+    for(int i = 0; i < n; i++) {
+        for(int j = 0; j < m; j++) {
+            if(!vis[i][j] && a[i][j] == 'X') {
+                dfs(i, j, vis, a);
+                comp++;
+            }
+        }
+    }
+    return comp;
+}
+```
+
 ### [Largest Distance between nodes of a Tree](https://www.interviewbit.com/problems/largest-distance-between-nodes-of-a-tree/)
 
 ```cpp
@@ -381,6 +411,45 @@ int Solution::solve(vector<int> &a) {
 }
 ```
 
+### [Cycle in Directed Graph](https://www.interviewbit.com/problems/cycle-in-directed-graph/)
+
+```cpp
+int cycle;
+void dfs(int v, array<vector<int>, 100005> &adj, vector<int> &vis, vector<int> &rec_stack) {
+    vis[v] = 1;
+    rec_stack[v] = 1;
+    for(auto it : adj[v]) {
+        if(!vis[it]) {
+            dfs(it, adj, vis, rec_stack);
+            if(cycle) return;
+        }
+        else {
+            if(rec_stack[it]) {
+                cycle = 1;
+                return;
+            }
+        }
+    }
+    rec_stack[v] = 0;
+    return;
+}
+
+int Solution::solve(int a, vector<vector<int> > &b) {
+    array<vector<int>, 100005> adj;
+    cycle = 0;
+    for(int i = 0; i < b.size(); i++) adj[b[i][0]].push_back(b[i][1]);
+    vector<int> vis(100005, 0);
+    vector<int> rec_stack(100005, 0);
+    for(int i = 1; i <= a; i++) {
+        if(!vis[i]) {
+            dfs(i, adj, vis, rec_stack);
+            if(cycle) return 1;
+        }
+    }
+    return 0;
+}
+```
+
 ### [Delete Edge!](https://www.interviewbit.com/problems/delete-edge/)
 
 ```cpp
@@ -410,6 +479,86 @@ int Solution::deleteEdge(vector<int> &a, vector<vector<int> > &b) {
     dfs(1, -1, adj, a);
     ans %= 1000000007;
     ans = (int)ans;
+    return ans;
+}
+```
+
+### [Two teams?](https://www.interviewbit.com/problems/two-teams/)
+
+```cpp
+int dfs(int v, array<vector<int>, 100005> &adj, vector<int> &color) {
+    for(auto it : adj[v]) {
+        if(!color[it]) {
+            color[it] = 3 - color[v];
+            if(dfs(it, adj, color)) return 1;
+        }
+        else {
+            if(color[v] == color[it]) return 1;
+        }
+    }
+    return 0;
+}
+
+int Solution::solve(int a, vector<vector<int> > &b) {
+    array<vector<int>, 100005> adj;
+    for(int i = 0; i < b.size(); i++) {
+        adj[b[i][0]].push_back(b[i][1]);
+        adj[b[i][1]].push_back(b[i][0]);
+    }
+    vector<int> color(100005, 0);
+
+    for(int i = 1; i <= a; i++) {
+        if(color[i] == 0) {
+            color[i] = 1;
+            if(dfs(i, adj, color)) return 0;
+        }
+    }
+    return 1;
+}
+```
+
+### [Stepping Numbers](https://www.interviewbit.com/problems/stepping-numbers/)
+
+```cpp
+// Method 1 (Did not use Graph)
+int step(int i) {
+    int dg = i % 10;
+    i = i/10;
+    while(i) {
+        int dig = i % 10;
+        if(abs(dg - dig) != 1) return 0;
+        dg = dig;
+        i = i/10;
+    }
+    return 1;
+}
+
+vector<int> Solution::stepnum(int a, int b) {
+    vector<int> ans;
+    for(int i = a; i <= b; i++) {
+        if(step(i)) ans.push_back(i);
+    }
+    return ans;
+}
+
+// Method 2 (Use Graph)
+void dfs(int num, int last_dig, int cur, int a, int b, vector<int> &ans) {
+    if(num >= a && num <= b) ans.push_back(num);
+    if(cur == 7) return;
+    if (last_dig == -1) {
+        for(int i = 1; i <= 9; i++) dfs(i, i, cur + 1, a, b, ans);
+    }
+    else {
+        if(last_dig + 1 <= 9) dfs(num*10 + last_dig + 1, last_dig + 1, cur + 1, a, b, ans);
+        if(last_dig - 1 >= 0) dfs(num*10 + last_dig - 1, last_dig - 1, cur + 1, a, b, ans);
+    }
+    return;
+}
+
+vector<int> Solution::stepnum(int a, int b) {
+    vector<int> ans;
+    dfs(0, -1, 0, a, b, ans);
+    sort(ans.begin(), ans.end());
     return ans;
 }
 ```
@@ -620,5 +769,43 @@ vector<vector<string> > Solution::findLadders(string a, string b, vector<string>
     vector<string> temp = {b};
     getAns(a, b, ans, temp, parent);
     return ans;
+}
+```
+
+### [Clone Graph (Star Marked)](https://www.interviewbit.com/problems/clone-graph/)
+
+```cpp
+/**
+ * Definition for undirected graph.
+ * struct UndirectedGraphNode {
+ *     int label;
+ *     vector<UndirectedGraphNode *> neighbors;
+ *     UndirectedGraphNode(int x) : label(x) {};
+ * };
+ */
+void dfs(UndirectedGraphNode* root, unordered_map<UndirectedGraphNode*, UndirectedGraphNode*> &cpy, unordered_map<UndirectedGraphNode*, int> &visited) {
+    UndirectedGraphNode* node = new UndirectedGraphNode(root->label);
+    cpy[root] = node; visited[root] = 1;
+    for(auto it : root->neighbors) {
+        if(!visited[it]) dfs(it, cpy, visited);
+    }
+    return;
+}
+
+void dfs2(UndirectedGraphNode* root, unordered_map<UndirectedGraphNode*, UndirectedGraphNode*> &cpy, unordered_map<UndirectedGraphNode*, int> &vis) {
+    UndirectedGraphNode* node = cpy[root]; vis[root] = 1;
+    for(auto it : root->neighbors) {
+        node->neighbors.push_back(cpy[it]);
+        if(!vis[it]) dfs2(it, cpy, vis);
+    }
+    return;
+}
+
+UndirectedGraphNode *Solution::cloneGraph(UndirectedGraphNode *node) {
+    unordered_map<UndirectedGraphNode*, UndirectedGraphNode*> cpy;
+    unordered_map<UndirectedGraphNode*, int> visited;
+    dfs(node, cpy, visited); unordered_map<UndirectedGraphNode*, int> vis;
+    dfs2(node, cpy, vis);
+    return cpy[node];
 }
 ```
