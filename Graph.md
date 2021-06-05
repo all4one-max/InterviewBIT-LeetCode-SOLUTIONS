@@ -83,6 +83,38 @@ int Solution::snakeLadder(vector<vector<int> > &a, vector<vector<int> > &b) {
 }
 ```
 
+### [Region in BinaryMatrix](https://www.interviewbit.com/problems/region-in-binarymatrix/)
+
+```cpp
+vector<array<int, 2>> mov = {{ -1, 0}, {0, 1}, {1, 0}, {0, -1}, {1, 1}, {1, -1}, {-1, -1}, {-1, 1}};
+
+int dfs(int x, int y, vector<vector<int>> &vis, vector<vector<int>> &a) {
+    vis[x][y] = 1; int ans = 1;
+    int n = a.size(), m = a[0].size();
+    for(auto it : mov) {
+        int nx = x + it[0], ny = y + it[1];
+        if(nx >= 0 && nx < n && ny >= 0 && ny < m && !vis[nx][ny] && a[nx][ny] == 1) {
+            ans += dfs(nx, ny, vis, a);
+        }
+    }
+    return ans;
+}
+
+int Solution::solve(vector<vector<int> > &a) {
+    int n = a.size(), m = a[0].size();
+    vector<vector<int>> vis(a.size() + 5, vector<int> (a[0].size() + 5, 0));
+    int ans = 0;
+    for(int i = 0; i < n; i++) {
+        for(int j = 0; j < m; j++) {
+            if(!vis[i][j] && a[i][j] == 1) {
+                ans = max(ans, dfs(i, j, vis, a));
+            }
+        }
+    }
+    return ans;
+}
+```
+
 ### [Level Order](https://www.interviewbit.com/problems/level-order/)
 
 ```cpp
@@ -340,6 +372,43 @@ int Solution::solve(int a, vector<int> &b, vector<int> &c) {
         }
     }
     return 1;
+}
+```
+
+### [Cycle in Undirected Graph](https://www.interviewbit.com/problems/cycle-in-undirected-graph/)
+
+```cpp
+int cycle;
+void dfs(int v, int p, array<vector<int>, 300005> &adj, vector<int> &vis) {
+    vis[v] = 1;
+    for(auto it : adj[v]) {
+        if(!vis[it]) {
+            dfs(it, v, adj, vis);
+            if(cycle) return;
+        }
+        else if(vis[it] && it != p) {
+            cycle = 1;
+            return;
+        }
+    }
+    return;
+}
+
+int Solution::solve(int a, vector<vector<int> > &b) {
+    array<vector<int>, 300005> adj;
+    cycle = 0;
+    for(int i = 0; i < b.size(); i++) {
+        adj[b[i][0]].push_back(b[i][1]);
+        adj[b[i][1]].push_back(b[i][0]);
+    }
+    vector<int> vis(300005, 0);
+    for(int i = 1; i <= a; i++) {
+        if(!vis[i]) {
+            dfs(i, -1, adj, vis);
+            if(cycle) return 1;
+        }
+    }
+    return 0;
 }
 ```
 
@@ -628,6 +697,46 @@ int Solution::exist(vector<string> &a, string b) {
         }
     }
     return 0;
+}
+```
+
+### [Convert Sorted List to Binary Search Tree](https://www.interviewbit.com/problems/convert-sorted-list-to-binary-search-tree/)
+
+```cpp
+/**
+ * Definition for binary tree
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+TreeNode* buildTree(ListNode* root) {
+    if(!root) return NULL;
+    ListNode* slow = root; ListNode* fast = root; ListNode* prev = NULL;
+    while(fast->next && fast->next->next) {
+        prev = slow;
+        slow = slow->next;
+        fast = fast->next->next;
+    }
+    TreeNode* node = new TreeNode(slow->val);
+    if(prev) prev->next = NULL;
+    if(prev) node->left = buildTree(root);
+    if(slow->next) node->right = buildTree(slow->next);
+    return node;
+}
+
+TreeNode* Solution::sortedListToBST(ListNode* a) {
+    return buildTree(a);
 }
 ```
 
