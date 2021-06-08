@@ -359,6 +359,53 @@ int Solution::solve(vector<vector<int> > &a) {
 }
 ```
 
+### [Tiling With Dominoes (Star Marked)](https://www.interviewbit.com/problems/tiling-with-dominoes/)
+
+```cpp
+// Method 1 (Combinatorics Solution, useful only for lesser number of rows)
+#define mod 1000000007
+
+int Solution::solve(int n) {
+    if(n % 2) return 0;
+    else {
+        long long ans = 1; long long a0 = 1, a1 = 0, b1 = 1, b0 = 0;
+        for(int i = 2; i <= n; i++) {
+            long long na = ((long long)a0 + 2LL * b1) % mod;
+            long long nb = (a1 + b0) % mod;
+            a0 = a1; b0 = b1; a1 = na; b1 = nb;
+        }
+        return a1;
+    }
+}
+
+// Method 2 (DP with Bitmask solution - easy to solve)
+#define mod 1000000007
+
+int Solution::solve(int n) {
+    vector<vector<long long>> dp(n + 2, vector<long long> (8, 0LL));
+    dp[1][3] = 1; dp[1][6] = 1; dp[0][7] = 1;
+    for(int i = 2; i <= n; i++) {
+        dp[i][1] = dp[i - 1][6];
+
+        dp[i][3] += dp[i - 1][7];
+        dp[i][3] += dp[i - 1][4];
+        dp[i][3] %= mod;
+
+        dp[i][4] = dp[i - 1][3];
+
+        dp[i][6] += dp[i - 1][7];
+        dp[i][6] += dp[i - 1][1];
+        dp[i][6] %= mod;
+
+        dp[i][7] += dp[i - 1][3];
+        dp[i][7] += dp[i - 1][6];
+        dp[i][7] += dp[i - 2][7];
+        dp[i][7] %= mod;
+    }
+    return dp[n][7];
+}
+```
+
 ### [Ways to Decode](https://www.interviewbit.com/problems/ways-to-decode/)
 
 ```cpp
@@ -432,7 +479,7 @@ int Solution::lis(const vector<int> &a) {
 ### [Jump Game Array](https://www.interviewbit.com/problems/jump-game-array/)
 
 ```cpp
-// Method 1 (DP giver MLE)
+// Method 1 (DP gives MLE)
 int recur(int ind, int n, vector<int> &a, vector<vector<int>> &dp) {
     if(ind == n - 1) return 1;
     if(a[ind] == 0) return 0;
@@ -575,10 +622,64 @@ int Solution::solve(const vector<int> &a) {
 }
 ```
 
+### [Shortest common superstring (Star Marked)](https://www.interviewbit.com/problems/shortest-common-superstring/)
+
+```cpp
+// So basically to solve this question you need to observe that n = 18 and you can memorize it as a trick that
+// if n is less than 20 then you can may be come up with a bitmask solution. So this observation along with
+// the knowledge of travelling salesman problem i managed to solve this question.
+int getAns(string a, string b) {
+    int n = a.size(), m = b.size(), cnt = 0;
+    for(int i = 0; i < a.size(); i++) {
+        int len = n - i;
+        if(m >= len) {
+            string a1 = a.substr(i, len);
+            string b1 = b.substr(0, len);
+            if(a1 == b1) {
+                cnt = len;
+                break;
+            }
+        }
+    }
+    return m - cnt;
+}
+
+int tsp(int pos, int mask, vector<vector<int>> &dp, vector<string> &a, int n, vector<vector<int>> &dp2) {
+    if(mask == ((1 << n) - 1)) return 0;
+
+    if(pos != -1 && dp[pos][mask] != -1) return dp[pos][mask];
+
+    int ans = 1e9;
+    for(int i = 0; i < n; i++) {
+        if((mask & (1 << i)) == 0) {
+            int cur_ans;
+            if(pos == -1) cur_ans = a[i].size() + tsp(i, mask | (1 << i), dp, a, n, dp2);
+            else cur_ans = dp2[pos][i] + tsp(i, mask | (1 << i), dp, a, n, dp2);
+            ans = min(ans, cur_ans);
+        }
+    }
+
+    if(pos == -1) return ans;
+    return dp[pos][mask] = ans;
+}
+
+int Solution::solve(vector<string> &a) {
+    int n = a.size();
+    vector<vector<int>> dp(19, vector<int> (300005, -1));
+    vector<vector<int>> dp2(n + 1, vector<int> (n + 1, 0));
+    for(int i = 0; i < n; i++) {
+        for(int j = 0; j < n; j++) {
+            if(i != j) dp2[i][j] = getAns(a[i], a[j]);
+        }
+    }
+    return tsp(-1, 0, dp, a, n, dp2);
+}
+```
+
 ### [Ways to color a 3xN Board (Star Makred)](https://www.interviewbit.com/problems/ways-to-color-a-3xn-board/)
 
 ```cpp
-// Method 1 (Using DP O(n * 36 * 36) Time and O(n * 4 * 4 * 4) space)
+// Method 1 (Using DP O(n * 36 * 36 * 3) Time and O(n * 4 * 4 * 4) space)
 int valid(array<int, 3> a1, array<int, 3> a2) {
     for(int i = 0; i < 3; i++) {
         if(a1[i] == a2[i]) return 0;
@@ -601,7 +702,6 @@ int Solution::solve(int n) {
             }
         }
     }
-    // v.size() = 36
     int mod = 1000000007;
     for(int i = n - 2; i >= 0; i--) {
         for(auto it : v) {
@@ -618,6 +718,19 @@ int Solution::solve(int n) {
         ans += dp[0][it[0]][it[1]][it[2]];
         ans %= mod;
     }
+    return ans;
+}
+
+// Method 2 (Maths solution)
+// To understand it better follow this [link](https://leetcode.com/problems/number-of-ways-to-paint-n-3-grid/discuss/574943/Java-Detailed-Explanation-with-Graph-Demo-DP-Easy-Understand)
+int Solution::solve(int n) {
+    long long abc = 24, aba = 12;
+    for(int i = n - 2; i >= 0; i--) {
+        long long new_abc = 11*abc + 10*aba;
+        long long new_aba = 5*abc + 7*aba;
+        aba = new_aba % 1000000007; abc = new_abc % 1000000007;
+    }
+    long long ans = ((long long)aba % 1000000007 + abc % 1000000007) % 1000000007;
     return ans;
 }
 ```
@@ -713,6 +826,54 @@ int Solution::solve(vector<int> &a, int k) {
 }
 ```
 
+### [Evaluate Expression To True (Star Marked)](https://www.interviewbit.com/problems/evaluate-expression-to-true/)
+
+```cpp
+#define mod 1003
+
+int Solution::cnttrue(string a) {
+    int n = a.size();
+    vector<vector<vector<int>>> dp(n + 5, vector<vector<int>> (n + 5, vector<int> (2, 0)));
+    for(int i = 0; i < n; i += 2) {
+        if(a[i] == 'T') dp[i][i][0] = 1;
+        else dp[i][i][1] = 1;
+    }
+    for(int len = 2; len < n; len++) {
+        for(int i = 0; i < n; i += 2) {
+            int j = i + 2*(len - 1);
+            if(j < n) {
+                for(int k = i + 1; k < j; k += 2) {
+                    long long ans1 = ((long long)dp[i][k - 1][0] * dp[k + 1][j][1]);
+                    ans1 %= mod;
+                    long long ans2 = ((long long)dp[i][k - 1][1] * dp[k + 1][j][0]);
+                    ans2 %= mod;
+                    long long ans3 = ((long long)dp[i][k - 1][0] * dp[k + 1][j][0]);
+                    ans3 %= mod;
+                    long long ans4 = ((long long)dp[i][k - 1][1] * dp[k + 1][j][1]);
+                    ans4 %= mod;
+                    long long ans = 0LL, Ans = 0LL;
+                    if(a[k] == '^') {
+                        ans = ((long long)ans1 + ans2); ans %= mod;
+                        Ans = ((long long)ans3 + ans4); Ans %= mod;
+                    }
+                    else if(a[k] == '|') {
+                        ans = ((long long)ans1 + ans2 + ans3); ans %= mod;
+                        Ans = (long long)ans4; Ans %= mod;
+                    }
+                    else {
+                        ans = (long long)ans3; ans %= mod;
+                        Ans = ((long long)ans4 + ans2 + ans1); Ans %= mod;
+                    }
+                    dp[i][j][0] += ans; dp[i][j][0] %= mod;
+                    dp[i][j][1] += Ans; dp[i][j][1] %= mod;
+                }
+            }
+        }
+    }
+    return dp[0][n - 1][0];
+}
+```
+
 ### [Best Time to Buy and Sell Stock III](https://www.interviewbit.com/problems/best-time-to-buy-and-sell-stocks-iii/)
 
 ```cpp
@@ -736,6 +897,64 @@ int Solution::maxProfit(const vector<int> &a) {
     vector<int> pref_sell(sell);
     for(int i = 1; i < n; i++) pref_sell[i] = max(pref_sell[i], pref_sell[i - 1]);
     for(int i = n - 1; i >= 1; i--) ans = max(ans, buy[i] + pref_sell[i - 1]);
+    return ans;
+}
+```
+
+### [Longest valid Parentheses (Star Marked)](https://www.interviewbit.com/problems/longest-valid-parentheses/)
+
+```cpp
+// Method 1 (O(N^2) solution Gives TLE)
+int Solution::longestValidParentheses(string a) {
+    int n = a.size();
+    vector<int> dp(n + 1, 0);
+    for(int i = n - 1; i >= 0; i--) {
+        stack<int> st;
+        int ans = 0;
+        for(int j = i; j < n; j++) {
+            if(a[j] == '(') st.push(j);
+            else {
+                if(st.empty()) {
+                    ans = 0;
+                    break;
+                }
+                int tp = st.top(); st.pop();
+                ans += 2;
+                if(tp == i) {
+                    if(i + ans < n) ans += dp[i + ans];
+                    break;
+                }
+            }
+        }
+        if(!st.empty()) ans = 0;
+        dp[i] = ans;
+    }
+    int ans = 0;
+    for(int i = 0; i < n; i++) ans = max(ans, dp[i]);
+    return ans;
+}
+
+// Method 2 (O(N) solution)
+int Solution::longestValidParentheses(string a) {
+    int n = a.size();
+    vector<int> dp(n + 1, 0);
+    for(int i = n - 1; i >= 0; i--) {
+        if(a[i] == ')') continue;
+        else {
+            if(i + 1 < n) {
+                int nxt = dp[i + 1];
+                int pos = i + nxt + 1;
+                if(pos < n) {
+                    if(a[pos] == ')') {
+                        dp[i] = dp[i + 1] + 2;
+                        if(i + dp[i] < n) dp[i] += dp[i + dp[i]];
+                    }
+                }
+            }
+        }
+    }
+    int ans = 0;
+    for(int i = 0; i < n; i++) ans = max(ans, dp[i]);
     return ans;
 }
 ```
