@@ -1162,3 +1162,143 @@ int Solution::arrange(string a, int b) {
     return ret;
 }
 ```
+
+### [Max Sum Without Adjacent Elements](https://www.interviewbit.com/problems/max-sum-without-adjacent-elements/)
+
+```cpp
+int Solution::adjacent(vector<vector<int> > &a) {
+    vector<int> dp; int n = a[0].size();
+    for(int i = 0; i < n; i++) dp.push_back(max(a[0][i], a[1][i]));
+    if(n == 1) return dp[0];
+    for(int i = n - 1; i >= 0; i--) {
+        int cur_ans = 0;
+        if(i + 2 < n) cur_ans = dp[i + 2];
+        if(i + 3 < n) cur_ans = max(cur_ans, dp[i + 3]);
+        dp[i] += cur_ans;
+    }
+    int ans = max(dp[0], dp[1]);
+    return ans;
+}
+```
+
+### [Tushar's Birthday Party](https://www.interviewbit.com/problems/tushars-birthday-party/)
+
+```cpp
+int Solution::solve(const vector<int> &a, const vector<int> &b, const vector<int> &c) {
+    int n = b.size();
+    vector<vector<int>> dp(n + 1, vector<int> (1005, 1e9));
+    for(int i = 0; i <= n; i++) dp[i][0] = 0;
+    for(int i = 1; i <= 1000; i++) {
+        for(int j = 1; j <= n; j++) {
+            if(b[j - 1] > i) dp[j][i] = dp[j - 1][i];
+            else {
+                dp[j][i] = min(dp[j][i], c[j - 1] + dp[j][i - b[j - 1]]);
+                dp[j][i] = min(dp[j][i], dp[j - 1][i]);
+            }
+        }
+    }
+    int ans = 0;
+    for(int i = 0; i < a.size(); i++) {
+        ans += dp[n][a[i]];
+    }
+    return ans;
+}
+```
+
+### [Word Break II](https://www.interviewbit.com/problems/word-break-ii/)
+
+```cpp
+unordered_map<int, vector<string>> dp;
+unordered_map<string, int> mp;
+
+vector<string> recur(int x, int y, string &a) {
+    if(x == a.size()) return {""};
+    string s; vector<string> ans;
+    if(dp.find(x) != dp.end()) return dp[x];
+    for(int i = x; i <= y; i++) {
+        s.push_back(a[i]);
+        if(mp.find(s) != mp.end()) {
+            vector<string> ret = recur(i + 1, y, a);
+            for(auto it : ret) {
+                string ss;
+                if(it != "") ss = s + " " + it;
+                else ss = s;
+                ans.push_back(ss);
+            }
+        }
+    }
+    dp[x] = ans;
+    return ans;
+}
+
+vector<string> Solution::wordBreak(string a, vector<string> &b) {
+    int n = a.size(); dp.clear(); mp.clear(); for(auto it : b) mp[it] = 1;
+    return recur(0, n - 1, a);
+}
+```
+
+### [Max Sum Path in Binary Tree](https://www.interviewbit.com/problems/max-sum-path-in-binary-tree/)
+
+```cpp
+/**
+ * Definition for binary tree
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+pair<int, int> travel(TreeNode* a) {
+    if(!a) return {0, 0};
+    int ret1 = 0, ret2 = 0, ans = a->val, cur_ans = a->val;
+    if(a->left) {
+        pair<int, int> p = travel(a->left); ret1 = p.first;
+        ans = max(ans, p.second);
+        cur_ans = max(cur_ans, a->val + ret1);
+    }
+    if(a->right) {
+        pair<int, int> p = travel(a->right); ret2 = p.first;
+        ans = max(ans, p.second);
+        cur_ans = max(cur_ans, a->val + ret2);
+    }
+    ans = max(max(cur_ans, ans), ret1 + ret2 + a->val);
+    return make_pair(cur_ans, ans);
+}
+
+int Solution::maxPathSum(TreeNode* a) {
+    auto it = travel(a);
+    return it.second;
+}
+```
+
+### [Palindrome Partitioning II](https://www.interviewbit.com/problems/palindrome-partitioning-ii/)
+
+```cpp
+vector<int> dp;
+
+int palindrome(string s) {
+    string rs; rs.resize(s.size()); reverse_copy(s.begin(), s.end(), rs.begin());
+    if(s == rs) return 1;
+    return 0;
+}
+
+int recur(string &a, int i) {
+    string s;
+    int n = a.size(), ret, ans = 1e9;
+    if(i == n) return -1;
+    if(dp[i] != -1) return dp[i];
+    for(int j = i; j < n; j++) {
+        s.push_back(a[j]);
+        if(palindrome(s)) {
+            ret = recur(a, j + 1);
+            ans = min(ans, 1 + ret);
+        }
+    }
+    return dp[i] = ans;
+}
+
+int Solution::minCut(string a) {
+    int n = a.size(); dp = vector<int> (n + 1, -1); return recur(a, 0);
+}
+```
