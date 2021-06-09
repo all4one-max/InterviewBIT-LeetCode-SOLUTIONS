@@ -993,3 +993,172 @@ int Solution::uniquePathsWithObstacles(vector<vector<int> > &a) {
     return dp[0][0];
 }
 ```
+
+### [Max Rectangle in Binary Matrix](https://www.interviewbit.com/problems/max-rectangle-in-binary-matrix/)
+
+```cpp
+vector<int> apply(vector<int> &a) {
+    int n = a.size();
+    stack<pair<int, int>> st;
+    vector<int> ans(n, 0);
+    for(int i = 0; i < n; i++) {
+        while(!st.empty() && st.top().first >= a[i]) st.pop();
+        if(st.empty()) ans[i] = a[i] * (i + 1);
+        else {
+            auto it = st.top();
+            int pos = it.second;
+            ans[i] = a[i] * (i - pos);
+        }
+        st.push({a[i], i});
+    }
+    return ans;
+}
+
+int calc(vector<int> row) {
+    int n = row.size();
+    vector<int> ans1 = apply(row);
+    reverse(row.begin(), row.end());
+    vector<int> ans2 = apply(row);
+    int ans = 0;
+    for(int i = 0; i < n; i++) ans = max(ans, ans1[i] + ans2[n - i - 1] - row[n - i - 1]);
+    return ans;
+}
+
+int Solution::maximalRectangle(vector<vector<int> > &a) {
+    int n = a.size(), m = a[0].size();
+    vector<int> row(m, 0); int ans = 0;
+    for(int i = 0; i < n; i++) {
+        for(int j = 0; j < m; j++) {
+            if(a[i][j] == 0) row[j] = 0;
+            else row[j]++;
+        }
+        ans = max(ans, calc(row));
+    }
+    return ans;
+}
+```
+
+### [Minimum Cost to Cut a Stick LeetCode](https://leetcode.com/problems/minimum-cost-to-cut-a-stick/submissions/)
+
+```cpp
+// the problem in interview bit asks to get the order of cut which can be easily
+// by saving parent for all the ranges we iterate through during recursion in a 2D array
+// later on we can write another recursive function to retrieve the actual order of cuts using the parent array
+class Solution {
+public:
+    int recur(int x, int y, int mn, int mx, vector<int> &b, vector<vector<int>> &dp) {
+        if(x == y) return dp[x][y] = mx - mn;
+        if(x > y || x < 0 || y >= b.size()) return 0;
+        if(dp[x][y] != -1) return dp[x][y];
+        int ans = 1e9;
+        for(int i = x; i <= y; i++) {
+            int ans1 = recur(x, i - 1, mn, b[i], b, dp);
+            int ans2 = recur(i + 1, y, b[i], mx, b, dp);
+            int cur_ans = ans1 + ans2 + mx - mn;
+            ans = min(ans, cur_ans);
+        }
+        return dp[x][y] = ans;
+    }
+
+    int minCost(int N, vector<int>& b) {
+        sort(b.begin(), b.end());
+        int n = b.size();
+        vector<vector<int>> dp(n + 1, vector<int> (n + 1, -1));
+        return recur(0, n - 1, 0, N, b, dp);
+    }
+};
+```
+
+### [Sub Matrices with sum Zero (Star Marked)](https://www.interviewbit.com/problems/sub-matrices-with-sum-zero/)
+
+```cpp
+int Solution::solve(vector<vector<int> > &a) {
+    int n = a.size();
+    if(n == 0) return 0; int m = a[0].size();
+    vector<vector<int>> dp(n + 1, vector<int> (m + 1, 0));
+    // dp[i][j] = sum for matrix for [0, 0] to [i, j]
+    for(int i = 1; i <= n; i++) {
+        for(int j = 1; j <= m; j++) {
+            dp[i][j] = a[i - 1][j - 1];
+            dp[i][j] += dp[i][j - 1];
+            dp[i][j] += dp[i - 1][j];
+            dp[i][j] -= dp[i - 1][j - 1];
+        }
+    }
+    vector<int> dp2(m + 1, 0);
+    unordered_map<int, int> mp; int ans = 0;
+    for(int i = 0; i <= n; i++) {
+        for(int j = i + 1; j <= n; j++) {
+            // solve for the sub matrices starting at the (i + 1)th row and
+            // ending at the jth column
+            for(int k = 1; k <= m; k++) dp2[k] = dp[j][k] - dp[i][k];
+            mp.clear();
+            for(int k = 1; k <= m; k++) {
+                if(dp2[k] == 0) ans++;
+                ans += mp[dp2[k]];
+                mp[dp2[k]]++;
+            }
+        }
+    }
+    return ans;
+}
+```
+
+### [Max Product Subarray](https://www.interviewbit.com/problems/max-product-subarray/)
+
+```cpp
+int Solution::maxProduct(const vector<int> &a) {
+    int n = a.size(), inf = -1e9;
+    vector<array<int, 2>> dp(n + 1, {inf, inf});
+    if(a[n - 1] > 0) dp[n - 1][0] = a[n - 1];
+    else if(a[n - 1] < 0) dp[n - 1][1] = a[n - 1];
+    int ans = *max_element(a.begin(), a.end());
+    for(int i = n - 2; i >= 0; i--) {
+        if(a[i] > 0) {
+            if(dp[i + 1][0] != inf) dp[i][0] = a[i] * dp[i + 1][0];
+            else dp[i][0] = a[i];
+            if(dp[i + 1][1] != inf) dp[i][1] = a[i] * dp[i + 1][1];
+        }
+        else if(a[i] < 0) {
+            if(dp[i + 1][1] != inf) dp[i][0] = a[i] * dp[i + 1][1];
+            if(dp[i + 1][0] != inf) dp[i][1] = a[i] * dp[i + 1][0];
+            else dp[i][1] = a[i];
+        }
+    }
+    for(int i = 0; i < n; i++) ans = max(ans, dp[i][0]);
+    return ans;
+}
+```
+
+### [Arrange II](https://www.interviewbit.com/problems/arrange-ii/)
+
+```cpp
+vector<vector<vector<int>>> dp;
+
+int recur(string &a, int k, int x, int y) {
+    int N = a.size();
+    if(x == N && k == 0) return 0;
+    if(x == N && k != 0) return 1e9;
+    if(dp[x][y][k] != -1) return dp[x][y][k];
+    int n = y - x + 1;
+    int mx = max(n, n - (k - 1)); int cost, b = 0, w = 0; int ans = 1e9;
+    for(int i = x; i < (x + mx); i++) {
+        if(a[i] == 'W') w++;
+        else b++;
+        if((k != 1) || (k == 1 && i == N - 1)) {
+            cost = b * w;
+            int ret = recur(a, k - 1, i + 1, y);
+            ans = min(ans, cost + ret);
+        }
+    }
+    return dp[x][y][k] = ans;
+}
+
+int Solution::arrange(string a, int b) {
+    int n = a.size();
+    dp = vector<vector<vector<int>>> (n + 1, vector<vector<int>> (n + 1, vector<int> (b + 1, -1)));
+    int ret = recur(a, b, 0, n - 1);
+    if(ret == 1e9) return -1;
+    return ret;
+}
+```

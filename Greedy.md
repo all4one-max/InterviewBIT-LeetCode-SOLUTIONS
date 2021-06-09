@@ -182,6 +182,7 @@ int Solution::mice(vector<int> &a, vector<int> &b) {
 ### [Gas Station (Star Marked)](https://www.interviewbit.com/problems/gas-station/)
 
 ```cpp
+// Try to think of the similarity between this question and kadane's algorithm
 int Solution::canCompleteCircuit(const vector<int> &a, const vector<int> &b) {
     int n = a.size();
     int tank = 0, start = 0, total = 0;
