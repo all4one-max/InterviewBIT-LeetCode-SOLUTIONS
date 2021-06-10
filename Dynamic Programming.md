@@ -1104,6 +1104,12 @@ int Solution::solve(vector<vector<int> > &a) {
 }
 ```
 
+### [Coin Sum Infinite (Star Marked)](https://www.interviewbit.com/problems/coin-sum-infinite/)
+
+```cpp
+
+```
+
 ### [Max Product Subarray](https://www.interviewbit.com/problems/max-product-subarray/)
 
 ```cpp
