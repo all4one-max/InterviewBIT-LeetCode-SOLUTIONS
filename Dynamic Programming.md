@@ -829,6 +829,7 @@ int Solution::solve(vector<int> &a, int k) {
 ### [Evaluate Expression To True (Star Marked)](https://www.interviewbit.com/problems/evaluate-expression-to-true/)
 
 ```cpp
+// Based on Matrix Chain Multiplication
 #define mod 1003
 
 int Solution::cnttrue(string a) {
@@ -976,6 +977,55 @@ int Solution::solve(vector<vector<int> > &a) {
 }
 ```
 
+### [Maximum Size Square Sub-matrix (Star Marked)](https://www.interviewbit.com/problems/maximum-size-square-sub-matrix/)
+
+```cpp
+// Method 1 (using 2 DP one for sum and other of max size of sub-matrix)
+// dp2[i][j] = maximum sub-matrix with [i, j] as rightmost and bottomost point
+int Solution::solve(vector<vector<int> > &a) {
+    int n = a.size(), m = a[0].size();
+    vector<vector<int>> dp(n + 1, vector<int> (m + 1, 0));
+    for(int i = 1; i <= n; i++) {
+        for(int j = 1; j <= m; j++) {
+            dp[i][j] = a[i - 1][j - 1];
+            dp[i][j] += dp[i][j - 1];
+            dp[i][j] += dp[i - 1][j];
+            dp[i][j] -= dp[i - 1][j - 1];
+        }
+    }
+    vector<vector<int>> dp2(n + 1, vector<int> (m + 1, 0)); int ans = 0;
+    for(int i = 1; i <= n; i++) {
+        for(int j = 1; j <= m; j++) {
+                int cnt = dp2[i - 1][j - 1];
+                int x = i - cnt - 1, y = j - cnt - 1;
+                int cur = dp[i][j] - dp[i][y] - dp[x][j] + dp[x][y];
+                if(cur == (cnt + 1) * (cnt + 1)) {
+                    dp2[i][j] = cnt + 1;
+                    ans = max(ans, (cnt + 1)*(cnt + 1));
+                }
+                else if (a[i - 1][j - 1] == 1) dp2[i][j] = 1;
+        }
+    }
+    return ans;
+}
+
+// Method 2 (using only 1 DP)
+int Solution::solve(vector<vector<int> > &a) {
+    int n = a.size(), m = a[0].size();
+    vector<vector<int>> dp(n + 1, vector<int> (m + 1, 0)); int ans = 0;
+    for (int i = 1; i <= n; i++) {
+        for (int j = 1; j <= m; j++) {
+            if (a[i - 1][j - 1] == 1) {
+                int mn = min(dp[i - 1][j - 1], min(dp[i][j - 1], dp[i - 1][j]));
+                dp[i][j] = mn + 1;
+                ans = max(ans, (mn + 1) * (mn + 1));
+            }
+        }
+    }
+    return ans;
+}
+```
+
 ### [Unique Paths in a Grid](https://www.interviewbit.com/problems/unique-paths-in-a-grid/)
 
 ```cpp
@@ -1107,7 +1157,47 @@ int Solution::solve(vector<vector<int> > &a) {
 ### [Coin Sum Infinite (Star Marked)](https://www.interviewbit.com/problems/coin-sum-infinite/)
 
 ```cpp
+// Method 1 (Using O(N * B) space and time)
+# define mod 1000007
 
+int Solution::coinchange2(vector<int> &a, int b) {
+    int n = a.size(); sort(a.begin(), a.end());
+    vector<vector<int>> dp(n + 1, vector<int> (b + 1, 0));
+    // dp[i][j] = number of ways to get sum j using the first i numbers;
+    for(int i = 0; i <= n; i++) dp[i][0] = 1;
+    for(int i = 1; i <= n; i++) {
+        for(int sum = 1; sum <= b; sum++) {
+            dp[i][sum] = dp[i - 1][sum];
+            dp[i][sum] %= mod;
+            if(sum >= a[i - 1]) {
+                dp[i][sum] += dp[i][sum - a[i - 1]];
+                dp[i][sum] %= mod;
+            }
+        }
+    }
+    return dp[n][b];
+}
+
+// Method 2 (Using O(N) space and O(N * B) time)
+# define mod 1000007
+
+int Solution::coinchange2(vector<int> &a, int b) {
+    int n = a.size(); sort(a.begin(), a.end());
+    vector<int> dp(b + 1, 0);
+    // dp[i][j] = number of ways to get sum j using the first i numbers;
+    dp[0] = 1;
+    for(int i = 1; i <= n; i++) {
+        for(int sum = 1; sum <= b; sum++) {
+            dp[sum] = dp[sum];
+            dp[sum] %= mod;
+            if(sum >= a[i - 1]) {
+                dp[sum] += dp[sum - a[i - 1]];
+                dp[sum] %= mod;
+            }
+        }
+    }
+    return dp[b];
+}
 ```
 
 ### [Max Product Subarray](https://www.interviewbit.com/problems/max-product-subarray/)
@@ -1211,6 +1301,100 @@ int Solution::solve(const vector<int> &a, const vector<int> &b, const vector<int
 }
 ```
 
+### [0-1 Knapsack](https://www.interviewbit.com/problems/0-1-knapsack/)
+
+```cpp
+int Solution::solve(vector<int> &a, vector<int> &b, int c) {
+    int n = a.size(); vector<vector<int>> dp(n + 1, vector<int> (c + 1, 0));
+    for(int i = n - 1; i >= 0; i--) {
+        for(int j = 0; j <= c; j++) {
+            dp[i][j] = dp[i + 1][j];
+            if(j >= b[i]) dp[i][j] = max(dp[i][j], a[i] + dp[i + 1][j - b[i]]);
+        }
+    }
+    return dp[0][c];
+}
+```
+
+### [Split Array With Same Average LeetCode (Star Marked)](https://leetcode.com/problems/split-array-with-same-average/submissions/)
+
+```cpp
+// Useful link: https://leetcode.com/problems/split-array-with-same-average/discuss/524407/C%2B%2B-solution-O(N*Sum)-DPsumbitmask-with-explanation
+// Method 1 (O(N * sum * N) time and O(N * sum) space gives TLE)
+class Solution {
+public:
+    bool splitArraySameAverage(vector<int>& a) {
+        int n = a.size(), sum = 0;
+        for(int i = 0; i < n; i++) sum += a[i];
+        vector<vector<int>> dp(n + 1, vector<int> (sum + 1, 0));
+        dp[0][0] = 1;
+        for(int i = 0; i < n; i++) {
+            for(int sm = sum; sm >= 0; sm--) {
+                for(int len = 1; len <= n; len++) {
+                    if(sm >= a[i]) {
+                        dp[len][sm] = (dp[len][sm] | dp[len - 1][sm - a[i]]);
+                    }
+                }
+            }
+        }
+        for(int i = 1; i <= n - 1; i++) {
+            if((sum * i) % n == 0) {
+                int sm = (sum * i) / n;
+                if(dp[i][sm]) return true;
+            }
+        }
+        return false;
+    }
+};
+
+// Method 2 (O(N * sum) time and O(sum) space dp with bitmask)
+class Solution {
+public:
+    bool splitArraySameAverage(vector<int>& a) {
+        int n = a.size(), sum = 0;
+        for(int i = 0; i < n; i++) sum += a[i];
+        vector<int> dp(sum + 1, 0);
+        dp[0] = 1;
+        for(int i = 0; i < n; i++) {
+            for(int sm = sum; sm >= 0; sm--) {
+                if(sm >= a[i]) dp[sm] |= (dp[sm - a[i]] << 1);
+            }
+        }
+        for(int i = 1; i <= n - 1; i++) {
+            if((sum * i) % n == 0) {
+                int sm = (sum * i) / n;
+                if(dp[sm] & (1 << i)) return true;
+            }
+        }
+        return false;
+    }
+};
+```
+
+### [Equal Average Partition (Star Marked)](https://www.interviewbit.com/problems/equal-average-partition/)
+
+```cpp
+
+```
+
+### [Best Time to Buy and Sell Stocks II](https://www.interviewbit.com/problems/best-time-to-buy-and-sell-stocks-ii/)
+
+```cpp
+int Solution::maxProfit(const vector<int> &a) {
+    int n = a.size(); if(n == 0) return 0;
+    int mn = a[0], mx = a[0]; int ans = 0;
+    for(int i = 1; i < n; i++) {
+        if(a[i] < mx) {
+            ans += (mx - mn);
+            mn = a[i], mx = a[i];
+        }
+        mx = max(mx, a[i]);
+    }
+    ans += (mx - mn);
+    return ans;
+}
+```
+
 ### [Word Break II](https://www.interviewbit.com/problems/word-break-ii/)
 
 ```cpp
@@ -1278,9 +1462,41 @@ int Solution::maxPathSum(TreeNode* a) {
 }
 ```
 
+### [Unique Binary Search Trees II](https://www.interviewbit.com/problems/unique-binary-search-trees-ii/)
+
+```cpp
+vector<int> dp;
+
+int generate(int n)
+{
+    if(n == 0) return 1;
+    if(dp[n] != -1) return dp[n];
+
+    int ans = 0;
+
+
+    for(int i = 1; i <= n; i++)
+    {
+        int l = generate(i - 1);
+        int r = generate(n - i);
+        ans += l * r;
+    }
+
+    return dp[n] = ans;
+}
+
+int Solution::numTrees(int A) {
+    dp = vector<int> (A + 1, -1);
+    return generate(A);
+}
+```
+
 ### [Palindrome Partitioning II](https://www.interviewbit.com/problems/palindrome-partitioning-ii/)
 
 ```cpp
+// Method 1 (O(N^3) as we calculate dp for every i in the range [1, N] and then we have)
+// transition of O(N) for every i, and it takes O(N) time to check whether a given string is
+// palindrome or not. This soultion get Accepted in InterviewBit but gives TLE in leetcode
 vector<int> dp;
 
 int palindrome(string s) {
@@ -1306,5 +1522,328 @@ int recur(string &a, int i) {
 
 int Solution::minCut(string a) {
     int n = a.size(); dp = vector<int> (n + 1, -1); return recur(a, 0);
+}
+
+// Method 2 (somehow this gets Accepted in Leetcode)
+class Solution {
+public:
+    vector<int> dp;
+
+    int palindrome(string &s) {
+        int i = 0, j = s.size() - 1;
+        while(i < j) {
+            if(s[i] != s[j]) return 0;
+            i++; j--;
+        }
+        return 1;
+    }
+
+    int recur(string &a, int i) {
+        string s;
+        int n = a.size(), ret, ans = 1e9;
+        if(i == n) return -1;
+        if(dp[i] != -1) return dp[i];
+        for(int j = i; j < n; j++) {
+            s.push_back(a[j]);
+            if(palindrome(s)) {
+                ret = recur(a, j + 1);
+                ans = min(ans, 1 + ret);
+            }
+        }
+        return dp[i] = ans;
+    }
+
+    int minCut(string a) {
+        int n = a.size(); dp = vector<int> (n + 1, -1); return recur(a, 0);
+    }
+};
+
+// Method 3 (O(N^2) space and O(N^2) time)
+class Solution {
+public:
+    vector<int> dp;
+    vector<vector<int>> dp2;
+
+    int recur(string &a, int i) {
+        int n = a.size(), ret, ans = 1e9;
+        if(i == n) return -1;
+        if(dp[i] != -1) return dp[i];
+        for(int j = i; j < n; j++) {
+            if(dp2[i][j]) {
+                ret = recur(a, j + 1);
+                ans = min(ans, 1 + ret);
+            }
+        }
+        return dp[i] = ans;
+    }
+
+    int minCut(string a) {
+        int n = a.size(); dp = vector<int> (n + 1, -1);
+        dp2 = vector<vector<int>> (n + 1, vector<int> (n + 1, 0));
+        for(int i = 0; i < n; i++) dp2[i][i] = 1;
+        for(int i = n - 1; i >= 0; i--) {
+            for(int j = i + 1; j < n; j++) {
+                if(a[i] == a[j]) {
+                    if(j - i == 1) dp2[i][j] = 2;
+                    else dp2[i][j] = dp2[i][j] || dp2[i + 1][j - 1];
+                }
+            }
+        }
+        return recur(a, 0);
+    }
+};
+
+// Method 4 (O(N) space and O(N^2) time)
+class Solution {
+public:
+    // Let's try and solve in O(N) space
+    int minCut(string a) {
+        int n = a.size(); vector<int> dp(n + 1, 1e9); dp[n] = -1;
+        for(int i = n - 1; i >= 0; i--) {
+            // Let's assume this point i is the centre of the palindrom
+            int j = i, k = i;
+            while(j >= 0 && k < n && a[j] == a[k]) {
+                j--; k++;
+                dp[j + 1] = min(dp[j + 1], 1 + dp[k]);
+            }
+            // Now let's try if the centre is of length i.e palindrome is of even length
+            if(i - 1 >= 0) {
+                k = i; j = i - 1;
+                while(j >= 0 && k < n && a[j] == a[k]) {
+                    j--; k++;
+                     dp[j + 1] = min(dp[j + 1], 1 + dp[k]);
+                }
+            }
+        }
+        return dp[0];
+    }
+};
+```
+
+### [Palindrome Partitioning III LeetCode (Star Marked)](https://leetcode.com/problems/palindrome-partitioning-iii/submissions/)
+
+```cpp
+// Method 1 (O(N * K * N * N) time and O(N * K) space)
+class Solution {
+public:
+    int getAns(string &a, int i, int j) {
+        int mov = 0;
+        while(i < j) {
+            if(a[i] != a[j]) mov++;
+            i++; j--;
+        }
+        return mov;
+    }
+
+    int palindromePartition(string s, int k) {
+        int n = s.size();
+        vector<vector<int>> dp(n + 1, vector<int> (k + 1, 1e9));
+        for(int i = n - 1; i >= 0; i--) {
+            for(int cuts = 0; cuts <= k; cuts++) {
+                int len = n - i + 1;
+                if(cuts > len - 1) continue;
+                for(int j = i; j < n; j++) {
+                    int mov = getAns(s, i, j);
+                    if(cuts == 0) {
+                        if(j == n - 1) dp[i][cuts] = mov;
+                        continue;
+                    }
+                    dp[i][cuts] = min(dp[i][cuts], mov + dp[j + 1][cuts - 1]);
+                }
+            }
+        }
+        return dp[0][k - 1];
+    }
+};
+
+// Method 2 (O(N * K * N) time for dp and  O(N * N * N) time for dp2 and O(N * k) space of dp and  O(N * N) space for dp2)
+// overall you would have O(N ^ 3) time and O(N ^ 2) space
+class Solution {
+public:
+    int getAns(string &a, int i, int j) {
+        int mov = 0;
+        while(i < j) {
+            if(a[i] != a[j]) mov++;
+            i++; j--;
+        }
+        return mov;
+    }
+
+    int palindromePartition(string s, int k) {
+        int n = s.size();
+        vector<vector<int>> dp(n + 1, vector<int> (k + 1, 1e9));
+        vector<vector<int>> dp2(n + 1, vector<int> (n + 1, 0));
+        for(int i = 0; i < n; i++) {
+            for(int j = i; j < n; j++) dp2[i][j] = getAns(s, i, j);
+        }
+
+        for(int i = n - 1; i >= 0; i--) {
+            for(int cuts = 0; cuts <= k; cuts++) {
+                int len = n - i + 1;
+                if(cuts > len - 1) continue;
+                for(int j = i; j < n; j++) {
+                    int mov = dp2[i][j];
+                    if(cuts == 0) {
+                        if(j == n - 1) dp[i][cuts] = mov;
+                        continue;
+                    }
+                    dp[i][cuts] = min(dp[i][cuts], mov + dp[j + 1][cuts - 1]);
+                }
+            }
+        }
+        return dp[0][k - 1];
+    }
+};
+
+// Method 3 (O(N * K * N) time for dp and  O(N * N) time for dp2 and O(N * k) space of dp and  O(N * N) space for dp2)
+// overall you would have O(N ^ 3) time and O(N ^ 2) space
+class Solution {
+public:
+    int palindromePartition(string s, int k) {
+        int n = s.size();
+        vector<vector<int>> dp(n + 1, vector<int> (k + 1, 1e9));
+        vector<vector<int>> dp2(n + 1, vector<int> (n + 1, 0));
+
+        for(int i = 0; i < n; i++) dp2[i][i] = 0;
+        for(int i = n - 1; i >= 0; i--) {
+            for(int j = i + 1; j < n; j++) {
+                if(j - i == 1) {
+                    if(s[i] != s[j]) dp2[i][j] = 1;
+                }
+                else {
+                    dp2[i][j] = dp2[i + 1][j - 1];
+                    if(s[i] != s[j]) dp2[i][j]++;
+                }
+            }
+        }
+
+        for(int i = n - 1; i >= 0; i--) {
+            for(int cuts = 0; cuts <= k; cuts++) {
+                int len = n - i + 1;
+                if(cuts > len - 1) continue;
+                for(int j = i; j < n; j++) {
+                    int mov = dp2[i][j];
+                    if(cuts == 0) {
+                        if(j == n - 1) dp[i][cuts] = mov;
+                        continue;
+                    }
+                    dp[i][cuts] = min(dp[i][cuts], mov + dp[j + 1][cuts - 1]);
+                }
+            }
+        }
+        return dp[0][k - 1];
+    }
+};
+```
+
+### [Word Break](https://www.interviewbit.com/problems/word-break/)
+
+```cpp
+vector<int> dp;
+unordered_map<string, int> mp;
+
+int recur(int x, string &a) {
+    int n = a.size();
+    if(x == n) return 1;
+    string s;
+    if(dp[x] != -1) return dp[x];
+    for(int i = x; i <= n - 1; i++) {
+        s.push_back(a[i]);
+        if(mp.find(s) != mp.end()) {
+            int ret = recur(i + 1, a);
+            if(ret) return dp[x] = 1;
+        }
+    }
+    return dp[x] = 0;
+}
+
+int Solution::wordBreak(string a, vector<string> &b) {
+    int n = a.size();
+    dp = vector<int> (n + 1, -1);
+    mp.clear(); for(auto it : b) mp[it] = 1;
+    return recur(0, a);
+}
+```
+
+### [Super Egg Drop LeetCode (StarMarked)](https://leetcode.com/problems/super-egg-drop/submissions/)
+
+```cpp
+// Method 1 (O(K * N * N) time and O(K * N) space)
+class Solution {
+public:
+    vector<vector<int>> dp;
+
+    int recur(int k, int n) {
+        if(k == 1) return dp[k][n] = n;
+        if(n <= 0) return 0;
+        if(n == 1) return 1;
+        if(dp[k][n] != -1) return dp[k][n];
+        int ans = 1e9;
+        for(int i = 1; i <= n; i++) {
+            int val1 = recur(k - 1, i - 1);
+            int val2 = recur(k, n - i);
+            ans = min(ans,1 + max(val1, val2));
+        }
+        return dp[k][n] = ans;
+    }
+
+    int superEggDrop(int k, int n) {
+        dp = vector<vector<int>> (k + 1, vector<int> (n + 1, -1));
+        return recur(k, n);
+    }
+};
+
+// Method 2 (O(K * N * logN) time and O(K * N) space)
+class Solution {
+public:
+    vector<vector<int>> dp;
+
+    int recur(int k, int n) {
+        if(k == 1) return dp[k][n] = n;
+        if(n <= 0) return 0;
+        if(n == 1) return 1;
+        if(dp[k][n] != -1) return dp[k][n];
+        int ans = 1e9;
+        int low = 1, high = n;
+        while(high >= low) {
+            int mid = (low + high)/2;
+            int val1 = recur(k - 1, mid - 1);
+            int val2 = recur(k, n - mid);
+            ans = min(ans,1 + max(val1, val2));
+            if(val1 < val2) low = mid + 1;
+            else high = mid - 1;
+            if(dp[k][n] == -1) dp[k][n] = ans;
+            else dp[k][n] = min(dp[k][n], ans);
+        }
+        return dp[k][n];
+    }
+
+    int superEggDrop(int k, int n) {
+        dp = vector<vector<int>> (k + 1, vector<int> (n + 1, -1));
+        int ans = recur(k, n);
+        return ans;
+    }
+};
+```
+
+### [Subset Sum Problem!](https://www.interviewbit.com/problems/subset-sum-problem/)
+
+```cpp
+int Solution::solve(vector<int> &a, int b) {
+    // same as 0 - 1 knapsack
+    int n = a.size();
+    if(n == 0) {
+        if(b != 0) return 0;
+        return 1;
+    }
+    vector<vector<int>> dp(n + 1, vector<int> (b + 1, 0));
+    for(int i = 0; i <= n; i++) dp[i][0] = 1;
+    for(int i = 1; i <= n; i++) {
+        for(int j = 1; j <= b; j++) {
+            if(a[i - 1] > j) dp[i][j] = dp[i - 1][j];
+            else dp[i][j] = dp[i - 1][j] | dp[i - 1][j - a[i - 1]];
+        }
+    }
+    return dp[n][b];
 }
 ```
