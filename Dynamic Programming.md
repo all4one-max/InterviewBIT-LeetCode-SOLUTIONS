@@ -1374,7 +1374,68 @@ public:
 ### [Equal Average Partition (Star Marked)](https://www.interviewbit.com/problems/equal-average-partition/)
 
 ```cpp
+// O(N * SUM * N)
+// Always remember if you are asked to find the actual partition then there is no other way but to backtrack
+// and find solution
+vector<vector<vector<int>>> dp;
+vector<int> taken;
 
+int partition(int ind, int sm, int len, vector<int> &temp, vector<vector<int>> &ans, vector<int> &a) {
+    int n = a.size();
+    if(dp[ind][sm][len] != -1) return dp[ind][sm][len];
+    if(len == 0) {
+        if(sm == 0) {
+            ans.push_back(temp);
+            return dp[ind][sm][len] = 1;
+        }
+        return dp[ind][sm][len] = 0;
+    }
+    if(ind == n) return dp[ind][sm][len] = 0;
+    if(sm - a[ind] >= 0) {
+        temp.push_back(a[ind]); taken[ind] = 1;
+        if(partition(ind + 1, sm - a[ind], len - 1, temp, ans, a)) return dp[ind][sm][len] = 1;
+        taken[ind] = 0; temp.pop_back();
+    }
+    if(partition(ind + 1, sm, len, temp, ans, a)) return dp[ind][sm][len] = 1;
+    return dp[ind][sm][len] = 0;
+}
+
+vector<vector<int> > Solution::avgset(vector<int> &a) {
+    int n = a.size(), sum = 0; sort(a.begin(), a.end());
+    for(int i = 0; i < n; i++) sum += a[i];
+    dp = vector<vector<vector<int>>> (n + 1, vector<vector<int>> (sum + 1, vector<int> (n + 1, -1)));
+    taken = vector<int> (n + 1, 0);
+    for(int i = 1; i <= n - 1; i++) {
+        if((sum * i) % n == 0) {
+            int sm = (sum * i) / n;
+            vector<int> temp; vector<vector<int>> ans;
+            if(partition(0, sm, i, temp, ans, a)) {
+                temp.clear();
+                for(int j = 0; j < n; j++) {
+                    if(!taken[j]) temp.push_back(a[j]);
+                }
+                ans.push_back(temp);
+                if(ans[0].size() < ans[1].size()) return ans;
+                else if(ans[0].size() > ans[1].size()) {
+                    swap(ans[0], ans[1]);
+                    return ans;
+                }
+                else {
+                    for(int j = 0; j < ans[0].size(); j++) {
+                        if(ans[0][j] < ans[1][j]) return ans;
+                        else if(ans[0][j] > ans[1][j]) {
+                            swap(ans[0], ans[1]);
+                            return ans;
+                        }
+                    }
+                    return ans;
+                }
+            }
+
+        }
+    }
+    return {};
+}
 ```
 
 ### [Best Time to Buy and Sell Stocks II](https://www.interviewbit.com/problems/best-time-to-buy-and-sell-stocks-ii/)
@@ -1765,7 +1826,7 @@ int Solution::wordBreak(string a, vector<string> &b) {
 }
 ```
 
-### [Super Egg Drop LeetCode (StarMarked)](https://leetcode.com/problems/super-egg-drop/submissions/)
+### [Super Egg Drop LeetCode (Star Marked)](https://leetcode.com/problems/super-egg-drop/submissions/)
 
 ```cpp
 // Method 1 (O(K * N * N) time and O(K * N) space)
@@ -1824,6 +1885,38 @@ public:
         return ans;
     }
 };
+```
+
+### [Merge elements](https://www.interviewbit.com/problems/merge-elements/)
+
+```cpp
+int Solution::solve(vector<int> &a) {
+    int n = a.size();
+    // since maximum value of n is 200, we will use something on the lines
+    // of matrix chain multiplication
+    vector<vector<int>> dp(n + 1, vector<int> (n + 1, 1e9));
+    vector<int> pref(n + 1, 0);  pref[0] = a[0];
+    for(int i = 0; i < n; i++) dp[i][i] = 0;
+    for(int i = 1; i < n; i++) pref[i] += (pref[i - 1] + a[i]);
+    for(int len = 2; len <= n; len++) {
+        for(int i = 0; i < n; i++) {
+            int j = i + len - 1;
+            if(j < n) {
+                for(int k = i; k < j; k++) {
+                    if(i > 0) {
+                        int left = pref[k] - pref[i - 1], right = pref[j] - pref[k];
+                        dp[i][j] = min(dp[i][j], dp[i][k] + (left + right) + dp[k + 1][j]);
+                    }
+                    else {
+                        int left = pref[k], right = pref[j] - pref[k];
+                        dp[i][j] = min(dp[i][j], dp[i][k] + (left + right) + dp[k + 1][j]);
+                    }
+                }
+            }
+        }
+    }
+    return dp[0][n - 1];
+}
 ```
 
 ### [Subset Sum Problem!](https://www.interviewbit.com/problems/subset-sum-problem/)
