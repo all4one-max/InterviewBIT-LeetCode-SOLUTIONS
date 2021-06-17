@@ -228,7 +228,7 @@ void Solution::sortColors(vector<int> &a) {
 }
 ```
 
-### [Max Continuous Series of 1s](https://www.interviewbit.com/problems/max-continuous-series-of-1s/)
+### [Max Continuous Series of 1s (Star Marked)](https://www.interviewbit.com/problems/max-continuous-series-of-1s/)
 
 ```cpp
 vector<int> Solution::maxone(vector<int> &a, int m) {
