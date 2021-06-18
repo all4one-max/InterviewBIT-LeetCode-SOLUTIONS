@@ -367,3 +367,52 @@ int Solution::solve(vector<int> &a, int b) {
     return ans;
 }
 ```
+
+## LeetCode Hard Problems
+
+### [Count Unique Characters of All Substrings of a Given String](https://leetcode.com/problems/count-unique-characters-of-all-substrings-of-a-given-string/)
+
+```cpp
+// Method 1 (using O(N*26) space and O(N*26) time)
+class Solution {
+public:
+    int uniqueLetterString(string s) {
+        vector<int> store[26]; int n = s.size();
+        for(int i = 0; i < n; i++) {
+            store[s[i] - 'A'].push_back(i);
+        }
+        int ans = 0;
+        for(int i = 0; i < 26; i++) {
+            for(int j = 0; j < store[i].size(); j++) {
+                int pos = store[i][j], prev = -1, next = n;
+                if(j - 1 >= 0) prev = store[i][j - 1];
+                if(j + 1 < store[i].size()) next = store[i][j + 1];
+                ans += ((pos - prev) * (next - pos));
+                ans %= 1000000007;
+            }
+        }
+        return ans;
+     }
+};
+
+// Method 2 (using O(N) space and O(N) time)
+class Solution {
+public:
+    int uniqueLetterString(string s) {
+        vector<int> last(26, -1); int n = s.size();
+        vector<int> nxt(n, n); vector<int> prv(n, -1);
+        for(int i = 0; i < n; i++) {
+            prv[i] = last[s[i] - 'A'];
+            if(last[s[i] - 'A'] != -1) nxt[last[s[i] - 'A']] = i;
+            last[s[i] - 'A'] = i;
+        }
+        int ans = 0;
+        for(int i = 0; i < n; i++) {
+            int pos = i, prev = prv[i], next = nxt[i];
+            ans += ((pos - prev) * (next - pos));
+            ans %= 1000000007;
+        }
+        return ans;
+     }
+};
+```
