@@ -370,7 +370,7 @@ int Solution::solve(vector<int> &a, int b) {
 }
 ```
 
-## LeetCode Hard Problems
+## LeetCode 2 Pointers Hard Problems
 
 ### [Count Unique Characters of All Substrings of a Given String](https://leetcode.com/problems/count-unique-characters-of-all-substrings-of-a-given-string/)
 
@@ -416,5 +416,163 @@ public:
         }
         return ans;
      }
+};
+```
+
+### [Minimum Window Substring](https://leetcode.com/problems/minimum-window-substring/submissions/)
+
+```cpp
+class Solution {
+public:
+    string minWindow(string s, string t) {
+        vector<int> store[100];
+        unordered_map<int, int> ump;
+        for(int i = 0; i < t.size(); i++) ump[t[i] - 'A']++; int len = 1e9, ind = -1;
+        for(int i = 0; i < s.size(); i++) {
+            store[s[i] - 'A'].push_back(i); int found = 1, mn = 1e9;
+            for(auto it : ump) {
+                int cnt = it.second;
+                if(store[it.first].size() >= cnt) {
+                    int pos = store[it.first][store[it.first].size() - cnt];
+                    mn = min(mn, pos);
+                }
+                else {
+                    found = 0;
+                    break;
+                }
+            }
+            if(found) {
+                int cur_len = i - mn + 1;
+                if(cur_len < len) {
+                    len = cur_len;
+                    ind = mn;
+                }
+            }
+        }
+        string ans = "";
+        if(ind != -1) ans = s.substr(ind, len);
+        return ans;
+    }
+};
+```
+
+### [Delivering Boxes from Storage to Ports (Star Marked)](https://leetcode.com/problems/delivering-boxes-from-storage-to-ports/submissions/)
+
+```cpp
+// VERY VERY VERY HARD PROBLEM
+// Method 1 (O(N^2) time and O(N) space) gives TLE
+class Solution {
+public:
+    int boxDelivering(vector<vector<int>>& boxes, int portsCount, int maxBoxes, int maxWeight) {
+        int n = boxes.size(); vector<int> dp(n + 1, 1e9); dp[n] = 0;
+        for(int i = n - 1; i >= 0; i--) {
+            int cur_box = 0, cur_weight = 0, trips = 0;
+            for(int j = i; j < n; j++) {
+                if(cur_box != maxBoxes) {
+                    if(cur_weight + boxes[j][1] <= maxWeight) {
+                        cur_box++;
+                        cur_weight += boxes[j][1];
+                        trips++;
+                        if(trips != 1 && boxes[j][0] == boxes[j - 1][0]) trips--;
+                        dp[i] = min(dp[i], trips + dp[j + 1] + 1);
+                    }
+                    else break;
+                }
+                else break;
+            }
+        }
+        for(int i = 0; i <= n; i++) cout<<dp[i]<<" ";
+        cout<<endl;
+        return dp[0];
+    }
+};
+
+// Method 2 (O(N * logN) time and O(N) space) gives AC
+class Solution {
+public:
+    int boxDelivering(vector<vector<int>>& boxes, int portsCount, int maxBoxes, int maxWeight) {
+        int n = boxes.size(); vector<int> dp(n + 1, 1e9); dp[n] = 0;
+        vector<int> dp2(n + 1, 0); dp2[n - 1] = 1;
+        for(int i = n - 2; i >= 0; i--) {
+            if(boxes[i][0] != boxes[i + 1][0]) dp2[i] = (1 + dp2[i + 1]);
+            else dp2[i] = dp2[i + 1];
+        }
+        int l = n, r = n - 1; multiset<int> mst; int cur_box = 0, cur_weight = 0;
+
+        for(int i = n - 1; i >= 0; i--) {
+            l--;
+            cur_box++; cur_weight += boxes[i][1];
+            if(i != n - 1 && boxes[i][0] == boxes[i + 1][0]) mst.insert(dp[i + 1] - dp2[i + 1] + 1);
+            else mst.insert(dp[i + 1] - dp2[i + 1]);
+            if(cur_box > maxBoxes) {
+                cur_weight -= boxes[r][1];
+                if(r != n - 1 && boxes[r][0] == boxes[r + 1][0]) mst.erase(mst.find(dp[r + 1] - dp2[r + 1] + 1));
+                else mst.erase(mst.find(dp[r + 1] - dp2[r + 1]));
+                r--;
+                cur_box--;
+            }
+            while(cur_weight > maxWeight) {
+                cur_weight -= boxes[r][1];
+                if(r != n - 1 && boxes[r][0] == boxes[r + 1][0]) mst.erase(mst.find(dp[r + 1] - dp2[r + 1] + 1));
+                else mst.erase(mst.find(dp[r + 1] - dp2[r + 1]));
+                r--;
+                cur_box--;
+            }
+            int mn = *mst.begin();
+            dp[i] = mn + dp2[i] + 1;
+        }
+        return dp[0];
+    }
+};
+```
+
+## LeetCode Sliding Window Hard Problems
+
+### [Minimum Number of K Consecutive Bit Flips](https://leetcode.com/problems/minimum-number-of-k-consecutive-bit-flips/submissions/)
+
+```cpp
+// Method 1 (O(N^2) time) gives TLE
+class Solution {
+public:
+    int minKBitFlips(vector<int>& nums, int k) {
+        int n = nums.size(); int ans = 0, l = -1, r = -1, parity = 0;
+        for(int i = 0; i < n; i++) {
+            if(nums[i] == 0) {
+                if(i + k - 1 >= n) return -1;
+                for(int j = i; j <= i + k - 1; j++) nums[j] = 1 - nums[j];
+                ans++;
+            }
+        }
+        return ans;
+    }
+};
+
+// Method 2 (O(N * logN) time and O(N) space) gives AC
+class Solution {
+public:
+    int minKBitFlips(vector<int>& nums, int k) {
+        int n = nums.size(); int ans = 0; vector<int> right; int sz = 0;
+        for(int i = 0; i < n; i++) {
+            int parity;
+            if(!sz) parity = 0;
+            else {
+                int pos = lower_bound(right.begin(), right.end(), i) - right.begin();
+                if(pos == sz) parity = 0;
+                else {
+                    int cnt = sz - pos;
+                    if(cnt % 2) parity = 1;
+                    else parity = 0;
+                }
+            }
+            if(parity % 2) nums[i] = 1 - nums[i];
+            if(nums[i] == 0) {
+                if(i + k - 1 >= n) return -1;
+                ans++;
+                sz++;
+                right.push_back(i + k - 1);
+            }
+        }
+        return ans;
+    }
 };
 ```
