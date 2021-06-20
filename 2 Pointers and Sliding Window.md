@@ -526,6 +526,80 @@ public:
 };
 ```
 
+### [Smallest Range Covering Elements from K Lists (Star Marked)](https://leetcode.com/problems/smallest-range-covering-elements-from-k-lists/)
+
+```cpp
+// Method 1 (merging all the array and then searching for the shortest window with number of distinct numbers
+// equal to the number of lists)
+// O(N) space and O(N * logN) time
+class Solution {
+public:
+    static bool comp(pair<int, int> p1, pair<int, int> p2) {
+        if(p1.second < p2.second) return true;
+        else if(p1.second == p2.second) {
+            if(p1.first < p2.first) return true;
+            return false;
+        }
+        return false;
+    }
+
+    vector<int> smallestRange(vector<vector<int>>& nums) {
+        int n = nums.size(); vector<pair<int, int>> arr;
+        for(int i = 0; i < n; i++) {
+            for(int j = 0; j < nums[i].size(); j++) arr.push_back({i, nums[i][j]});
+        }
+        sort(arr.begin(), arr.end(), comp);
+        int dis = 0, l = 0; unordered_map<int, int> ump; int ans = 1e9, ind1 = -1, ind2 = -1;
+        for(int i = 0; i < arr.size(); i++) {
+            if(ump[arr[i].first] == 0) {
+                ump[arr[i].first] = 1;
+                dis++;
+            }
+            else ump[arr[i].first]++;
+            if(dis == n) {
+                while(l <= i && l < arr.size()) {
+                    if(ans > arr[i].second - arr[l].second + 1) {
+                        ans = arr[i].second - arr[l].second + 1;
+                        ind1 = arr[l].second, ind2 = arr[i].second;
+                    }
+                    ump[arr[l].first]--;
+                    if(ump[arr[l].first] == 0) {
+                        dis--;
+                        l++;
+                        break;
+                    }
+                    l++;
+                }
+            }
+        }
+        return {ind1, ind2};
+    }
+};
+
+// Method 2 (using set)
+// O(k) space and O(N* logK) time
+class Solution {
+public:
+
+    vector<int> smallestRange(vector<vector<int>>& nums) {
+        int n = nums.size(); set<vector<int>> st;
+
+        for(int i = 0; i < n; i++) st.insert({nums[i][0], 0, i}); int ans = 1e9, ind1 = -1, ind2 = -1;
+        while(true) {
+            auto mn = *(st.begin()); auto mx = *(prev(st.end()));
+            int vl = mx[0] - mn[0] + 1;
+            if(ans > vl) {
+                ans = vl;
+                ind1 = mn[0]; ind2 = mx[0];
+            }
+            if(mn[1] + 1 == nums[mn[2]].size()) break;
+            st.erase(st.find(mn)); st.insert({nums[mn[2]][mn[1] + 1], mn[1] + 1, mn[2]});
+        }
+        return {ind1, ind2};
+    }
+};
+```
+
 ## LeetCode Sliding Window Hard Problems
 
 ### [Minimum Number of K Consecutive Bit Flips](https://leetcode.com/problems/minimum-number-of-k-consecutive-bit-flips/submissions/)
@@ -570,6 +644,79 @@ public:
                 ans++;
                 sz++;
                 right.push_back(i + k - 1);
+            }
+        }
+        return ans;
+    }
+};
+
+// Method 3 (O(N) time and O(1) space)
+// I will just write the explaination and not the code, so basically for every index we need to keep track
+// whether the current digit is right or wrong. We did this using an array called right which stores the right
+// index of all the flips and then we used lower_bound to find all the flips in which a particular index was
+// included. Now what we can do is we can maintain a queue which stores the right point of the flips we have done.
+// Now everytime we arrive at a particular index we can pop all those right pointers from the queue which are no
+// longer valid and then the count of valid flips will be the size of our queue.
+```
+
+### [Max Value of Equation](https://leetcode.com/problems/max-value-of-equation/submissions/)
+
+```cpp
+class Solution {
+public:
+    int findMaxValueOfEquation(vector<vector<int>>& points, int k) {
+        int n = points.size(); multiset<int> mst; mst.insert(points[0][0] + points[0][1]); int sz = 1;
+        int r = 0, ans = -1e9;
+        for(int i = 0; i < n; i++) {
+            int vl = points[i][0] + points[i][1];
+            if(mst.find(vl) != mst.end()) {
+                mst.erase(mst.find(vl)); sz--;
+            }
+            if(i > r) r = i;
+            while(r + 1 < n && (points[r + 1][0] - points[i][0]) <= k) {
+                r++; sz++;
+                mst.insert(points[r][0] + points[r][1]);
+            }
+            if(sz) {
+                int val = *(prev(mst.end()));
+                ans = max(ans, val - (points[i][0] - points[i][1]));
+            }
+        }
+        return ans;
+    }
+};
+```
+
+### [Sliding Window Median](https://leetcode.com/problems/sliding-window-median/)
+
+```cpp
+// solved using ordered_set in O(N *  logk) time and O(K) space
+#include <ext/pb_ds/assoc_container.hpp>
+#include <ext/pb_ds/tree_policy.hpp>
+using namespace __gnu_pbds;
+#define ordered_set    tree<pair<int, int>, null_type, less<pair<int, int>>, rb_tree_tag, tree_order_statistics_node_update>
+
+class Solution {
+public:
+    vector<double> medianSlidingWindow(vector<int>& nums, int k) {
+        int n = nums.size();
+        ordered_set o_set; vector<double> ans;
+        for(int i = 0; i < k - 1; i++) o_set.insert({nums[i], i});
+        for(int i = k - 1; i < n; i++) {
+            if(i - k >= 0) {
+                auto ers = make_pair(nums[i - k], i - k);
+                o_set.erase(o_set.find(ers));
+            }
+            o_set.insert({nums[i], i});
+            if(k % 2) {
+                auto ret = *(o_set.find_by_order((k/2)));
+                ans.push_back((double)ret.first);
+            }
+            else {
+                auto ret1 = *(o_set.find_by_order(((k/2) - 1)));
+                auto ret2 = *(o_set.find_by_order((k/2)));
+                double cur_ans = ((double)ret1.first + ret2.first)/2;
+                ans.push_back(cur_ans);
             }
         }
         return ans;
