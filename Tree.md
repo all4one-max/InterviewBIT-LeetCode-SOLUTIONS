@@ -242,7 +242,7 @@ vector<int> Solution::recoverTree(TreeNode* a) {
     return ans;
 }
 
-// Method 2 (Using Morris Inorder Traversal which uses constant space)
+// Method 2 (Using Morris Inorder Traversal to generate the inorder array and still not in constant space)
 // Morris Inorder Traversal
 
 vector<int> Solution::recoverTree(TreeNode* root) {
@@ -291,6 +291,54 @@ vector<int> Solution::recoverTree(TreeNode* root) {
         }
     }
     if(ans[0] > ans[1]) swap(ans[0], ans[1]);
+    return ans;
+}
+
+// Method 3 (constant space solution using Morris Inorder Traversal)
+// Morris Inorder Traversal
+
+vector<int> Solution::recoverTree(TreeNode* root) {
+    TreeNode* cur = root; vector<int> ans; TreeNode* pre = NULL;
+    TreeNode* first = NULL; TreeNode* second = NULL;
+    while(cur) {
+        if(!cur->left) {
+            if(pre != NULL && pre->val > cur->val) {
+                if(first == NULL) {
+                    first = pre;
+                    second = cur;
+                }
+                second = cur;
+            }
+            pre = cur;
+            cur = cur->right;
+        }
+        else {
+            TreeNode* inorder_predecessor = cur->left;
+            while(inorder_predecessor->right && inorder_predecessor->right != cur) inorder_predecessor = inorder_predecessor->right;
+            if(inorder_predecessor->right == NULL) {
+                inorder_predecessor->right = cur;
+                cur = cur->left;
+            }
+            else {
+                inorder_predecessor->right = NULL;
+                if(pre != NULL && pre->val > cur->val) {
+                    if(first == NULL) {
+                        first = pre;
+                        second = cur;
+                    }
+                second = cur;
+                }
+                pre = cur;
+                cur = cur->right;
+            }
+
+        }
+    }
+    if(first && second) {
+        if(first->val > second->val) swap(first, second);
+        ans.push_back(first->val);
+        ans.push_back(second->val);
+    }
     return ans;
 }
 ```
@@ -978,7 +1026,7 @@ TreeNode* Solution::buildTree(vector<int> &a) {
 }
 ```
 
-### [Inorder Traversal of Cartesian Tree](https://www.interviewbit.com/problems/inorder-traversal-of-cartesian-tree/)
+### [Sorted Array To Balanced BST](https://www.interviewbit.com/problems/sorted-array-to-balanced-bst/)
 
 ```cpp
 /**

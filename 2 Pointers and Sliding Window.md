@@ -456,7 +456,7 @@ public:
 };
 ```
 
-### [Delivering Boxes from Storage to Ports (Star Marked)](https://leetcode.com/problems/delivering-boxes-from-storage-to-ports/submissions/)
+### [Delivering Boxes from Storage to Ports (Star Marked)](https://leetcode.com/problems/delivering-boxes-from-storage-to-ports/)
 
 ```cpp
 // VERY VERY VERY HARD PROBLEM
