@@ -1922,6 +1922,7 @@ int Solution::solve(vector<int> &a) {
 ### [Subset Sum Problem!](https://www.interviewbit.com/problems/subset-sum-problem/)
 
 ```cpp
+// Method 1 (O(N * W))
 int Solution::solve(vector<int> &a, int b) {
     // same as 0 - 1 knapsack
     int n = a.size();
@@ -1938,5 +1939,17 @@ int Solution::solve(vector<int> &a, int b) {
         }
     }
     return dp[n][b];
+}
+
+// Mehtode 2 (O((N * W) / 32))
+#include<bitset>
+
+int Solution::solve(vector<int> &a, int b) {
+    bitset<100005> sums;
+    sums[0] = 1;
+    for(int x : a)
+        sums |= (sums<<x);
+    if(sums.test(b)) return 1;
+    return 0;
 }
 ```

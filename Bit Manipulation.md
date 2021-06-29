@@ -164,3 +164,77 @@ int Solution::singleNumber(const vector<int> &a) {
     return ans;
 }
 ```
+
+## LeetCode Bit Manipulation Hard Problems
+
+### [Triples with Bitwise AND Equal To Zero (Star Marked)](https://leetcode.com/problems/triples-with-bitwise-and-equal-to-zero/)
+
+```cpp
+class Solution {
+public:
+    int countTriplets(vector<int>& nums) {
+        int n = nums.size(); unordered_map<int, int> ump;
+        for(auto it : nums) {
+            for(auto it2 : nums) ump[it & it2]++;
+        } int ans = 0;
+        for(auto it : nums) {
+            for(auto it2 : ump) {
+                if((it & it2.first) == 0) ans += it2.second;
+            }
+        }
+        return ans;
+    }
+};
+```
+
+### [Minimum One Bit Operations to Make Integers Zero (Star Marked)](https://leetcode.com/problems/minimum-one-bit-operations-to-make-integers-zero/)
+
+```cpp
+// it takes (1<<(i + 1)) - 1 operations to go from a number which has it's ith bit set
+// to 0. i.e 1000 to 0000 will take (1<<4) - 1 = 15
+
+// O(32) time and O(32) space, may be you can optimise the space complexity
+class Solution {
+public:
+    int get1(int ind, vector<int> &bits) {
+        if(bits[ind] == 0) {
+            if(ind == 0) return 1;
+            int ret = get1(ind - 1, bits);
+            return (ret + (1<<ind));
+        }
+        else {
+            if(ind == 0) return 0; int ans = 0;
+            for(int i = ind - 1; i >= 0; i--) {
+                if(bits[i]) {
+                    if(i == 0) ans++;
+                    else {
+                        int ret = get1(i - 1, bits);
+                        ans += (ret + (1<<i));
+                    }
+                    break;
+                }
+            }
+            return ans;
+        }
+    }
+
+    int minimumOneBitOperations(int n) {
+        vector<int> bits(32, 0);
+        for(int i = 0; i < 32; i++) {
+            if(n & (1<<i)) bits[i] = 1;
+        }
+        int ans = 0;
+        for(int i = 31; i >= 0; i--) {
+            if(bits[i]) {
+                if(i == 0) ans = 1;
+                else {
+                    int ret = get1(i - 1, bits);
+                    ans += (ret + (1<<i));
+                }
+                break;
+            }
+        }
+        return ans;
+    }
+};
+```

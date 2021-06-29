@@ -645,3 +645,74 @@ public:
     }
 };
 ```
+
+### [Pizza With 3n Slices (Star Marked)](https://leetcode.com/problems/pizza-with-3n-slices/)
+
+```cpp
+// very very very hard problem
+
+// this is a very question, doing house robber II will help in solving this question.
+// So basically given this circular array, the observations are:
+// 1. the main obervation is given an array of size n if we choose atmost n/3 slices which are not adjacent
+//    there would be a way to actually eat these slices according to the the conditions given. Therefore this question
+//    actually reduces to finding out the maximum sum of n/3 slice which are not consecutive.
+// 2. we can't choose a[0] and a[n - 1] slice at the same time, therefore we can operate separately on
+//    the array arr[0:n - 2] and arr[1:n - 1].
+
+// made 2 dps
+class Solution {
+public:
+    int maxSizeSlices(vector<int>& slices) {
+        int n = slices.size();
+        vector<vector<int>> dp(n + 1, vector<int> (n + 1, 0));
+        for(int i = 0; i < n; i++) dp[i][1] = slices[i];
+        for(int i = 1; i < n - 1; i++) {
+            dp[i][1] = max(dp[i][1], dp[i - 1][1]);
+            for(int j = 2; j <= n; j++) {
+                if(i - 2 >= 0) dp[i][j] = (slices[i] + dp[i - 2][j - 1]);
+                dp[i][j] = max(dp[i][j], dp[i - 1][j]);
+            }
+        }
+        int ans = dp[n - 2][n/3];
+        vector<vector<int>> dp2(n + 1, vector<int> (n + 1, 0));
+        for(int i = 1; i < n; i++) dp2[i][1] = slices[i];
+        for(int i = 1; i < n; i++) {
+            dp2[i][1] = max(dp2[i][1], dp2[i - 1][1]);
+            for(int j = 2; j <= n; j++) {
+                if(i - 2 >= 0) dp2[i][j] = (slices[i] + dp2[i - 2][j - 1]);
+                dp2[i][j] = max(dp2[i][j], dp2[i - 1][j]);
+            }
+        }
+        ans = max(ans, dp2[n - 1][n/3]);
+        return ans;
+    }
+};
+
+// made 1 dp
+class Solution {
+public:
+    int maxSizeSlices(vector<int>& slices) {
+        int n = slices.size();
+        vector<vector<int>> dp(n + 1, vector<int> (n + 1, 0));
+        for(int i = 0; i < n; i++) dp[i][1] = slices[i];
+        for(int i = 1; i < n - 1; i++) {
+            dp[i][1] = max(dp[i][1], dp[i - 1][1]);
+            for(int j = 2; j <= n; j++) {
+                if(i - 2 >= 0) dp[i][j] = (slices[i] + dp[i - 2][j - 1]);
+                dp[i][j] = max(dp[i][j], dp[i - 1][j]);
+            }
+        }
+        int ans = dp[n - 2][n/3]; dp[0][1] = 0;
+        for(int i = 1; i < n; i++) dp[i][1] = slices[i];
+        for(int i = 1; i < n; i++) {
+            dp[i][1] = max(dp[i][1], dp[i - 1][1]);
+            for(int j = 2; j <= n; j++) {
+                if(i - 2 >= 0) dp[i][j] = (slices[i] + dp[i - 2][j - 1]);
+                dp[i][j] = max(dp[i][j], dp[i - 1][j]);
+            }
+        }
+        ans = max(ans, dp[n - 1][n/3]);
+        return ans;
+    }
+};
+```
