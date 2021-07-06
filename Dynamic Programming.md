@@ -1088,7 +1088,7 @@ int Solution::maximalRectangle(vector<vector<int> > &a) {
 }
 ```
 
-### [Minimum Cost to Cut a Stick LeetCode](https://leetcode.com/problems/minimum-cost-to-cut-a-stick/submissions/)
+### [Minimum Cost to Cut a Stick LeetCode (Star Marked)](https://leetcode.com/problems/minimum-cost-to-cut-a-stick/)
 
 ```cpp
 // the problem in interview bit asks to get the order of cut which can be easily

@@ -466,7 +466,6 @@ void solve(vector<int> &temp, vector<int> &ans, set<int> &st, int n) {
     return;
 }
 
-// Method 2 (gray_seq(n) = 0gray_seq(n - 1) + 1reverse_gray_seq(n - 1))
 vector<int> Solution::grayCode(int n) {
     vector<int> temp(n, 0);
     vector<int> ans;
@@ -476,6 +475,7 @@ vector<int> Solution::grayCode(int n) {
 }
 
 
+// Method 2 (gray_seq(n) = 0gray_seq(n - 1) + 1reverse_gray_seq(n - 1))
 vector<int> Solution::grayCode(int n) {
     vector<int> ans = {0, 1};
     for(int i = 1; i < n; i++) { // now for length >=2 and <=n
