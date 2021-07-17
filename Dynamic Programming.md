@@ -1316,7 +1316,7 @@ int Solution::solve(vector<int> &a, vector<int> &b, int c) {
 }
 ```
 
-### [Split Array With Same Average LeetCode (Star Marked)](https://leetcode.com/problems/split-array-with-same-average/submissions/)
+### [Split Array With Same Average LeetCode (Star Marked)](https://leetcode.com/problems/split-array-with-same-average)
 
 ```cpp
 // Useful link: https://leetcode.com/problems/split-array-with-same-average/discuss/524407/C%2B%2B-solution-O(N*Sum)-DPsumbitmask-with-explanation
@@ -1952,4 +1952,74 @@ int Solution::solve(vector<int> &a, int b) {
     if(sums.test(b)) return 1;
     return 0;
 }
+```
+
+## LeetCode Dynamic Programming Hard Problems
+
+### [Stone Game II (Star Marked)](https://leetcode.com/problems/stone-game-ii/)
+
+```cpp
+class Solution {
+public:
+    int stoneGameII(vector<int>& piles) {
+        int n = piles.size(); vector<vector<int>> dp(n + 1, vector<int> (n + 1, 0));
+        // dp[i][j] is the maximum number of stones Alex can get when starting at index i with M = j
+        vector<int> suf(n + 1, 0); for(int i = n - 1; i >= 0; i--) suf[i] = suf[i + 1] + piles[i];
+        for(int m = 1; m <= n; m++) dp[n - 1][m] = piles[n - 1];
+        for(int i = n - 2; i >= 0; i--) {
+            for(int m = 1; m <= n; m++) {
+                for(int j = 1; j <= 2*m; j++) {
+                    if(i + j > n) continue;
+                    dp[i][m] = max(dp[i][m], suf[i] - dp[i + j][max(j, m)]);
+                }
+            }
+        }
+        return dp[0][1];
+    }
+};
+```
+
+### [Stone Game III](https://leetcode.com/problems/stone-game-iii/)
+
+```cpp
+class Solution {
+public:
+    string stoneGameIII(vector<int>& stoneValue) {
+        int n = stoneValue.size();
+        vector<int> suf(n + 1, 0); for(int i = n - 1; i >= 0; i--) suf[i] = suf[i + 1] + stoneValue[i];
+        vector<int> dp(n + 1, -1e9); dp[n - 1] = stoneValue[n - 1]; dp[n] = 0;
+        // dp[i] = maximum number of stones you can get if you start at ith position
+        for(int i = n - 2; i >= 0; i--) {
+            for(int j = 1; j <= 3; j++) {
+                if(i + j > n) continue;
+                dp[i] = max(dp[i], suf[i] - dp[i + j]);
+            }
+        }
+        if(dp[0] > suf[0] - dp[0]) return "Alice";
+        else if(dp[0] < suf[0] - dp[0]) return "Bob";
+        return "Tie";
+    }
+};
+```
+
+### [Stone Game VIII (Star Marked)](https://leetcode.com/problems/stone-game-viii/)
+
+```cpp
+class Solution {
+public:
+    int stoneGameVIII(vector<int>& stones) {
+        // dp[i] = the maximum score difference the current player can get when the game starts at i, i.e.
+        // stones 0 ~ i are already merged as a new stone i whose value is prefix[i].
+        int n = stones.size(); vector<int> dp(n + 1, 0);
+        if(n == 1) return 0;
+        vector<int> pref(n , 0); pref[0] = stones[0];
+        for(int i = 1; i < n; i++) pref[i] = pref[i - 1] + stones[i];
+        int mx = pref[n - 1];
+        for(int i = n - 2; i >= 0; i--) {
+            dp[i] = mx;
+            mx = max(mx, pref[i] - dp[i]);
+        }
+        return dp[0];
+    }
+};
 ```
