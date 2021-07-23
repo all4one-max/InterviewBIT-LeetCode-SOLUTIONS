@@ -745,6 +745,39 @@ vector<string> Solution::fullJustify(vector<string> &a, int b) {
     }
     return ans;
 }
+
+// concise and clear solution
+class Solution {
+public:
+    vector<string> fullJustify(vector<string>& words, int maxWidth) {
+        vector<string> ans;
+        for(int i = 0, k, l; i < words.size(); i += k) {
+            for(k = l = 0; (i + k) < words.size() && l + words[i + k].size() <= maxWidth - k; k++) {
+                l += words[i + k].size();
+            }
+            if(k == 1) {
+                string cur = words[i] + string(maxWidth - words[i].size(), ' ');
+                ans.push_back(cur);
+                continue;
+            }
+            string cur = ""; int space = (maxWidth - l) / (k - 1); int extra = (maxWidth - l) % (k - 1);
+            for(int j = 0; j < k - 1; j++) {
+                cur += words[i + j];
+                if(i + k >= words.size())  cur += " ";
+                else {
+                    cur += string(space, ' ');
+                    if(extra) {
+                        cur += " ";
+                        extra--;
+                    }
+                }
+            }
+            cur += (words[i + k - 1] + string(maxWidth - cur.size() - words[i + k - 1].size(), ' '));
+            ans.push_back(cur);
+        }
+        return ans;
+    }
+};
 ```
 
 ### [Pretty Json (Star Marked)](https://www.interviewbit.com/problems/pretty-json/)

@@ -2023,3 +2023,139 @@ public:
     }
 };
 ```
+
+### [Distinct Subsequences II (Star Marked)](https://leetcode.com/problems/distinct-subsequences-ii/)
+
+```cpp
+#define mod 1000000007
+
+class Solution {
+public:
+    int distinctSubseqII(string s) {
+        int n = s.size(); vector<int> dp(n + 1, 0);
+        // dp[i] = number of distinct subsequences in [0........s[i]]
+        dp[0] = 1;
+        vector<int> last(26, -1);
+        for(int i = 1; i <= n; i++) {
+            dp[i] = 2*dp[i - 1]; dp[i] %= mod;
+            if(last[s[i - 1] - 'a'] != -1) {
+                dp[i] = ((long long)dp[i] - dp[last[s[i - 1] - 'a'] - 1] + mod) % mod;
+            }
+            last[s[i - 1] - 'a'] = i;
+        }
+        return dp[n] - 1;
+    }
+};
+```
+
+### [Paint House III (Star Marked)](https://leetcode.com/problems/paint-house-iii/)
+
+```cpp
+// O(M * target * N) solution, made first AC using this but some part of this code
+// is complicated and tought to think.
+class Solution {
+public:
+    int minCost(vector<int>& houses, vector<vector<int>>& cost, int m, int n, int target) {
+        vector<vector<vector<int>>> dp(m + 1, vector<vector<int>> (n + 1, vector<int> (target + 1, 1e9)));
+        if(houses[0] != 0) dp[0][houses[0]][1] = 0;
+        else {
+            for(int i = 1; i <= n; i++) dp[0][i][1] = cost[0][i - 1];
+        }
+        for(int i = 1; i < m; i++) {
+            for(int j = 1; j <= target; j++) {
+                if(houses[i] != 0) {
+                    if(houses[i - 1] != 0) {
+                        if(houses[i] == houses[i - 1]) dp[i][houses[i]][j] = dp[i - 1][houses[i]][j];
+                        else dp[i][houses[i]][j] = dp[i - 1][houses[i - 1]][j - 1];
+                    }
+                    else {
+                        for(int k = 1; k <= n; k++) {
+                            if(k != houses[i]) dp[i][houses[i]][j] = min(dp[i][houses[i]][j], dp[i - 1][k][j - 1]);
+                            else dp[i][houses[i]][j] = min(dp[i][houses[i]][j], dp[i - 1][k][j]);
+                        }
+                    }
+                }
+                else {
+                    if(houses[i - 1] != 0) {
+                        for(int k = 1; k <= n; k++) {
+                            if(k != houses[i - 1]) dp[i][k][j] = min(dp[i][k][j], dp[i - 1][houses[i - 1]][j - 1] + cost[i][k - 1]);
+                            else dp[i][k][j] = min(dp[i][k][j], dp[i - 1][houses[i - 1]][j] + cost[i][k - 1]);
+                        }
+                    }
+                    else {
+                        int note = -1, mn = 1e9;
+                        for(int k = 1; k <= n; k++) {
+                            if(mn > dp[i - 1][k][j - 1]) {
+                                mn = dp[i - 1][k][j - 1];
+                                note = k;
+                            }
+                        }
+                        for(int k = 1; k <= n; k++) {
+                            dp[i][k][j] = min(dp[i][k][j], dp[i - 1][k][j] + cost[i][k - 1]);
+                            if(k != note) dp[i][k][j] = min(dp[i][k][j], mn + cost[i][k - 1]);
+                            else dp[i][k][j] = min(dp[i][k][j], dp[i - 1][note][j] + cost[i][k - 1]);
+                        }
+                        if(note != -1) {
+                            for(int k = 1; k <= n; k++) {
+                                if(k != note) dp[i][note][j] = min(dp[i][note][j], dp[i - 1][k][j - 1] + cost[i][note - 1]);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        int ans = 1e9;
+        for(int i = 1; i <= n; i++) ans = min(ans, dp[m - 1][i][target]);
+        if(ans == 1e9) return -1;
+        return ans;
+    }
+};
+
+// O(M * target * N^2) solution this has worse complexity but it is easy to understand
+class Solution {
+public:
+    int minCost(vector<int>& houses, vector<vector<int>>& cost, int m, int n, int target) {
+        vector<vector<vector<int>>> dp(m + 1, vector<vector<int>> (n + 1, vector<int> (target + 1, 1e9)));
+        if(houses[0] != 0) dp[0][houses[0]][1] = 0;
+        else {
+            for(int i = 1; i <= n; i++) dp[0][i][1] = cost[0][i - 1];
+        }
+        for(int i = 1; i < m; i++) {
+            for(int j = 1; j <= target; j++) {
+                if(houses[i] != 0) {
+                    if(houses[i - 1] != 0) {
+                        if(houses[i] == houses[i - 1]) dp[i][houses[i]][j] = dp[i - 1][houses[i]][j];
+                        else dp[i][houses[i]][j] = dp[i - 1][houses[i - 1]][j - 1];
+                    }
+                    else {
+                        for(int k = 1; k <= n; k++) {
+                            if(k != houses[i]) dp[i][houses[i]][j] = min(dp[i][houses[i]][j], dp[i - 1][k][j - 1]);
+                            else dp[i][houses[i]][j] = min(dp[i][houses[i]][j], dp[i - 1][k][j]);
+                        }
+                    }
+                }
+                else {
+                    if(houses[i - 1] != 0) {
+                        for(int k = 1; k <= n; k++) {
+                            if(k != houses[i - 1]) dp[i][k][j] = min(dp[i][k][j], dp[i - 1][houses[i - 1]][j - 1] + cost[i][k - 1]);
+                            else dp[i][k][j] = min(dp[i][k][j], dp[i - 1][houses[i - 1]][j] + cost[i][k - 1]);
+                        }
+                    }
+                    else {
+                        for(int k = 1; k <= n; k++) {
+                            for(int l = 1; l <= n; l++) {
+                                if(k != l) dp[i][k][j] = min(dp[i][k][j], dp[i - 1][l][j - 1] + cost[i][k - 1]);
+                                else dp[i][k][j] = min(dp[i][k][j], dp[i - 1][l][j] + cost[i][k - 1]);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        int ans = 1e9;
+        for(int i = 1; i <= n; i++) ans = min(ans, dp[m - 1][i][target]);
+        if(ans == 1e9) return -1;
+        return ans;
+    }
+};
+```

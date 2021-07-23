@@ -524,6 +524,35 @@ public:
         return dp[0];
     }
 };
+
+// Method 3  same complexity as above but easier to understand and clear and concise code
+class Solution {
+public:
+    int boxDelivering(vector<vector<int>>& boxes, int portsCount, int maxBoxes, int maxWeight) {
+        int n = boxes.size(); vector<int> dp(n + 1, 1e9); dp[n] = 0;
+        vector<int> dp2(n + 1, 0); dp2[n - 1] = 1;
+        for(int i = n - 2; i >= 0; i--) {
+            if(boxes[i][0] != boxes[i + 1][0]) dp2[i] = (1 + dp2[i + 1]);
+            else dp2[i] = dp2[i + 1];
+        }
+        int l = n, r = n - 1; multiset<int> mst; int cur_box = 0, cur_weight = 0;
+
+        for(int i = n - 1; i >= 0; i--) {
+            l--;
+            cur_box++; cur_weight += boxes[i][1];
+            mst.insert(dp[i + 1] - dp2[i] + 1);
+            while(cur_weight > maxWeight || cur_box > maxBoxes) {
+                cur_weight -= boxes[r][1];
+                mst.erase(mst.find(dp[r + 1] - dp2[r] + 1));
+                r--;
+                cur_box--;
+            }
+            int mn = *mst.begin();
+            dp[i] = mn + dp2[i] + 1;
+        }
+        return dp[0];
+    }
+};
 ```
 
 ### [Smallest Range Covering Elements from K Lists (Star Marked)](https://leetcode.com/problems/smallest-range-covering-elements-from-k-lists/)

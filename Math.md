@@ -127,7 +127,7 @@ int Solution::isPalindrome(int n) {
 }
 ```
 
-### [Reverse integer (Star Marked)](https://www.interviewbit.com/courses/programming/topics/math/)
+### [Reverse integer (Star Marked)](https://www.interviewbit.com/problems/reverse-integer/)
 
 ```cpp
 int Solution::reverse(int x) {

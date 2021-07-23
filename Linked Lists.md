@@ -256,6 +256,26 @@ ListNode* Solution::deleteDuplicates(ListNode* a) {
     }
     return head;
 }
+
+// concise and clear code
+ListNode* Solution::deleteDuplicates(ListNode* a) {
+    ListNode dummy(0); ListNode* head = &dummy;
+    while (a) {
+        int cnt = 0;
+        int store = a->val;
+        ListNode* node = a;
+        while (a!=NULL && a->val==store) {
+            cnt++;
+            a=a->next;
+        }
+        node->next = NULL;
+        if (cnt==1) {
+            head->next = node;
+            head = head->next;
+        }
+    }
+    return dummy.next;
+}
 ```
 
 ### [Merge Two Sorted Lists (Star Marked)](https://www.interviewbit.com/problems/merge-two-sorted-lists/)
@@ -300,6 +320,25 @@ ListNode* Solution::mergeTwoLists(ListNode* a, ListNode* b) {
 
     return head;
 }
+
+// clear and concise code
+ListNode* Solution::mergeTwoLists(ListNode* a, ListNode* b) {
+    ListNode dummy(0); ListNode* head = &dummy;
+    while(a && b) {
+        if(a->val > b->val) {
+            head->next = b;
+            b = b->next;
+        }
+        else {
+            head->next = a;
+            a = a->next;
+        }
+        head = head->next; head->next = NULL;
+    }
+    if(a) head->next = a;
+    if(b) head->next = b;
+    return dummy.next;
+}
 ```
 
 ### [Remove Duplicates from Sorted List](https://www.interviewbit.com/problems/remove-duplicates-from-sorted-list/)
@@ -338,7 +377,7 @@ ListNode* Solution::deleteDuplicates(ListNode* a) {
 }
 ```
 
-### [Remove Nth Node from List End (Star Marked)](https://www.interviewbit.com/problems/remove-nth-node-from-list-end/s)
+### [Remove Nth Node from List End (Star Marked)](https://www.interviewbit.com/problems/remove-nth-node-from-list-end/)
 
 ```cpp
 /**
@@ -418,6 +457,29 @@ ListNode* Solution::reverseList(ListNode* a, int k) {
         }
     }
     return head;
+}
+
+// clear and concise code
+ListNode* reversell(ListNode* head, ListNode* tail) {
+    if (head == tail) return head;
+    ListNode* small_head = reversell(head->next, tail);
+    ListNode* small_tail = head->next;
+    small_tail->next = head;
+    head->next = NULL;
+    return small_head;
+}
+
+
+ListNode* Solution::reverseList(ListNode* a, int k) {
+    if(!a) return a;
+    ListNode* head = a;
+    for(int i = 0; i < k - 1; i++) {
+        a = a->next;
+    }
+    ListNode* tail = a; a = a->next;
+    ListNode* new_head = reversell(head, tail);
+    head->next = reverseList(a, k);
+    return new_head;
 }
 ```
 

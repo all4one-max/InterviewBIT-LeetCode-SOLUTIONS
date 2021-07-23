@@ -1144,3 +1144,98 @@ int Solution::solve(vector<int> &a) {
     return mx+mn;
 }
 ```
+
+## LeetCode Arrays Hard Problems
+
+### [The Skyline Problem](https://leetcode.com/problems/the-skyline-problem/)
+
+```cpp
+class Solution {
+public:
+    static bool comp(array<int, 4> a1, array<int, 4> a2) {
+        if(a1[0] < a2[0]) return true;
+        else if(a1[0] == a2[0]) {
+            return a1[2] > a2[2];
+        }
+        return false;
+    }
+
+    vector<vector<int>> getSkyline(vector<vector<int>>& buildings) {
+        int n = buildings.size();
+        vector<array<int, 4>> events;
+        for(int i = 0; i < n; i++) {
+            events.push_back({buildings[i][0], buildings[i][2], 1, buildings[i][1]});
+            events.push_back({buildings[i][1], buildings[i][2], -1, buildings[i][1]});
+        }
+        sort(events.begin(), events.end(), comp);
+        multiset<pair<int, int>> st; vector<vector<int>> ans;
+        for(int i = 0; i < events.size(); i++) {
+            if(events[i][2] == 1) {
+                if(ans.size()) {
+                    int m = ans.size();
+                    if(ans[m - 1][1] < events[i][1]) {
+                        if(ans[m - 1][0] == events[i][0]) ans[m - 1][1] = events[i][1];
+                        else ans.push_back({events[i][0], events[i][1]});
+                    }
+                }
+                else ans.push_back({events[i][0], events[i][1]});
+                st.insert({events[i][1], events[i][3]});
+            }
+            else {
+                int m = ans.size();
+                st.erase(st.find({events[i][1], events[i][0]}));
+                if(st.size() == 0) {
+                    if(ans[m - 1][0] == events[i][0]) ans[m - 1][1] = 0;
+                    else ans.push_back({events[i][0], 0});
+                    continue;
+                }
+                auto mx = *(prev(st.end()));
+                if(mx.first < ans[m - 1][1]) {
+                    if(ans[m - 1][0] == events[i][0]) ans[m - 1][1] = mx.first;
+                    else ans.push_back({events[i][0], mx.first});
+                }
+            }
+        }
+        return ans;
+    }
+};
+```
+
+### [Rectangle Area II (Star Marked)](https://leetcode.com/problems/rectangle-area-ii/)
+
+```cpp
+#define mod 1000000007
+
+class Solution {
+public:
+    int rectangleArea(vector<vector<int>>& rectangles) {
+        int n = rectangles.size();
+        vector<int> x, y;
+        for(int i = 0; i < rectangles.size(); i++) {
+            x.push_back(rectangles[i][0]); x.push_back(rectangles[i][2]);
+            y.push_back(rectangles[i][1]); y.push_back(rectangles[i][3]);
+        }
+        sort(x.begin(), x.end()); x.resize(unique(x.begin(), x.end()) - x.begin());
+        sort(y.begin(), y.end()); y.resize(unique(y.begin(), y.end()) - y.begin());
+        map<int, int> mapx; map<int, int> mapy;
+        for(int i = 0; i < x.size(); i++) mapx[x[i]] = i;
+        for(int i = 0; i < y.size(); i++) mapy[y[i]] = i;
+        vector<vector<int>> grid(250, vector<int> (250, 0));
+        for(int i = 0; i < rectangles.size(); i++) {
+            for(int j = mapx[rectangles[i][0]]; j < mapx[rectangles[i][2]]; j++) {
+                for(int k = mapy[rectangles[i][1]]; k < mapy[rectangles[i][3]]; k++) grid[k][j] = 1;
+            }
+        }
+        long long ans = 0;
+        for(int i = 0; i < 250; i++) {
+            for(int j = 0; j < 250; j++) {
+                if(grid[i][j]) {
+                    ans += ((long long)(x[j + 1] - x[j]) * (y[i + 1] - y[i]));
+                    ans %= mod;
+                }
+            }
+        }
+        return (int)ans;
+    }
+};
+```
