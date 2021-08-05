@@ -2159,3 +2159,274 @@ public:
     }
 };
 ```
+
+### [Partition to K Equal Sum Subsets (Star Marked)](https://leetcode.com/problems/partition-to-k-equal-sum-subsets/submissions/)
+
+```cpp
+class Solution {
+public:
+    int recur(vector<int> &nums, int k, int eq, int mask, vector<vector<int>>  &dp) {
+        if(k == 0) return 1;
+        if(dp[k][mask] != -1) return dp[k][mask];
+        int n = nums.size();
+        for(int i = 0; i < (1LL<<n); i++) {
+            int sm = 0, cpy = mask;
+            for(int j = 0; j < n; j++) {
+                if((i>>j)&1 && mask&(1LL<<j)) {
+                    sm += nums[j];
+                    cpy = cpy^(1LL<<j);
+                }
+            }
+            if(sm == eq) {
+                if(recur(nums, k - 1, eq, cpy, dp)) return dp[k][mask] = 1;
+            }
+        }
+        return dp[k][mask] = 0;
+    }
+
+    bool canPartitionKSubsets(vector<int>& nums, int k) {
+        int n = nums.size(), sm = 0;
+        for(int i = 0; i < n; i++) sm += nums[i];
+        if(sm%k) return 0;
+        vector<vector<int>> dp(k + 1, vector<int> ((1LL<<n) + 5, -1));
+        return recur(nums, k, sm/k, (1LL<<n) - 1, dp);
+    }
+};
+```
+
+### [cherry pickup (Star Marked)](https://leetcode.com/problems/cherry-pickup/)
+
+```cpp
+class Solution {
+public:
+
+    int recur(int r1, int c1, int c2, vector<vector<int>> &grid, vector<vector<vector<int>>> &dp) {
+//      variables r1, c1, c2 can be used to define position of 2 persons who are
+//      (r1 + c1) distance away from (0, 0)
+//      dp[r1][c1][c2] = maximum number of cherries that can be picked if the 2 persons start
+//      from (r1, c1) and (r2, c2) and go to (n - 1, n - 1)
+        int n = grid.size();
+        int r2 = r1 + c1 - c2;
+        if(dp[r1][c1][c2] != -1) return dp[r1][c1][c2];
+        if (r1 == n || r2 == n || c1 == n || c2 == n) return -2;
+        if(grid[r1][c1] == -1 || grid[r2][c2] == -1) return -2;
+        if(r1 == n - 1 && c1 == n - 1 && r2 == n - 1 && c2 == n - 1) return grid[r1][c1];
+        int ans = grid[r1][c1];
+        if(c1 != c2) ans += grid[r2][c2];
+        int ret = max({recur(r1 + 1, c1, c2, grid, dp), recur(r1 + 1, c1, c2 + 1, grid, dp),
+                   recur(r1, c1 + 1, c2, grid, dp), recur(r1, c1 + 1, c2 + 1, grid, dp)});
+        if(ret == -2) return dp[r1][c1][c2] = -2;
+        ans += ret;
+        return dp[r1][c1][c2] = ans;
+
+    }
+
+    int cherryPickup(vector<vector<int>>& grid) {
+        int n = grid.size();
+        vector<vector<vector<int>>> dp(n + 1, vector<vector<int>> (n + 1, vector<int> (n + 1, -1)));
+        int ret = recur(0, 0, 0, grid, dp);
+        if(ret == -2) return 0;
+        return ret;
+    }
+};
+```
+
+### [Count Number of Special Subsequences](https://leetcode.com/problems/count-number-of-special-subsequences/)
+
+```cpp
+#define mod 1000000007
+
+class Solution {
+public:
+    int countSpecialSubsequences(vector<int>& nums) {
+        int n = nums.size(); vector<long long> dp(n, 0);
+        vector<int> pow_of_2(n + 1, 1);
+        for(int i = 1; i <= n; i++) {
+            pow_of_2[i] = (pow_of_2[i - 1] * 2) % mod;
+        }
+//      sub1 = number of special subsequences ending at 1
+//      sub2 = number of special subsequences ending at 2
+        long long cnt0 = 0, cnt1 = 0, sub1 = 0, sub2 = 0, ans = 0;
+        for(int i = 0; i < n; i++) {
+            if(nums[i] == 0) cnt0++;
+            else if(nums[i] == 1) {
+                dp[i] = ((pow_of_2[cnt0] - 1) + sub1)%mod;
+                sub1 = (sub1 + dp[i])%mod;
+            }
+            else {
+                dp[i] = (sub1 + sub2)%mod;
+                sub2 = (dp[i] + sub2)%mod;
+            }
+        }
+        return sub2;
+    }
+};
+```
+
+### [Dice Roll Simulation](https://leetcode.com/problems/dice-roll-simulation/)
+
+```cpp
+#define mod 1000000007
+
+class Solution {
+public:
+    int recur(int n, int last, int cnt, vector<int> &rollMax, vector<vector<vector<int>>> &dp) {
+        if(n == 0) return 1;
+        if(last != -1 && dp[n][last][cnt] != -1) return dp[n][last][cnt];
+        long long ans = 0;
+        for(int i = 0; i < 6; i++) {
+            if(i != last) {
+                ans = (ans + recur(n - 1, i, 1, rollMax, dp)) % mod;
+            }
+            else {
+                if(cnt != rollMax[i]) ans = (ans + recur(n - 1, i, cnt + 1, rollMax, dp))%mod;
+            }
+        }
+        return (last == -1 ? ans : dp[n][last][cnt] = ans);
+    }
+
+    int dieSimulator(int n, vector<int>& rollMax) {
+        vector<vector<vector<int>>> dp(n + 1, vector<vector<int>> (6, vector<int> (16, -1)));
+        return recur(n, -1, 0, rollMax, dp);
+    }
+};
+```
+
+### [String Compression II (Star Marked)](https://leetcode.com/problems/string-compression-ii/)
+
+```cpp
+// Method 1 (O(k * (n^2) * 26) Time and Space recursive gives TLE)
+vector<vector<vector<vector<int>>>> dp;
+
+class Solution {
+public:
+
+    int calculate(int len) {
+        if(len == 0) return 0;
+        else if(len == 1) return 1;
+        else if(len < 10) return 2;
+        else if(len < 100) return 3;
+        return 4;
+    }
+
+    int solve(int i, int prev, int len, int k, string &s) {
+        if(i == s.size()) return calculate(len);
+
+        if(dp[i][prev][len][k] != 1e5) return dp[i][prev][len][k];
+
+
+        int cur = s[i] - 'a' + 1;
+        if(k) dp[i][prev][len][k] = solve(i + 1, prev, len, k - 1, s);
+        if(cur == prev) dp[i][prev][len][k] = min(dp[i][prev][len][k], solve(i + 1, prev, len + 1, k, s));
+        else dp[i][prev][len][k] = min(dp[i][prev][len][k], calculate(len) + solve(i + 1, cur, 1, k, s));
+
+        return dp[i][prev][len][k];
+    }
+
+    int getLengthOfOptimalCompression(string s, int k) {
+        int n = s.size();
+        dp =  vector<vector<vector<vector<int>>>> (n + 1, vector<vector<vector<int>>> (26, vector<vector<int>> (n + 1, vector<int> (k + 1, 1e5))));
+        return solve(0, 0, 0, k, s);
+    }
+};
+
+// Method 2 (O(k * (n^2) * 26) Time and Space iterative gives TLE)
+class Solution {
+public:
+    int calculate(int len) {
+        if(len == 0) return 0;
+        else if(len == 1) return 1;
+        else if(len < 10) return 2;
+        else if(len < 100) return 3;
+        return 4;
+    }
+
+    int getLengthOfOptimalCompression(string s, int k) {
+        int n = s.size();
+//      dp[i][j] = minimum length of string compression we can get such that the string ends at s[i]
+//      and we can perform at max j deletions
+        vector<vector<int>> dp(n + 1, vector<int> (k + 1, 1e9));
+        for(int i = 0; i < n; i++) {
+            for(int j = 0; j <= k; j++) {
+                for(int l = 0; l < 26; l++) {
+                    int removed = 0;
+                    for(int p = i; p >= 0; p--) {
+                        if(s[p] - 'a' != l) removed++;
+                        if(j >= removed) {
+                            int len = i - p + 1 - removed;
+                            if(p) dp[i][j] = min(dp[i][j], dp[p - 1][j - removed] + calculate(len));
+                            else dp[i][j] = min(dp[i][j], 0 + calculate(len));
+                        }
+                    }
+                }
+            }
+        }
+        return dp[n - 1][k];
+    }
+};
+
+// Method 3 (O(N * k * N) space and time gets AC)
+class Solution {
+public:
+    int calculate(int len) {
+        if(len == 0) return 0;
+        else if(len == 1) return 1;
+        else if(len < 10) return 2;
+        else if(len < 100) return 3;
+        return 4;
+    }
+
+    int getLengthOfOptimalCompression(string s, int k) {
+        int n = s.size();
+//      dp[i][j] = minimum length of string compression we can get such that the string ends at s[i]
+//      and we can perform at max j deletions
+        vector<vector<int>> dp(n + 1, vector<int> (k + 1, 1e9));
+        for(int i = 0; i < n; i++) {
+            for(int j = 0; j <= k; j++) {
+                int removed = 0;
+                if (j > 0) {
+                    if(i > 0) dp[i][j] = dp[i - 1][j - 1];
+                    else dp[i][j] = 0;
+                }
+                for(int p = i; p >= 0; p--) {
+                    if(s[p] != s[i]) removed++;
+                    if(j >= removed) {
+                        int len = i - p + 1 - removed;
+                        if(p) dp[i][j] = min(dp[i][j], dp[p - 1][j - removed] + calculate(len));
+                        else dp[i][j] = min(dp[i][j], 0 + calculate(len));
+                    }
+                }
+            }
+        }
+        return dp[n - 1][k];
+    }
+};
+```
+
+### [Maximize Score After N Operations (Star Marked)](https://leetcode.com/problems/maximize-score-after-n-operations/)
+
+```cpp
+class Solution {
+public:
+    int recur(vector<int> &nums, int mask, int cnt, vector<int> &dp) {
+        int n = nums.size();
+        if(mask == (1<<n) - 1) return 0;
+        if(dp[mask] != -1) return dp[mask];
+        int ans = 0;
+        for(int i = 0; i < n; i++) {
+            for(int j = i + 1; j < n; j++) {
+                int cur_mask = (1<<i) + (1<<j);
+                if((cur_mask & mask) == 0) {
+                    ans = max(ans, cnt * __gcd(nums[i], nums[j]) + recur(nums, cur_mask | mask, cnt + 1, dp));
+                }
+            }
+        }
+        return dp[mask] = ans;
+    }
+
+    int maxScore(vector<int>& nums) {
+        int n = nums.size(); vector<int> dp(1<<n, -1);
+        return recur(nums, 0, 1, dp);
+    }
+};
+```
