@@ -2430,3 +2430,109 @@ public:
     }
 };
 ```
+
+### [Minimum Cost to Connect Two Groups of Points (Star Marked)](https://leetcode.com/problems/minimum-cost-to-connect-two-groups-of-points/)
+
+```cpp
+// Method 1 (Using simple backtracking Gives TLE)
+class Solution {
+public:
+    map<pair<int, int>, int> mp;
+    map<int, int> mp1;
+    map<int, int> mp2;
+
+    int recur(vector<vector<int>> &cost, int cnta, int cntb) {
+        int n = cost.size(); int m = cost[0].size();
+        if(cnta == n && cntb == m) return 0;
+        int ans = 1e9;
+        for(int i = 0; i < n; i++) {
+            for(int j = 0; j < m; j++) {
+                if(mp[{i, j}] == 0) {
+                    mp[{i, j}] = 1;
+                    if(mp2[j] == 0) {
+                        mp2[j] = 1;
+                        if(mp1[i] == 0) {
+                            mp1[i] = 1;
+                            ans = min(ans, cost[i][j] + recur(cost, cnta + 1, cntb + 1));
+                            mp1[i] = 0;
+                        }
+                        else {
+                            ans = min(ans, cost[i][j] + recur(cost, cnta, cntb + 1));
+                        }
+                        mp2[j] = 0;
+                    }
+                    else {
+                        if(mp1[i] == 0) {
+                            mp1[i] = 1;
+                            ans = min(ans, cost[i][j] + recur(cost, cnta + 1, cntb));
+                            mp1[i] = 0;
+                        }
+                    }
+                    mp[{i, j}] = 0;
+                }
+            }
+        }
+        return ans;
+    }
+
+    int connectTwoGroups(vector<vector<int>>& cost) {
+        mp.clear(); mp1.clear(); mp2.clear();
+        return recur(cost, 0, 0);
+    }
+};
+
+// Method 2(dp with bitmasking still gives TLE)
+class Solution {
+public:
+    int recur(vector<vector<int>> &cost, int maska, int maskb, vector<vector<int>> &dp) {
+        int n = cost.size(); int m = cost[0].size();
+        if(maska == ((1<<n) - 1) && maskb == ((1<<m) - 1)) return 0;
+        int ans = 1e9;
+        if(dp[maska][maskb] != -1) return dp[maska][maskb];
+        for(int i = 0; i < n; i++) {
+            for(int j = 0; j < m; j++) {
+                if(((maska>>i) & (maskb>>j)) == 0) {
+                    ans = min(ans, cost[i][j] + recur(cost, maska | (1<<i), maskb | (1<<j), dp));
+                }
+            }
+        }
+        return ans;
+    }
+
+    int connectTwoGroups(vector<vector<int>>& cost) {
+        int n = cost.size(), m = cost[0].size();
+        vector<vector<int>> dp(1<<n, vector<int> (1<<m, -1));
+        return recur(cost, 0, 0, dp);
+    }
+};
+
+// Method 3(dp with bitmask gives AC)
+// so basically you will try to connect to every point of set 1 with every other point of set 2 and
+// once you have connected all the points of set 1, you will iterate on the disconnected points
+// of set 2 and connect them to points of set 1 with which they have minimum cost.
+```
+
+### [Burst Balloons](https://leetcode.com/problems/burst-balloons/)
+
+```cpp
+class Solution {
+public:
+//     this is same as MCM
+    int maxCoins(vector<int>& nums) {
+        int n = nums.size();
+        nums.insert(nums.begin(), 1); nums.push_back(1);
+        vector<vector<int>> dp(n + 5, vector<int> (n +  5, 0));
+        for(int l = 1; l <= n; l++) {
+            for(int i = 1; i <= n; i++) {
+                int j = i + l - 1;
+                if(j <= n) {
+                    for(int k = i; k <= j; k++) {
+                        dp[i][j] = max(dp[i][j], dp[i][k - 1] + nums[i - 1] * nums[k] * nums[j + 1] + dp[k + 1][j]);
+                    }
+                }
+            }
+        }
+        return dp[1][n];
+    }
+};
+```

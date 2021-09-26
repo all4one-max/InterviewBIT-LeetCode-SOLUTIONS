@@ -260,3 +260,47 @@ int Solution::trap(const vector<int> &a) {
     return ans;
 }
 ```
+
+## LeetCode Stack Hard Problems
+
+### [Number of Visible People in a Queue (Star Marked)](https://leetcode.com/problems/number-of-visible-people-in-a-queue/)
+
+```cpp
+// O(N * logN solution)
+#include<bits/stdc++.h>
+using namespace std;
+
+class Solution {
+public:
+    int bin(int val, vector<int> &st) {
+        int n = st.size();
+        int low = 0, high = n - 1, ans = -1;
+        while(low <= high) {
+            int mid = (low + high)/2;
+            if(st[mid] >= val) {
+                ans = mid;
+                low = mid + 1;
+            }
+            else high = mid - 1;
+        }
+        if(ans == -1)  return n;
+        return n - ans - 1;
+    }
+
+    vector<int> canSeePersonsCount(vector<int>& heights) {
+        int n = heights.size(); vector<int> ans(n, 1); ans[n - 1] = 0;
+        vector<int> st;
+        for(int i = n - 1; i >= 0; i--) {
+            auto pos = bin(heights[i], st);
+            if(i!=n-1) {
+                // cout<<pos<<" "<<st.size()<<endl;
+                if(pos != st.size()) ans[i] = max(ans[i], (int)pos + 1);
+                else ans[i] = max(ans[i], (int)pos);
+            }
+            while(!st.empty() && heights[i] >= st.back()) st.pop_back();
+            st.push_back(heights[i]);
+        }
+        return ans;
+    }
+};
+```

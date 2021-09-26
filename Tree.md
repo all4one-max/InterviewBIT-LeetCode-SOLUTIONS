@@ -1553,3 +1553,70 @@ vector<int> Solution::order(vector<int> &a, vector<int> &b) {
     return ans;
 }
 ```
+
+## LeetCode Tree Hard Problems
+
+### [Delete Duplicate Folders in System (Star Marked)](https://leetcode.com/problems/delete-duplicate-folders-in-system/)
+
+```cpp
+struct trie_node {
+    string c;
+    map<string, trie_node*> ump;
+    bool deleted, terminate;
+    trie_node(string a) : c(a), deleted(false), terminate(false) {}
+};
+
+unordered_map<string, trie_node*> tree_ans;
+vector<vector<string>> ans;
+
+class Solution {
+public:
+    // basically the main concept that we learnt in this question is that to uniquely
+    // identify a subtree we can serialise that particular subtree.
+    string serialise(trie_node* head) {
+        string ans = "";
+        for(auto &it : head->ump) ans += it.first + serialise(it.second) + ",";
+
+        if(ans != "") {
+            if(tree_ans.find(ans) != tree_ans.end()) {
+                tree_ans[ans]->deleted = true;
+                head->deleted = true;
+            }
+            tree_ans[ans] = head;
+        }
+        // since duplicate folders are supposed to contain
+        // the same non-empty set of identical subfolders
+        return ans;
+    }
+
+    void dfs(trie_node* head, vector<string> &temp) {
+        for(auto &it : head->ump) {
+            if(!it.second->deleted) {
+                temp.push_back(it.first);
+                if(it.second->terminate) ans.push_back(temp);
+                dfs(it.second, temp);
+                temp.pop_back();
+            }
+        }
+        return;
+    }
+
+    vector<vector<string>> deleteDuplicateFolder(vector<vector<string>>& paths) {
+        int n = paths.size(); tree_ans.clear(); ans.clear();
+        trie_node* head = new trie_node("/");
+        for(int i = 0; i < n; i++) {
+            int m = paths[i].size();
+            auto temp = head;
+            for(int j = 0; j < m; j++) {
+                if(temp->ump.find(paths[i][j]) == temp->ump.end()) temp->ump[paths[i][j]] = new trie_node(paths[i][j]);
+                temp = temp->ump[paths[i][j]];
+            }
+            temp->terminate = true;
+        }
+        serialise(head);
+        vector<string> temp;
+        dfs(head, temp);
+        return ans;
+    }
+};
+```

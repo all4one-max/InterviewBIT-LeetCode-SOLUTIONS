@@ -1150,6 +1150,7 @@ int Solution::solve(vector<int> &a) {
 ### [The Skyline Problem](https://leetcode.com/problems/the-skyline-problem/)
 
 ```cpp
+// Method 1 (A bit Complex Implementation)
 class Solution {
 public:
     static bool comp(array<int, 4> a1, array<int, 4> a2) {
@@ -1199,6 +1200,47 @@ public:
         return ans;
     }
 };
+
+// Method 2 (Simpler Implementation)
+class Solution {
+public:
+    static bool comp(vector<int> a1, vector<int> a2) {
+        if(a1[0] < a2[0]) return true;
+        else if(a1[0] == a2[0]) {
+            return a1[2] > a2[2];
+        }
+        return false;
+    }
+
+    vector<vector<int>> getSkyline(vector<vector<int>>& buildings) {
+        int n = buildings.size();
+        vector<vector<int>> events;
+        for(int i = 0; i < n; i++) {
+            events.push_back({buildings[i][0], buildings[i][2], 1});
+            events.push_back({buildings[i][1], buildings[i][2], -1});
+        }
+        sort(events.begin(), events.end(), comp);
+        multiset<int> st; vector<vector<int>> ans;
+        st.insert(0);
+        for(int i = 0; i < events.size(); i++) {
+            int pos = events[i][0], height = events[i][1];
+            if(events[i][2] == 1) {
+                if(height > *st.rbegin()) ans.push_back({pos, height});
+                st.insert(height);
+            }
+            else {
+                st.erase(st.find(height));
+                if(height > *st.rbegin()) ans.push_back({pos, *st.rbegin()});
+            }
+        }
+        vector<vector<int>> arr; int m = ans.size();
+        for(int i = 0; i < m; i++) {
+            if(i + 1 < m && ans[i][0] != ans[i + 1][0]) arr.push_back(ans[i]);
+            if(i == m - 1) arr.push_back(ans[i]);
+        }
+        return arr;
+    }
+};
 ```
 
 ### [Rectangle Area II (Star Marked)](https://leetcode.com/problems/rectangle-area-ii/)
@@ -1236,6 +1278,138 @@ public:
             }
         }
         return (int)ans;
+    }
+};
+```
+
+### [Describe the Painting (Star Marked)](https://leetcode.com/problems/describe-the-painting/)
+
+```cpp
+// Method 1 (I don't know how this works)
+class Solution {
+public:
+    static bool comp(array<int, 4> v1, array<int, 4> v2) {
+        if(v1[0] < v2[0]) return true;
+        else if(v1[0] > v2[0]) return false;
+        return v1[1] < v2[1];
+    }
+
+    vector<vector<long long>> splitPainting(vector<vector<int>>& segments) {
+        int n = segments.size();
+        vector<array<int, 4>> events;
+        for(int i = 0; i < n; i++) {
+            events.push_back({segments[i][0], 1, segments[i][2], segments[i][1]});
+            events.push_back({segments[i][1], -1, segments[i][2], segments[i][1]});
+        }
+        sort(events.begin(), events.end(), comp);
+        multiset<int> st;
+        vector<vector<long long>> ans;
+        long long col = 0; int sz = 0;;
+        for(int i = 0; i < events.size(); i++) {
+            int l = events[i][0], r = events[i][3], color = events[i][2];
+            if(events[i][1] == 1) {
+                col = col + (long long)color;
+                if(sz && ans[sz - 1][0] == l) ans[sz - 1][2] = col;
+                else {
+                    if(sz && st.size()) ans[sz - 1][1] = l;
+                    ans.push_back({l, -1, col});
+                    sz++;
+                }
+                st.insert(r);
+            }
+            else {
+                col -= color;
+                st.erase(st.find(r));
+                ans[sz - 1][1] = r;
+                if(r == ans[sz - 1][0]) ans[sz - 1][2] = col;
+                if(st.size() && *st.rbegin() > r && r != ans[sz - 1][0]) {
+                    ans.push_back({r, -1, col});
+                    sz++;
+                }
+            }
+        }
+        return ans;
+    }
+};
+
+// Method 2 (this is something you will understand but still it's not easy to implement correctly in first go)
+#include<bits/stdc++.h>
+using namespace std;
+
+class Solution {
+public:
+    static bool comp(array<int, 4> v1, array<int, 4> v2) {
+        if(v1[0] < v2[0]) return true;
+        else if(v1[0] > v2[0]) return false;
+        return v1[1] < v2[1];
+    }
+
+    vector<vector<long long>> splitPainting(vector<vector<int>>& segments) {
+        int n = segments.size();
+        vector<array<int, 4>> events;
+        for(int i = 0; i < n; i++) {
+            events.push_back({segments[i][0], 1, segments[i][2], segments[i][1]});
+            events.push_back({segments[i][1], -1, segments[i][2], segments[i][1]});
+        }
+        sort(events.begin(), events.end(), comp);
+        multiset<int> st;
+        vector<vector<long long>> ans;
+        long long col = 0; int sz = 0;;
+        for(int i = 0; i < events.size(); i++) {
+            int l = events[i][0], r = events[i][3], color = events[i][2];
+            if(events[i][1] == 1) {
+                col += (long long)color;
+                if(!sz) {
+                    ans.push_back({l, r, col});
+                    sz++;
+                }
+                else {
+                    if(ans[sz - 1][0] == l) {
+                        ans[sz - 1][1] = max((int)ans[sz - 1][1], (int)r);
+                        ans[sz - 1][2] = col;
+                    }
+                    else {
+                        if(ans[sz - 1][1] > l) {
+                            ans.push_back({l, max((int)r, (int)ans[sz - 1][1]), col});
+                            ans[sz - 1][1] = l;
+                        }
+                        else ans.push_back({l, r, col});
+                        sz++;
+                    }
+                }
+            }
+            else {
+                col -= (long long)color;
+                if(ans[sz - 1][0] == r) ans[sz - 1][2] = col;
+                else if(ans[sz - 1][1] > r) {
+                    ans.push_back({r, ans[sz - 1][1], col});
+                    ans[sz - 1][1] = r;
+                    sz++;
+                }
+            }
+        }
+        return ans;
+    }
+};
+
+// Method 3 (very simple implementation)
+class Solution {
+public:
+    vector<vector<long long>> splitPainting(vector<vector<int>>& segments) {
+        int n = segments.size();
+        vector<vector<long long>> ans;
+        map<long long, long long> mp;
+        for(int i = 0; i < n; i++) {
+            mp[segments[i][0]] += segments[i][2];
+            mp[segments[i][1]] -= segments[i][2];
+        }
+        int prev = -1; long long col = 0;
+        for(auto it : mp) {
+            if(prev != -1 && col) ans.push_back({prev, it.first, col});
+            prev = it.first;
+            col += it.second;
+        }
+        return ans;
     }
 };
 ```

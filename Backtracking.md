@@ -491,6 +491,7 @@ vector<int> Solution::grayCode(int n) {
 ### [NQueens](https://www.interviewbit.com/problems/nqueens/)
 
 ```cpp
+// Time Complexity (O(N!))
 int canPlace(int i, int j, vector<string> &temp, int n) {
     for(int x = 0; x < n; x++) {
         for(int y = 0; y < n; y++) {
@@ -534,6 +535,7 @@ vector<vector<string> > Solution::solveNQueens(int n) {
 ### [Sudoko](https://www.interviewbit.com/problems/sudoku/)
 
 ```cpp
+// Time Complexity (O(9^81))
 int check(int i, int j, vector<vector<char> > &a, int k) {
     for(int y = 0; y < 9; y++) if(a[i][y] == (k + '0')) return 0;
     for(int x = 0; x < 9; x++) if(a[x][j] == (k + '0')) return 0;
