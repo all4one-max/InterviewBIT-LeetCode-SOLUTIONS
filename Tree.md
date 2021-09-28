@@ -1556,6 +1556,133 @@ vector<int> Solution::order(vector<int> &a, vector<int> &b) {
 
 ## LeetCode Tree Hard Problems
 
+### [Serialize and Deserialize Binary Tree (Star Marked)](https://leetcode.com/problems/serialize-and-deserialize-binary-tree/)
+
+```cpp
+// Method 1 (my own code, it is complex so NOT RECOMMENDED TO USE, althought somehow this method is faster than method 2)
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Codec {
+public:
+
+    // Encodes a tree to a single string.
+    string serialize(TreeNode* root) {
+        if(!root) return "N";
+
+        string left = serialize(root->left);
+        string right = serialize(root->right);
+
+        string ser = to_string(root->val);
+        ser += "s" + to_string(left.size()) + "e" + left;
+        ser += "s" + to_string(right.size()) + "e" + right;
+
+        return ser;
+    }
+
+    pair<int, int> getLength(string &s, int ind) {
+        string sze = "";
+        while(s[ind] != 'e') {
+            sze.push_back(s[ind]);
+            ind++;
+        }
+
+        int tot = stoi(sze);
+        return make_pair(tot, ind + 1);
+    }
+
+    int getRoot(string &data) {
+        int val = 1;
+        string s;
+        if(data[0] == '-') {
+            data = data.substr(1, data.size() - 1);
+            val = -1;
+        }
+        int i = 0;
+        while(data[i] != 's') {
+            s.push_back(data[i]);
+            i++;
+        }
+        val *= stoi(s); int n = data.size();
+        data = data.substr(i - 1, n - i + 1);
+        return val;
+    }
+
+    // Decodes your encoded data to tree.
+    TreeNode* deserialize(string data) {
+        if(data == "N") return NULL;
+
+        int root_val = getRoot(data);
+        TreeNode* root = new TreeNode(root_val);
+
+        pair<int, int> lft = getLength(data, 2);
+        string left = data.substr(lft.second, lft.first);
+
+        pair<int, int> rht = getLength(data, lft.second + lft.first + 1);
+        string right = data.substr(rht.second, rht.first);
+
+        root->left = deserialize(left);
+        root->right = deserialize(right);
+
+        return root;
+    }
+};
+
+// Mehtod 2 (clean and concise code)
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Codec {
+public:
+
+    // Encodes a tree to a single string.
+    string serialize(TreeNode* root) {
+        if(!root) return "N";
+
+        string left = serialize(root->left);
+        string right = serialize(root->right);
+
+        string ser = to_string(root->val) + "," + left + "," + right;
+
+        return ser;
+    }
+
+     // Decodes your encoded data to tree.
+    TreeNode* deserialize(string data) {
+        return Deserialize(data);
+    }
+
+    TreeNode* Deserialize(string& data) {
+        if(data[0] == 'N') {
+            if(data.size() > 1) data = data.substr(2, data.size() - 1);
+            return NULL;
+        }
+
+        int pos = data.find(',');
+        int root_val = stoi(data.substr(0, pos));
+        data = data.substr(pos + 1, data.size() - pos - 1);
+
+        TreeNode* root = new TreeNode(root_val);
+        root->left = Deserialize(data);
+        root->right = Deserialize(data);
+
+        return root;
+    }
+};
+```
+
 ### [Delete Duplicate Folders in System (Star Marked)](https://leetcode.com/problems/delete-duplicate-folders-in-system/)
 
 ```cpp
