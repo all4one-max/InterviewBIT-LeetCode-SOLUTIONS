@@ -923,7 +923,7 @@ UndirectedGraphNode *Solution::cloneGraph(UndirectedGraphNode *node) {
 
 ### [Maximum Employees to Be Invited to a Meeting (Star Marked)](https://leetcode.com/problems/maximum-employees-to-be-invited-to-a-meeting/)
 
-```
+```cpp
 class Solution {
 public:
 
