@@ -918,3 +918,82 @@ UndirectedGraphNode *Solution::cloneGraph(UndirectedGraphNode *node) {
     return cpy[node];
 }
 ```
+
+## LeetCode Graph Hard Problems
+
+### [Maximum Employees to Be Invited to a Meeting (Star Marked)](https://leetcode.com/problems/maximum-employees-to-be-invited-to-a-meeting/)
+
+```
+class Solution {
+public:
+
+
+    void dfs(int v, vector<int> &dist_bottom, array<vector<int>, 100005> &adj, vector<int> &vis, vector<int> &bottom_vertex) {
+        vis[v] = 1;
+        int nxt = adj[v][0];
+        if(!vis[nxt]) dfs(nxt, dist_bottom, adj, vis, bottom_vertex);
+        dist_bottom[v] = dist_bottom[nxt] + 1;
+        if(dist_bottom[v] == 1) bottom_vertex[v] = v;
+        else bottom_vertex[v] = bottom_vertex[nxt];
+        return;
+    }
+
+    void dfs2(int v, vector<int> &vis2, array<vector<int>, 100005> &adj2) {
+        vis2[v] = 1;
+        for(auto it : adj2[v]) {
+            if(!vis2[it]) dfs2(it, vis2, adj2);
+        }
+        return;
+    }
+
+    int maximumInvitations(vector<int>& favorite) {
+        const int n = favorite.size();
+        array<vector<int>, 100005> adj;
+        array<vector<int>, 100005> adj2;
+        vector<int> dist_bottom(n, 0);
+        vector<int> bottom_vertex(n, 0);
+        vector<int> vis(n, 0);
+        vector<int> incoming(n, 0);
+        for(int i = 0; i < n; i++) {
+            adj[i].push_back(favorite[i]);
+            adj2[favorite[i]].push_back(i);
+            incoming[favorite[i]]++;
+        }
+        for(int i = 0; i < n; i++) {
+            if(!vis[i]) dfs(i, dist_bottom, adj, vis, bottom_vertex);
+        }
+        vector<int> bottom;
+        for(int i = 0; i < n; i++) {
+            if(dist_bottom[i] == 1) bottom.push_back(i);
+        }
+        vector<int> indices[n];
+        for(int i = 0; i < n; i++) {
+            indices[bottom_vertex[i]].push_back(i);
+        }
+        int ans = 0;
+        vector<int> vis2(n, 0);
+        int cur_ans = 0;
+        for(auto b : bottom) {
+            if(favorite[favorite[b]] == b) {
+                vis2[b] = 1;
+                dfs2(favorite[b], vis2, adj2);
+                int mx = 2;
+                for(auto v : indices[b]) {
+                    if(incoming[v] == 0 && vis2[v] && bottom_vertex[v] == b) mx = max(mx, dist_bottom[v]);
+                }
+                int current = mx;
+                for(auto v : indices[b]) {
+                    if(incoming[v] == 0 && !vis2[v] && bottom_vertex[v] == b) current = max(current, mx + dist_bottom[v] - 1);
+                }
+                cur_ans += current;
+            }
+            else {
+                int cur_ans = dist_bottom[favorite[b]];
+                ans = max(ans, cur_ans);
+            }
+        }
+        ans = max(ans, cur_ans);
+        return ans;
+    }
+};
+```
