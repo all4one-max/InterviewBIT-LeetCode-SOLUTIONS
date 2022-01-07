@@ -304,3 +304,36 @@ public:
     }
 };
 ```
+
+### [Check if a Parentheses String Can Be Valid (Star Marked)](https://leetcode.com/contest/biweekly-contest-68/problems/check-if-a-parentheses-string-can-be-valid/)
+
+```cpp
+class Solution {
+public:
+    bool canBeValid(string s, string locked) {
+        int n = s.size();
+        stack<int> st; set<int> free;
+        for(int i = 0; i < n; i++) {
+            if(!(locked[i] - '0')) free.insert(i);
+            else {
+                if(s[i] == ')') {
+                    if(!st.empty()) st.pop();
+                    else {
+                        if(free.size()) free.erase(prev(free.end()));
+                        else return false;
+                    }
+                }
+                else st.push(i);
+            }
+        }
+        while(!st.empty()) {
+            auto it = st.top(); st.pop();
+            auto it2 = free.lower_bound(it);
+            if(it2 == free.end()) return false;
+            free.erase(it2);
+        }
+        if(free.size() % 2) return false;
+        return true;
+    }
+};
+```
