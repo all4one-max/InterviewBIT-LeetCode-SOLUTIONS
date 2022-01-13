@@ -2761,3 +2761,80 @@ signed main()
     return 0;
 }
 ```
+
+### [C. Road Optimization (Star Marked)](https://codeforces.com/contest/1625/problem/C)
+
+```cpp
+// it is fairly possible that reaching the ith stop in a suboptimal time
+// might lead to way that makes reaching the last stop optimally
+
+#include "bits/stdc++.h"
+#include <ext/pb_ds/assoc_container.hpp>
+#include <ext/pb_ds/tree_policy.hpp>
+#include <map>
+// #include "atcoder/math.hpp"
+using namespace __gnu_pbds;
+using namespace std;
+#define tezi           ios_base::sync_with_stdio(0); cin.tie(0); cout.tie(0);
+#define ordered_set    tree<long long, null_type,less<long long>, rb_tree_tag,tree_order_statistics_node_update>
+#define int             long long
+#define fo(i,n)        for (int i=0;i<n;i++)
+#define fo1(i, n)      for (int i = 1; i < n; i++)
+#define endl           "\n"
+#define MAX(a,b)       (a>b) ? a : b
+#define MIN(a,b)       (a>b) ? b : a
+#define fi             first
+#define se             second
+#define pb             push_back
+#define mp             make_pair
+#define all(v)         v.begin(), v.end()
+#define uniq(v)        v.resize(unique(all(v)) - v.begin())
+#define sz(v)          (long long)v.size()
+#define pii            pair<int, int>
+
+int n,  m, y, e, t, k, q, u1, u2,  w, c, d, x, cycle = 0;
+const int mx = 400005, mod = 998244353  , mx2 = 200005 , mx3 = 100005, INF = 1000000000000000000;
+
+void solve() {
+    int l;
+    cin >> n >> l >> k;
+    vector<int> dist(n + 1, l); fo(i, n) cin >> dist[i];
+    vector<int> speed(n, 0); fo(i, n) cin >> speed[i];
+    vector<vector<int>> dp(n + 1, vector<int> (k + 1, INF));
+    int time = 0;
+    fo(i, n + 1) {
+        dp[i][0] = time;
+        if (i + 1 <= n) time += (speed[i] * (dist[i + 1] - dist[i]));
+    }
+    fo(i, k + 1) dp[0][i] = 0;
+    fo1(i, k + 1)  {
+        fo1(j, n + 1) {
+            dp[j][i] = min(dp[j][i], dp[j][i - 1]);
+            int rem = 0;
+            for (int l = j - 1; l >= 0; l--) {
+                if (i - rem < 0) continue;
+                time = dp[l][i - rem] + speed[l] * (dist[j] - dist[l]);
+                rem++;
+                dp[j][i] = min(dp[j][i], time);
+            }
+        }
+    }
+    cout << dp[n][k] << endl;
+    return;
+}
+
+signed main()
+{   tezi
+# ifndef ONLINE_JUDGE
+    // for getting input from input.txt
+    freopen("input.txt", "r", stdin);
+    // for getting input from output.txt
+    freopen("output.txt", "w", stdout);
+    // for printing erros
+    freopen("Errors.txt", "w", stderr);
+# endif
+    t = 1;
+    fo(i, t) solve();
+    return 0;
+}
+```
