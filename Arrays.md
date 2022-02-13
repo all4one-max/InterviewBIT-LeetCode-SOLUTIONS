@@ -884,78 +884,18 @@ int Solution::repeatedNumber(const vector<int> &a) {
 ### [Minimum Lights to Activate](https://www.interviewbit.com/problems/minimum-lights-to-activate/)
 
 ```cpp
-#define fo(i,n)        for (int i=0;i<n;i++)
-#define fo1(i, n)      for (int i = 1; i < n; i++)
-#define endl           "\n"
-#define MAX(a,b)       (a>b) ? a : b
-#define MIN(a,b)       (a>b) ? b : a
-#define fi             first
-#define se             second
-#define pb             push_back
-#define mp             make_pair
-#define all(v)         v.begin(), v.end()
-#define sz(v)          v.size()
-#define pii            pair<int, int>
-
 int Solution::solve(vector<int> &a, int b) {
-    int n=a.size();
-    int zero=0;
-    int i=0;
-    while (i<n) {
-        if (a[i]==0) zero++;
-        else break;
-        i++;
-    }
-    if (zero>(b-1) || (i==n && zero>0)) return -1;
-    i=n-1;
-    zero=0;
-    while (i>=0) {
-        if (a[i]==0) zero++;
-        else break;
-        i--;
-    }
-    if (zero>(b-1) || (i==-1 && zero>0)) return -1;
-    zero=0;
-    fo(i,n) {
-        if (a[i]==0) zero++;
-        else {
-            if (zero>(2*b-2)) return -1;
-            zero=0;
-        }
-    }
-    /*now the tough part*/
-    int ans=0;
-    fo(i,n) {
-        if (a[i]==1 || a[i]==0) {
-            int found=0;
-            for(int j=(n-1);j>=0;j--) {
-                if (a[j]==1 && (j-b+1)<=i) {
-                    for(int k=j;k>=max((j-b+1),0);k--) {
-                        if (a[k]==0 || a[k]==1) a[k]+=2;
-                    }
-                    for(int k=j+1;k<=min(n-1,j+b-1);k++) {
-                        if (a[k]==0 || a[k]==1) a[k]+=2;
-                    }
-                    ans++;
-                    found=1;
-                    break;
-                }
-            }
-            if (found==0) {
-                for(int j=i;j>=0;j--) {
-                    if ((a[j]==3 || a[j]==1) && (j+b-1)>=i) {
-                        for(int k=j;k>=max((j-b+1),0);k--) {
-                            if (a[k]==0 || a[k]==1) a[k]+=2;
-                        }
-                        for(int k=j+1;k<=min(n-1,j+b-1);k++) {
-                            if (a[k]==0 || a[k]==1) a[k]+=2;
-                        }
-                        ans++;
-                        break;
-                    }
-                }
+    int n = a.size(), i = 0, ans = 0;
+    while(i < n) {
+        ans++; int fnd = 0;
+        for(int j = min(n, i + b) - 1; j > max(0, i - b); j--) {
+            if(a[j] == 1) {
+                i = j + b;
+                fnd = 1;
+                break;
             }
         }
+        if(!fnd) return -1;
     }
     return ans;
 }

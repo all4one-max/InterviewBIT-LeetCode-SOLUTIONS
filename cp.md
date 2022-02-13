@@ -286,3 +286,108 @@ signed main()
     return 0;
 }
 ```
+
+### [E. Average and Median (Star Marked)](https://atcoder.jp/contests/abc236/tasks/abc236_e)
+
+```cpp
+#include "bits/stdc++.h"
+#include <ext/pb_ds/assoc_container.hpp>
+#include <ext/pb_ds/tree_policy.hpp>
+#include <map>
+// #include "atcoder/math.hpp"
+using namespace __gnu_pbds;
+using namespace std;
+#define tezi           ios_base::sync_with_stdio(0); cin.tie(0); cout.tie(0);
+#define ordered_set    tree<long long, null_type,less<long long>, rb_tree_tag,tree_order_statistics_node_update>
+#define int             long long
+#define fo(i,n)        for (int i=0;i<n;i++)
+#define fo1(i, n)      for (int i = 1; i < n; i++)
+#define endl           "\n"
+#define MAX(a,b)       (a>b) ? a : b
+#define MIN(a,b)       (a>b) ? b : a
+#define fi             first
+#define se             second
+#define pb             push_back
+#define mp             make_pair
+#define all(v)         v.begin(), v.end()
+#define uniq(v)        v.resize(unique(all(v)) - v.begin())
+#define sz(v)          (long long)v.size()
+#define pii            pair<int, int>
+
+int n,  m, y, e, t, k, q, u1, u2,  w, c, d, x, mx_ind;
+const int mx = 400005, mod = 1000000007, mx2 = 200005 , mx3 = 100005, INF = 1000000000000000000;
+vector<int> arr(mx2, 0);
+vector<int> arr2(mx2, 0);
+
+void solve_avg() {
+  long double low = (long double)0, high = (long double) * max_element(all(arr)), ans = (long double)0;
+  while (low <= high) {
+    long double mid = (low + high) / 2;
+    vector<int> cpy(n + 1, 0);
+    fo1(i, n + 1) cpy[i] = arr[i - 1] - mid;
+    vector<array<int, 2>> dp(n + 1, {0, 0});
+    fo1(i, n + 1) {
+      dp[i][1] = cpy[i] + (int)max(dp[i - 1][1], dp[i - 1][0]);
+      dp[i][0] = dp[i - 1][1];
+    }
+    if (max(dp[n][1], dp[n][0]) >= 0LL) {
+      low = mid + 1;
+      ans = max(ans, mid);
+    }
+    else high = mid - 1;
+  }
+  cout << fixed << setprecision(9) << (ans / (long double)10000) << endl;
+  return;
+}
+
+void solve_median() {
+  int lw = 1, hgh = *max_element(all(arr2)); int median = 1;
+  while (lw <= hgh) {
+    int mid = (lw + hgh) / 2;
+    vector<int> cpy(n + 1, 0);
+    fo1(i, n + 1) {
+      if (arr2[i - 1] >= mid) cpy[i] = 1;
+      else cpy[i] = -1;
+    }
+    vector<array<int, 2>> dp(n + 1, {0, 0});
+    fo1(i, n + 1) {
+      dp[i][1] = cpy[i] + (int)max(dp[i - 1][1], dp[i - 1][0]);
+      dp[i][0] = dp[i - 1][1];
+    }
+    if (max(dp[n][1], dp[n][0]) > 0LL) {
+      lw = mid + 1;
+      median = max(median, mid);
+    }
+    else hgh = mid - 1;
+  }
+  cout << median << endl;
+  return;
+}
+
+void solve() {
+  cin >> n;
+  fo(i, n) {
+    cin >> arr[i];
+    arr2[i] = arr[i];
+    arr[i] *= (int)10000;
+  }
+  solve_avg();
+  solve_median();
+  return;
+}
+
+signed main()
+{ tezi
+# ifndef ONLINE_JUDGE
+  // for getting input from input.txt
+  freopen("input.txt", "r", stdin);
+  // for getting input from output.txt
+  freopen("output.txt", "w", stdout);
+  // for printing erros
+  freopen("Errors.txt", "w", stderr);
+# endif
+  t = 1;
+  fo(i, t) solve();
+  return 0;
+}
+```

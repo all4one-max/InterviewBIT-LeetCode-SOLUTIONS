@@ -370,7 +370,7 @@ int Solution::solve(vector<int> &a, int b) {
 }
 ```
 
-## LeetCode 2 Pointers Hard Problems
+## 2 Pointers Hard Problems
 
 ### [Count Unique Characters of All Substrings of a Given String](https://leetcode.com/problems/count-unique-characters-of-all-substrings-of-a-given-string/)
 
@@ -751,4 +751,95 @@ public:
         return ans;
     }
 };
+```
+
+### [D. Range Partition](https://codeforces.com/contest/1631/problem/D)
+
+```cpp
+#include "bits/stdc++.h"
+#include <ext/pb_ds/assoc_container.hpp>
+#include <ext/pb_ds/tree_policy.hpp>
+#include <map>
+// #include "atcoder/math.hpp"
+using namespace __gnu_pbds;
+using namespace std;
+#define tezi           ios_base::sync_with_stdio(0); cin.tie(0); cout.tie(0);
+#define ordered_set    tree<long long, null_type,less<long long>, rb_tree_tag,tree_order_statistics_node_update>
+#define int             long long
+#define fo(i,n)        for (int i=0;i<n;i++)
+#define fo1(i, n)      for (int i = 1; i < n; i++)
+#define endl           "\n"
+#define MAX(a,b)       (a>b) ? a : b
+#define MIN(a,b)       (a>b) ? b : a
+#define fi             first
+#define se             second
+#define pb             push_back
+#define mp             make_pair
+#define all(v)         v.begin(), v.end()
+#define uniq(v)        v.resize(unique(all(v)) - v.begin())
+#define sz(v)          (long long)v.size()
+#define pii            pair<int, int>
+
+int n,  m, y, e, t, k, q, u1, u2,  w, c, d, x, mx_ind;
+const int mx = 400005, mod = 1000000007, mx2 = 200005 , mx3 = 100005, INF = 1000000000000000000;
+
+void solve() {
+  cin >> n >> k; vector<int> arr1(n + 1, 0); fo1(i, n + 1) cin >> arr1[i];
+  fo(i, n + 1) BIT[i] = 0;
+  fo1(i, n + 1) {
+    arr[i] = 1;
+  }
+  vector<int> cnt(n + 1, 0); fo1(i, n + 1) cnt[arr1[i]]++;
+  fo1(i, n + 1) cnt[i] += cnt[i - 1];
+  vector<int> store[n + 1];
+  fo1(i, n + 1) store[arr1[i]].pb(i);
+  int l = *min_element(arr1.begin() + 1, arr1.end()); int r = l;
+  int L, R, anss = INF;
+  while (l <= r && r <= n) {
+    int cur_ans = cnt[r] - cnt[l - 1];
+    int rest = n - cur_ans;
+    int there = cur_ans - rest;
+    if (there >= k) {
+      if (r - l + 1 < anss) {
+        anss = r - l + 1;
+        L = l; R = r;
+      }
+      l++;
+    }
+    else r++;
+  }
+  cout << L << " " << R << endl;
+  vector<vector<int>> ans;
+  int sm = 0, last = 1;
+  fo1(i, n + 1) {
+    if (k == 1) {
+      ans.pb({last, n});
+      break;
+    }
+    sm += (arr1[i] >= L && arr1[i] <= R ? 1 : -1);
+    if (sm > 0) {
+      sm = 0;
+      ans.pb({last, i});
+      last = i + 1;
+      k--;
+    }
+  }
+  for (auto it : ans) cout << it[0] << " " << it[1] << endl;
+  return;
+}
+
+signed main()
+{ tezi
+# ifndef ONLINE_JUDGE
+  // for getting input from input.txt
+  freopen("input.txt", "r", stdin);
+  // for getting input from output.txt
+  freopen("output.txt", "w", stdout);
+  // for printing erros
+  freopen("Errors.txt", "w", stderr);
+# endif
+  cin >> t;
+  fo(i, t) solve();
+  return 0;
+}
 ```

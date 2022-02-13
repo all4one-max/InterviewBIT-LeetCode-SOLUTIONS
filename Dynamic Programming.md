@@ -2838,3 +2838,79 @@ signed main()
     return 0;
 }
 ```
+
+### [Stamping the Grid (Star Marked)](https://leetcode.com/problems/stamping-the-grid/)
+
+```cpp
+class Solution {
+public:
+    vector<vector<int>> getPrefSum(vector<vector<int>> &grid, int n, int m) {
+        vector<vector<int>> dp(n + 1, vector<int> (m + 1, 0));
+        for(int i = 1; i <= n; i++) {
+            for(int j = 1; j <= m; j++) {
+                dp[i][j] = dp[i][j - 1] + dp[i - 1][j] + grid[i - 1][j - 1] - dp[i - 1][j - 1];
+            }
+        }
+        return dp;
+    }
+
+    bool possibleToStamp(vector<vector<int>>& grid, int stampHeight, int stampWidth) {
+        int n = grid.size(), m = grid[0].size();
+        auto dp = getPrefSum(grid, n, m);
+        vector<vector<int>> dp2(n, vector<int> (m, 0));
+        for(int i = 1; i <= n; i++) {
+            for(int j = 1; j <= m; j++) {
+                int u = i + stampHeight - 1, v = j + stampWidth - 1;
+                if(u > n || v > m) continue;
+                int sum = dp[u][v] - dp[u][j - 1] - dp[i - 1][v] + dp[i - 1][j - 1];
+                if(!sum) dp2[u - 1][v - 1] = 1;
+            }
+        }
+        auto dp3 = getPrefSum(dp2, n, m);
+        bool ok = true;
+        for(int i = 1; i <= n; i++) {
+            for(int j = 1; j <= m; j++) {
+                if(grid[i - 1][j - 1] == 1) continue;
+                int u = min(n, i + stampHeight - 1), v = min(m, j + stampWidth - 1);
+                int sum = dp3[u][v] - dp3[u][j - 1] - dp3[i - 1][v] + dp3[i - 1][j - 1];
+                if(!sum) ok = false;
+            }
+        }
+        return ok;
+    }
+};
+```
+
+### [Maximum AND Sum of Array (Star Marked)](https://leetcode.com/contest/weekly-contest-280/problems/maximum-and-sum-of-array/)
+
+```cpp
+vector<vector<int>> dp;
+
+class Solution {
+public:
+
+    int dp3Mask(int ind, int mask, vector<int> &nums, int k) {
+        int n = nums.size();
+        if(ind == n) return 0;
+        if(dp[ind][mask] != -1) return dp[ind][mask];
+
+        int curMask = mask; int pw = 1, ans = 0;
+        for(int i = 0; i < k; i++) {
+            int filled = curMask % 3;
+            if(filled != 2) {
+                int curAns = ((i + 1)&nums[ind]) + dp3Mask(ind + 1, mask + pw, nums, k);
+                ans = max(ans, curAns);
+            }
+            curMask/=3;
+            pw*=3;
+        }
+        return dp[ind][mask] = ans;
+    }
+
+    int maximumANDSum(vector<int>& nums, int numSlots) {
+        int n = nums.size();
+        dp = vector<vector<int>> (n, vector<int> (pow(3, numSlots), -1));
+        return dp3Mask(0, 0, nums, numSlots);
+    }
+};
+```
