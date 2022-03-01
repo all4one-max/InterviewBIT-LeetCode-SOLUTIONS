@@ -2914,3 +2914,54 @@ public:
     }
 };
 ```
+
+### [Minimum Time to Finish the Race (Star Marked)](https://leetcode.com/contest/weekly-contest-282/problems/minimum-time-to-finish-the-race/)
+
+```cpp
+class Solution {
+public:
+    int minimumFinishTime(vector<vector<int>>& tires, int changeTime, int numLaps) {
+        int n = tires.size();
+        vector<int> mx_pos;
+        int mxLaps = 1;
+        map<int, long long> mpp;
+        for(int i = 0; i < n; i++) {
+            long long f = (long long)tires[i][0], r = (long long)tires[i][1];
+            long long cur = 1LL,sm = 0LL; int cnt = 0;
+            while(true) {
+                long long now = f * cur;
+                sm += now;
+                if(now >= ((long long)changeTime + f)) break;
+                cur *= r;
+                cnt++;
+                mxLaps = max(mxLaps, cnt);
+                if(mpp[cnt] == 0) mpp[cnt] = sm;
+                else {
+                    long long curTime = mpp[cnt];
+                    if(curTime > sm) mpp[cnt] = sm;
+                }
+            }
+            mx_pos.push_back(cnt);
+        }
+        long long inf = 1e15;
+        vector<long long> minTime(1001, inf);
+        minTime[0] = 0;
+        for(int i = 0; i < n; i++) {
+            long long f = (long long)tires[i][0], r = (long long)tires[i][1];
+            long long cur = 0LL;
+            for(int j = 1; j <= mx_pos[i]; j++) {
+                cur += ((long long)(f * pow(r, j - 1)));
+                minTime[j] = min(minTime[j], cur);
+            }
+        }
+        vector<long long> dp(1001, inf);
+        dp[0] = 0;
+        for(int j = 1; j <= numLaps; j++) {
+            for(int i = 1; i <= j; i++) {
+                dp[j] = min(dp[j], minTime[i] + dp[j - i] + changeTime);
+            }
+        }
+        return dp[numLaps] - changeTime;
+    }
+};
+```

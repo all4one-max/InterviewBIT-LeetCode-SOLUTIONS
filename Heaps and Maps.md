@@ -716,3 +716,100 @@ public:
     }
 };
 ```
+
+### [Minimum Difference in Sums After Removal of Elements (Star Marked)](https://leetcode.com/contest/biweekly-contest-71/problems/minimum-difference-in-sums-after-removal-of-elements/)
+
+```cpp
+class Solution {
+public:
+    long long minimumDifference(vector<int>& nums) {
+        int n = (nums.size())/3;
+        vector<long long> pref(3*n, 0), suf(3*n, 0);
+        priority_queue<int> pq1;
+        for(int i = 0; i < 3*n; i++) {
+            pref[i] = (i?pref[i - 1]:0);
+            if(pq1.size() == n) {
+                if(pq1.top() > nums[i]) {
+                    pref[i] -= pq1.top();
+                    pq1.pop();
+                    pq1.push(nums[i]);
+                    pref[i] += nums[i];
+                }
+            }
+            else {
+                pq1.push(nums[i]);
+                pref[i] += nums[i];
+            }
+        }
+        priority_queue<int, vector<int>, greater<int>> pq2;
+        for(int i = (3*n) - 1; i >= 0; i--) {
+            suf[i] = (((i + 1) < 3*n)?suf[i + 1]:0);
+            if(pq2.size() == n) {
+                if(pq2.top() < nums[i]) {
+                    suf[i] -= pq2.top();
+                    pq2.pop();
+                    pq2.push(nums[i]);
+                    suf[i] += nums[i];
+                }
+            }
+            else {
+                pq2.push(nums[i]);
+                suf[i] += nums[i];
+            }
+        }
+        long long ans = 1e18;
+        for(int i = n - 1; i < 2*n; i++) ans = min(ans, pref[i] - suf[i + 1]);
+        return ans;
+    }
+};
+```
+
+### [Smallest Sufficient Team (Star Marked)](https://leetcode.com/problems/smallest-sufficient-team/)
+
+```cpp
+vector<long long> dp;
+class Solution {
+public:
+    long long dpMask(int mask, vector<string>& req_skills, vector<int>& people, vector<int> &avail) {
+        int n = req_skills.size(), m = people.size();
+        if(mask == ((1<<n) - 1)) return 0;
+        if(dp[mask] != -1) return dp[mask];
+        int ans = 1e9; long long vans = 0;
+        for(int i = 0; i < m; i++) {
+            if(avail[i]) {
+                int curMask = mask|people[i];
+                avail[i] = 0;
+                auto ret = dpMask(curMask, req_skills, people, avail);
+                ret|=(1LL<<i);
+                auto cnt = __builtin_popcountll(ret);
+                if(ans > cnt) {
+                    ans = cnt;
+                    vans = ret;
+                }
+                avail[i] = 1;
+            }
+        }
+        return dp[mask] = vans;
+    }
+
+    vector<int> smallestSufficientTeam(vector<string>& req_skills, vector<vector<string>>& people) {
+        dp = vector<long long> (100000, -1LL);
+        int n = people.size(), m = req_skills.size();
+        map<string, int> mpp;
+        int ind = 0; for(auto it : req_skills) mpp[it] = ind++;
+        vector<int> preMask;
+        for(auto v : people) {
+            int curMask = 0;
+            for(auto u : v) curMask+=(1<<mpp[u]);
+            preMask.push_back(curMask);
+        }
+        vector<int> avail(n, 1);
+        long long ans =  dpMask(0, req_skills, preMask, avail);
+        vector<int> ret;
+        for(int i = 0; i < n; i++) {
+            if((ans>>i)&1) ret.push_back(i);
+        }
+        return ret;
+    }
+};
+```
