@@ -308,6 +308,17 @@ public:
 ### [Check if a Parentheses String Can Be Valid (Star Marked)](https://leetcode.com/contest/biweekly-contest-68/problems/check-if-a-parentheses-string-can-be-valid/)
 
 ```cpp
+
+/*
+Few Important things you should know when solving valid paranthesis type of question.
+1. if you have a balanced paranthesis and u add an opening and a closing baracket to this,
+then the resulting sequence will also be balanced.
+eg -> (()()) (balanced) -> (\((\))()) (balanced)
+2. If you have two balanced paranthesis sequence and you add the second one to the first one in the same order,
+then also the resulting sequence will be balanced
+eg -> (()()(())), (()) (try adding them, the sequence will be balanced)
+*/
+
 class Solution {
 public:
     bool canBeValid(string s, string locked) {
