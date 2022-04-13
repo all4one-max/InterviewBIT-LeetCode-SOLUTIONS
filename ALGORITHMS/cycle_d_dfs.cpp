@@ -32,6 +32,7 @@ vector<int> adj[mx3];
 vector<int> visited(mx3, 0);
 vector<int> rec_stack(mx3, 0);
 bool cycle = false;
+vector<int> cycleV(mx3, 0);
 
 void dfs(int v, int p) {
   visited[v] = 1;
@@ -46,6 +47,23 @@ void dfs(int v, int p) {
         cycle = true;
         return;
       }
+    }
+  }
+  rec_stack[v] = 0;
+  return;
+}
+
+// DFS to find all the vertices which are part of a cycle in the given graph
+void dfs2(int v, int p) {
+  visited[v] = 1;
+  rec_stack[v] = 1;
+  for (auto it : adj[v]) {
+    if (visited[it] == 0) {
+      dfs(it, v);
+      if (cycleV[it]) cycleV[v] = 1;
+    }
+    else {
+      if (rec_stack[it]) cycleV[v] = 1;
     }
   }
   rec_stack[v] = 0;

@@ -20,6 +20,7 @@ using namespace std;
 int n,  m, y, e, t, k, len, u1, u2,  f, sm = 0, cnt = 0, a, b;
 const int mx = 200005, mod = 1000000007, mx2 = 1000005 , mx3 = 1000001;
 vector<int> fact(mx, 1);
+vector<int> mod_inv(mx, 0);
 
 int fme(int a, int b) {
   int res = 1;
@@ -43,9 +44,14 @@ signed main()
   // for getting input from output.txt
   freopen("output.txt", "w", stdout);
 # endif
-  for (int i = 1; i < (mx + 1); i++) {
+  for (int i = 1; i < mx; i++) {
     fact[i] = (fact[i - 1] * i) % mod;
   }
+  fo(i, mx) {
+    int fct = fact[i];
+    mod_inv[i] = modinv(fct);
+  }
+  // replace modinv(fact[r]) by mod_inv[r] if you have to optimise ncr % mod
   cout << binomial(5, 3);
   return 0;
 

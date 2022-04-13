@@ -6,8 +6,8 @@
 using namespace __gnu_pbds;
 using namespace std;
 #define tezi           ios_base::sync_with_stdio(0); cin.tie(0); cout.tie(0);
-#define ordered_set    tree<int, null_type,less<int>, rb_tree_tag,tree_order_statistics_node_update>
-#define int            long long
+#define ordered_set    tree<long long, null_type,less<long long>, rb_tree_tag,tree_order_statistics_node_update>
+#define int             long long
 #define fo(i,n)        for (int i=0;i<n;i++)
 #define fo1(i, n)      for (int i = 1; i < n; i++)
 #define endl           "\n"
@@ -19,29 +19,59 @@ using namespace std;
 #define mp             make_pair
 #define all(v)         v.begin(), v.end()
 #define uniq(v)        v.resize(unique(all(v)) - v.begin())
-#define sz(v)          v.size()
+#define sz(v)          (long long)v.size()
 #define pii            pair<int, int>
 
-int n,  m, y, e, t, k, q, u1, u2,  w, v, c, d, x, a, b;
-const int mx = 400005, mod = 1LL << 32, mx2 = 300005 , mx3 = 100005, INF = 1000000000000000000;
+int n,  m, y, e, t, k, q, u1, u2,  w, c, d, x;
+const int mx = 400005, mod = 1000000007, mx2 = 200005 , mx3 = 100005, INF = 1000000000000000000;
 
 void solve() {
-  cin >> n; vector<int> p(n + 5, 0); fo(i, n) cin >> p[i];
-  vector<vector<int>> dp(n + 2, vector<int>(n + 2, 1e9));
-  fo(i, n) dp[i][i] = 0;
-  for (int l = 2; l < n; l++) {
-    for (int i = 1; i < n; i++) {
-      int j = i + l - 1;
-      if (j < n) {
-        for (int k = i; k < j; k++) {
-          dp[i][j] = min(dp[i][j], dp[i][k] + p[i - 1] * p[k] * p[j] + dp[k + 1][j]);
-        }
-      }
+  cin >> n; vector<int> a(n, 0); fo(i, n) cin >> a[i];
+  vector<pair<int, int>> d(n + 1, {INF, -1}); d[0].fi = -INF;
+  vector<int> parent(n, -1);
+  // dp[i] = minimum possible element at which a sequence of length i ends
+  for (int i = 0; i < n; i++) {
+    int pos = upper_bound(all(d), make_pair(a[i], INF)) - d.begin();
+    if (pos <= n && a[i] > d[pos - 1].fi && d[pos].fi > a[i]) {
+      d[pos] = {a[i], i};
+      parent[i] = d[pos - 1].se;
     }
   }
-  cout << dp[1][n - 1] << endl;
+  int note;
+  for (int i = n; i > 0; i--) {
+    if (d[i].fi < INF) {
+      note = d[i].se;
+      cout << i << endl;
+      break;
+    }
+  }
+  vector<int> arr;
+  while (note != -1) {
+    arr.pb(a[note]);
+    note = parent[note];
+  }
+  reverse(all(arr));
+  for (auto it : arr) cout << it << " ";
+  cout << endl;
   return;
+
 }
+
+/*
+code for longest non - decreasing sequence
+vector<int> longestObstacleCourseAtEachPosition(vector<int>& a) {
+    int n = a.size(); vector<int> d(n + 1, 1e9); d[0] = 0;
+    vector<int> ans(n, 1);
+    for(int i = 0; i < n; i++) {
+        int pos = upper_bound(d.begin(), d.end(), a[i]) - d.begin();
+        if (pos <= n && a[i] >= d[pos - 1] && d[pos] > a[i]) {
+          d[pos] = a[i];
+        }
+        ans[i] = pos;
+    }
+    return ans;
+}
+*/
 
 signed main()
 { tezi

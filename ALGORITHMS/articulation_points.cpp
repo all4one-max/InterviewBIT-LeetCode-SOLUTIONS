@@ -27,6 +27,25 @@ vector<bool> visited;
 set<int> cut_points;
 int timer = 0;
 
+/*
+To solve questions related to articulation points and bridges it's very important
+to understand the concept of dfs tree, which you can look up in detail in fft's
+blog, but let's discuss some key points here itself.
+
+1. A Back edge is always from a vertex to an ancestor of that vetex in the dfs
+tree.
+
+----Point 2 and 3 are related to bridge------
+2. A span edge can be a bridge only if there is a back edge from some subtree of
+it's child to it's ancestor.
+
+3. A back edge can never be a bridge.
+
+Now in the code for finding articulation point, low[i] signifies the lowest time of entry
+vertex or the lowest depth vertex, vertex i can reach.
+*/
+
+
 void find_cutpoints_helper(int vertex, int parent) {
   visited[vertex] = true;
   tin[vertex] = low[vertex] = timer++;
@@ -36,7 +55,7 @@ void find_cutpoints_helper(int vertex, int parent) {
     if (visited[it]) {
       // if a node which is the child of vertex has already been visited, then this mean
       // it -> vertex is a back edge
-      low[vertex] = min(low[vertex], low[it]);
+      low[vertex] = min(low[vertex], tin[it]);
     }
     else {
       children++;
@@ -44,7 +63,7 @@ void find_cutpoints_helper(int vertex, int parent) {
       low[vertex] = min(low[vertex], low[it]);
       // now if the low value of my child is greater than my time in of the parent
       // then this means there is not any back edge from the descendents of this child
-      // to the ancestor(or this vertex itself)
+      // to the ancestor
       if (low[it] >= tin[vertex] && parent != -1) {
         cut_points.insert(vertex);
       }

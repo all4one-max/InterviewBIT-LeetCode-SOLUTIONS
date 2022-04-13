@@ -95,7 +95,6 @@ void solve() {
             }
         }
     }
-
     if (v1 != -1) {
         fo(i, sz(res) - 1) {
             if ((res[i] == v1 && res[i + 1] == v2) || (res[i] == v2 && res[i] == v1)) {

@@ -467,6 +467,19 @@ bool comp(pair<int, int>p1, pair<int, int>p2) {
     return false;
 }
 
+struct fraction {
+    int p, q;
+    fraction(int num, int den) : p(num), q(den) {}
+    bool operator<(const fraction &other)const {
+        int val = (((int)q * other.p) < ((int)other.q * p));
+        return val;
+    }
+    bool operator<=(const fraction &other)const {
+        int val = (((int)q * other.p) <= ((int)other.q * p));
+        return val;
+    }
+};
+
 void explainExtra() {
 
     sort(a + 2, a + 4); // [first, last)

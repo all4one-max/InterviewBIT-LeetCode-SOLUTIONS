@@ -26,6 +26,12 @@ int n,  m, y, e, t, k, q, u1, u2,  w, c, d, x, distinct = 0;
 const int mx = 800005, mod = 1000000007, mx2 = 200005 , mx3 = 2000005, INF = 1000000000000000000;
 const int block_size = 500;
 
+/*
+1. We cannot update value between two queries.
+2. Only applicable in case of offline queries.
+3. First expand the range on both sides, then only start contracting the range
+*/
+
 struct Query
 {
     int l;

@@ -6,8 +6,8 @@
 using namespace __gnu_pbds;
 using namespace std;
 #define tezi           ios_base::sync_with_stdio(0); cin.tie(0); cout.tie(0);
-#define ordered_set    tree<int, null_type,less<int>, rb_tree_tag,tree_order_statistics_node_update>
-#define int            long long
+#define ordered_set    tree<long long, null_type,less<long long>, rb_tree_tag,tree_order_statistics_node_update>
+#define int             long long
 #define fo(i,n)        for (int i=0;i<n;i++)
 #define fo1(i, n)      for (int i = 1; i < n; i++)
 #define endl           "\n"
@@ -19,27 +19,45 @@ using namespace std;
 #define mp             make_pair
 #define all(v)         v.begin(), v.end()
 #define uniq(v)        v.resize(unique(all(v)) - v.begin())
-#define sz(v)          v.size()
+#define sz(v)          (long long)v.size()
 #define pii            pair<int, int>
 
-int n,  m, y, e, t, k, q, u1, u2,  w, v, c, d, x, a, b;
-const int mx = 400005, mod = 1LL << 32, mx2 = 300005 , mx3 = 100005, INF = 1000000000000000000;
+#ifndef ONLINE_JUDGE
+#define debug(x) cerr << #x <<" "; _print(x); cerr << endl;
+#else
+#define debug(x);
+#endif
+
+void _print(int t) {cerr << t;}
+void _print(string t) {cerr << t;}
+void _print(char t) {cerr << t;}
+void _print(double t) {cerr << t;}
+
+template <class T, class V> void _print(pair <T, V> p) {cerr << "{"; _print(p.fi); cerr << ","; _print(p.se); cerr << "}";}
+template <class T> void _print(vector <T> v) {cerr << "[ "; for (T i : v) {_print(i); cerr << " ";} cerr << "]";}
+template <class T> void _print(set <T> v) {cerr << "[ "; for (T i : v) {_print(i); cerr << " ";} cerr << "]";}
+template <class T> void _print(multiset <T> v) {cerr << "[ "; for (T i : v) {_print(i); cerr << " ";} cerr << "]";}
+template <class T, class V> void _print(map <T, V> v) {cerr << "[ "; for (auto i : v) {_print(i); cerr << " ";} cerr << "]";}
+
+int n,  m, y, e, t, k, q, u1, u2,  w, c, d, x;
+const int mx = 400005, mod = 1000000007, mx2 = 200005 , mx3 = 100005, INF = 1000000000000000000;
 
 void solve() {
-  cin >> n; vector<int> p(n + 5, 0); fo(i, n) cin >> p[i];
-  vector<vector<int>> dp(n + 2, vector<int>(n + 2, 1e9));
-  fo(i, n) dp[i][i] = 0;
-  for (int l = 2; l < n; l++) {
-    for (int i = 1; i < n; i++) {
-      int j = i + l - 1;
-      if (j < n) {
-        for (int k = i; k < j; k++) {
-          dp[i][j] = min(dp[i][j], dp[i][k] + p[i - 1] * p[k] * p[j] + dp[k + 1][j]);
-        }
-      }
+  cin >> n;
+  vector<int> v(1 << n, 0);
+  vector<vector<int>> dp(1 << n, vector<int> (n + 5, 0));
+  vector<int> F(1 << n, 0);
+  fo(i, 1 << n) cin >> v[i];
+  fo(mask, 1 << n) {
+    dp[mask][0] = v[mask];
+    fo1(j, n + 1) {
+      if (mask & (1 << (j - 1))) dp[mask][j] = dp[mask][j - 1] + dp[mask ^ (1 << (j - 1))][j - 1];
+      else dp[mask][j] = dp[mask][j - 1];
     }
+    F[mask] = dp[mask][n];
   }
-  cout << dp[1][n - 1] << endl;
+  fo(mask, 1 << n) cout << F[mask] << " ";
+  cout << endl;
   return;
 }
 
@@ -50,6 +68,8 @@ signed main()
   freopen("input.txt", "r", stdin);
   // for getting input from output.txt
   freopen("output.txt", "w", stdout);
+  // for printing erros
+  freopen("Errors.txt", "w", stderr);
 # endif
   t = 1;
   fo(i, t) solve();
