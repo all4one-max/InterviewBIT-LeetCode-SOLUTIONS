@@ -348,3 +348,47 @@ public:
     }
 };
 ```
+
+### [Check if There Is a Valid Parentheses String Path (Star Marked)](https://leetcode.com/contest/weekly-contest-292/problems/check-if-there-is-a-valid-parentheses-string-path/)
+
+```cpp
+class Solution {
+public:
+    int dp[101][101][101];
+
+    bool check(vector<vector<char>>& grid, int i, int j, int bal) {
+        // for some given position [i, j] and difference between opening and closing bracket
+        // we will have unique number of opening and closing bracket.
+
+        // Proof: ( + ) = i + j + 1
+        // ( - ) = bal
+        // 2( = i + j + 1 + bal
+        // since i,j will remain constant for a given position, therefore for a given bal
+        // count ( and ) will always remain same.
+
+        // Do note the following points
+        // 1. Further, we need to realise that in questions of stack, we can use such structures.
+        // 2. we are only concerned with the amount of ( and ), rather than the actual configuration.
+
+
+        int n = grid.size(), m = grid[0].size();
+        bal += ((grid[i][j] == '(')? 1 : -1);
+        if(bal < 0 || (bal > (n + m + 1)/2)) return 0;
+        if(dp[i][j][bal] != -1) return dp[i][j][bal];
+        if((i == n - 1) && (j == m - 1) && bal == 0) return dp[i][j][bal] = 1;
+        if(i + 1 < n && check(grid, i + 1, j, bal)) return dp[i][j][bal] = 1;
+        if(j + 1 < m && check(grid, i, j + 1, bal)) return dp[i][j][bal] = 1;
+        return dp[i][j][bal] = 0;
+    }
+
+    bool hasValidPath(vector<vector<char>>& grid) {
+        int n = grid.size(), m = grid[0].size();
+        for(int i = 0; i < 101; i++) {
+            for(int j = 0; j < 101; j++) {
+                for(int k = 0; k < 101; k++) dp[i][j][k] = -1;
+            }
+        }
+        return check(grid, 0, 0, 0) == 1;
+    }
+};
+```

@@ -2695,3 +2695,28 @@ public:
     }
 };
 ```
+
+### [Total Appeal of A String (Star Marked)](https://leetcode.com/contest/weekly-contest-291/problems/total-appeal-of-a-string/)
+
+```cpp
+class Solution {
+public:
+    long long appealSum(string s) {
+        int n = s.size();
+        long long ans = 1;
+        vector<int> dp(n, 0); dp[0] = 1;
+        vector<int> prev(26, -1); prev[s[0] - 'a'] = 0;
+        for(int i = 1; i < n; i++) {
+            dp[i] = 1 + dp[i - 1];
+            if(prev[s[i] - 'a'] != -1) {
+                int ind = prev[s[i] - 'a'];
+                dp[i] += (i - ind - 1);
+            }
+            else dp[i] += i;
+            prev[s[i] - 'a'] = i;
+            ans += dp[i];
+        }
+        return ans;
+    }
+};
+```
