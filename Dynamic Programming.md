@@ -2720,3 +2720,55 @@ public:
     }
 };
 ```
+
+### [Substring With Largest Variance (Star Marked)](https://leetcode.com/contest/biweekly-contest-78/problems/substring-with-largest-variance/)
+
+```cpp
+class Solution {
+public:
+    int returnAns(vector<int> &v, int i, int j) {
+        int n = v.size();
+        int cur_ans = 0, max_ans = 0, a = 0, b = 0, firsta = -1;
+        for(int k = 0; k < n; k++) {
+            if(v[k] == i) {
+                a++;
+                if(b == 0) {
+                    a = 1;
+                    firsta = k;
+                }
+                else {
+                    if(firsta != -1) {
+                        firsta = -1; a--;
+                    }
+                }
+            }
+            else if(v[k] == j) {
+                b++;
+            }
+            if(a!=0 && b!=0) {
+                int cur_diff = b - a;
+                max_ans = max(max_ans, cur_diff);
+                if(cur_diff < 0) {
+                    firsta = k;
+                    b = 0; a = 1;
+                }
+            }
+        }
+        return max_ans;
+    }
+
+    int largestVariance(string s) {
+        int n = s.size();
+        vector<int> v;
+        for(int i = 0; i < n; i++) v.push_back(s[i] - 'a');
+        int ans = 0;
+        for(int i = 0; i < 26; i++) {
+            for(int j = i + 1; j < 26; j++) {
+                ans = max(ans, returnAns(v, i, j));
+                ans = max(ans, returnAns(v, j, i));
+            }
+        }
+        return ans;
+    }
+};
+```
