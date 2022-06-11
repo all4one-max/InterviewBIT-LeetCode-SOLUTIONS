@@ -786,3 +786,77 @@ signed main()
     return 0;
 }
 ```
+
+### [C. Tokitsukaze and Strange Inequality (Star Marked)](https://codeforces.com/contest/1678/problem/C)
+
+```cpp
+#include "bits/stdc++.h"
+#include <ext/pb_ds/assoc_container.hpp>
+#include <ext/pb_ds/tree_policy.hpp>
+#include <map>
+// #include "atcoder/math.hpp"
+using namespace __gnu_pbds;
+using namespace std;
+#define tezi           ios_base::sync_with_stdio(0); cin.tie(0); cout.tie(0);
+#define ordered_set    tree<pair<long long, long long>, null_type,less<pair<long long, long long>>, rb_tree_tag,tree_order_statistics_node_update>
+#define int            long long
+#define ld             long double
+#define fo(i,n)        for (int i=0;i<n;i++)
+#define fo1(i, n)      for (int i=1;i<n;i++)
+#define MAX(a,b)       (a>b) ? a : b
+#define MIN(a,b)       (a>b) ? b : a
+#define fi             first
+#define nl             "\n"
+#define se             second
+#define pb             push_back
+#define mp             make_pair
+#define all(v)         v.begin(), v.end()
+#define uniq(v)        v.resize(unique(all(v)) - v.begin())
+#define sz(v)          (long long)v.size()
+#define pii            pair<int, int>
+
+int n,  m, y, e, t, k, q, u1, u2,  w, c, d, x, ans;
+const int mx = 400005, mod = 1000000007, mx2 = 200005 , mx3 = 100005, INF = 1000000000000000000;
+
+void solve() {
+  cin >> n; vector<int> arr(n, 0);
+  fo(i, n) cin >> arr[i];
+  vector<int> bd(n, 0);
+  fo1(i, n) {
+    for (int j = i + 2; j < n; j++) {
+      if (arr[i] > arr[j]) bd[i]++;
+    }
+  }
+  vector<int> pref(bd);
+  fo1(i, n) pref[i] += pref[i - 1];
+  debug(bd) debug(pref)
+  int ans = 0;
+  for (int c = 2; c < n - 1; c++) {
+    for (int a = c - 2; a >= 0; a--) {
+      if (arr[a] > arr[c]) bd[a]--;
+    }
+    for (int a = 1; a <= c; a++) pref[a] = (bd[a] + pref[a - 1]);
+    for (int a = 0; a < c - 1; a++) {
+      if (arr[a] < arr[c]) ans += (pref[c - 1] - pref[a]);
+    }
+  }
+  cout << ans << nl;
+  return;
+}
+
+signed main()
+{ tezi
+# ifndef ONLINE_JUDGE
+  // for getting input from input.txt
+  freopen("input.txt", "r", stdin);
+  // for getting input from output.txt
+  freopen("output.txt", "w", stdout);
+  // for printing erros
+  freopen("Errors.txt", "w", stderr);
+# endif
+  cin >> t;
+  // t = 1;
+  fo(i, t) solve();
+  return 0;
+}
+```

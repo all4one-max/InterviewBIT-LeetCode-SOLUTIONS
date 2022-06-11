@@ -494,3 +494,82 @@ vector<int> Solution::findSubstring(string s, const vector<string> &b) {
     return ans;
 }
 ```
+
+## Dynamic Programming Hard Problems
+
+### [Count Integers in Intervals (Star Marked)](https://leetcode.com/contest/weekly-contest-293/problems/count-integers-in-intervals/)
+
+```cpp
+class CountIntervals {
+public:
+    map<int, int> mp;
+    int ans;
+    CountIntervals() {
+        mp.clear();
+        ans = 0;
+    }
+
+    void add(int left, int right) {
+        if(!mp.size()) {
+            mp[left] = right;
+            ans += (right - left + 1);
+        }
+        else {
+            auto it = mp.lower_bound(left);
+            if(it == mp.end()) {
+                auto it2 = it; it2--;
+                int key = (*it2).first, value = (*it2).second;
+                if(value + 1 >= left) {
+                    mp[key] = max(value, right);
+                    if(right > value) ans += (right - value);
+                }
+                else {
+                    mp[left] = right;
+                    ans += (right - left + 1);
+                }
+            }
+            else {
+                vector<int> rem;
+                if(it != mp.begin()) {
+                    auto it2 = it;
+                    it2--;
+                    int key = (*it2).first, value = (*it2).second;
+                    if(left <= value) {
+                        left = key;
+                        right = max(right, value);
+                        ans -= (value - key + 1);
+                        rem.push_back(key);
+                    }
+                }
+                while(it != mp.end()) {
+                    int key=(*it).first,value=(*it).second;
+                    if(right < key) break;
+                    else {
+                        ans -= (value - key + 1);
+                        rem.push_back(key);
+                        if(right <= value) {
+                            right = value;
+                            break;
+                        }
+                        else it++;
+                    }
+                }
+                for(auto k : rem) mp.erase(k);
+                mp[left] = right;
+                ans += (right - left + 1);
+            }
+        }
+    }
+
+    int count() {
+        return ans;
+    }
+};
+
+/**
+ * Your CountIntervals object will be instantiated and called as such:
+ * CountIntervals* obj = new CountIntervals();
+ * obj->add(left,right);
+ * int param_2 = obj->count();
+ */
+```
