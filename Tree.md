@@ -216,29 +216,29 @@ void in_order(TreeNode* root, vector<int> &inorder) {
 
 vector<int> Solution::recoverTree(TreeNode* a) {
     vector<int> inorder;
+    inorder.push_back(-1);
     in_order(a, inorder);
+    inorder.push_back(1e9);
     vector<int> ans;
     int note = -1, ind = -1;
     int n = inorder.size();
-    for(int i = inorder.size() - 1; i >= 0; i--) {
-        if((i!=0 && inorder[i] < inorder[i - 1]) || (i == 0 && i + 1 < n && inorder[i + 1] < inorder[i])) {
-            note = inorder[i];
-            ind = i;
-            ans.push_back(inorder[i]);
+    for(int i = 0; i < n; i++) {
+        if(i && (inorder[i] < inorder[i - 1])) {
+            int second = inorder[i - 1], first;
+            for(int j = i; j < n; j++) {
+                swap(inorder[i - 1], inorder[j]);
+                if((inorder[i - 2] < inorder[i - 1]) && (inorder[i - 1] < inorder[i])) {
+                    if((inorder[j - 1] < inorder[j]) && (inorder[j] < inorder[j + 1])) {
+                        first = inorder[i - 1];
+                        break;
+                    }
+                }
+                swap(inorder[i - 1], inorder[j]);
+            }
+            ans.push_back(first); ans.push_back(second);
             break;
         }
     }
-    for(int i = 0; i < n; i++) {
-        if(i != ind) {
-            if(inorder[i] >= inorder[ind - 1]) {
-                if((ind != n - 1 && inorder[i] <= inorder[ind + 1]) || (ind == n - 1)) {
-                    ans.push_back(inorder[i]);
-                    break;
-                }
-            }
-        }
-    }
-    sort(ans.begin(), ans.end());
     return ans;
 }
 
@@ -247,6 +247,7 @@ vector<int> Solution::recoverTree(TreeNode* a) {
 
 vector<int> Solution::recoverTree(TreeNode* root) {
     vector<int> inorder;
+    inorder.push_back(-1);
     TreeNode* cur = root;
     while(cur) {
         if(!cur->left) {
@@ -268,29 +269,27 @@ vector<int> Solution::recoverTree(TreeNode* root) {
 
         }
     }
-    if(inorder.size() == 1) return {};
-    int ind = -1;
-    for(int i = inorder.size() - 1; i >= 0; i--) {
-        if((i != 0 && inorder[i] < inorder[i - 1])) {
-            ind = i;
+    inorder.push_back(1e9);
+    vector<int> ans;
+    int n = inorder.size();
+    for(int i = 0; i < n; i++) {
+        if(i && (inorder[i] < inorder[i - 1])) {
+            int second = inorder[i - 1], first;
+            for(int j = i; j < n; j++) {
+                swap(inorder[i - 1], inorder[j]);
+                if((inorder[i - 2] < inorder[i - 1]) && (inorder[i - 1] < inorder[i])) {
+                    if((inorder[j - 1] < inorder[j]) && (inorder[j] < inorder[j + 1])) {
+                        first = inorder[i - 1];
+                        break;
+                    }
+                }
+                swap(inorder[i - 1], inorder[j]);
+
+            }
+            ans.push_back(first); ans.push_back(second);
             break;
         }
     }
-    if(ind == -1) return {};
-    vector<int> ans;
-    int n = inorder.size();
-    ans.push_back(inorder[ind]);
-    for(int i = 0; i < n; i++) {
-        if(i != ind) {
-            if(inorder[i] >= inorder[ind - 1]) {
-                if((ind != n - 1 && inorder[i] <= inorder[ind + 1]) || (ind == n - 1)) {
-                    ans.push_back(inorder[i]);
-                    break;
-                }
-            }
-        }
-    }
-    if(ans[0] > ans[1]) swap(ans[0], ans[1]);
     return ans;
 }
 

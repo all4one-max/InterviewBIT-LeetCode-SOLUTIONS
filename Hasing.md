@@ -495,7 +495,7 @@ vector<int> Solution::findSubstring(string s, const vector<string> &b) {
 }
 ```
 
-## Dynamic Programming Hard Problems
+## Hashing Hard Problems
 
 ### [Count Integers in Intervals (Star Marked)](https://leetcode.com/contest/weekly-contest-293/problems/count-integers-in-intervals/)
 
@@ -572,4 +572,34 @@ public:
  * obj->add(left,right);
  * int param_2 = obj->count();
  */
+```
+
+### [Steps to Make Array Non-decreasing (Star Marked)](https://leetcode.com/problems/steps-to-make-array-non-decreasing/#:~:text=In%20one%20step%2C%20remove%20all,becomes%20a%20non%2Ddecreasing%20array.)
+
+```cpp
+class Solution {
+public:
+    int totalSteps(vector<int>& nums) {
+        int n = nums.size();
+        map<int,int> mp; vector<pair<int,int>> del;
+        for(int i = 0; i < n; i++) {
+            if((i + 1 < n) && (nums[i] > nums[i + 1])) del.push_back({i, i + 1});
+            mp[i] = nums[i];
+        }
+        int mov = 0;
+        while(!del.empty()) {
+            mov++; vector<pair<int,int>> ndel;
+            for(auto [i, j] : del) mp.erase(mp.find(j));
+            for(auto [i, j] : del) {
+                auto it = mp.find(i);
+                if(it == (mp.end())) continue;
+                auto itn = next(it);
+                if(itn == (mp.end())) continue;
+                if(nums[i] > nums[(*itn).first]) ndel.push_back({i, (*itn).first});
+            }
+            swap(del, ndel);
+        }
+        return mov;
+    }
+};
 ```
