@@ -598,6 +598,25 @@ vector<int> Solution::inorderTraversal(TreeNode* root) {
     }
     return inorder;
 }
+
+// Method 2 (Better Implementation)
+vector<int> Solution::inorderTraversal(TreeNode* root) {
+    stack<TreeNode*> st;
+    vector<int> inorder;
+    TreeNode* cur = root;
+    while(cur || !st.empty()) {
+        if(cur) {
+            st.push(cur);
+            cur = cur->left;
+        }
+        else {
+            inorder.push_back(st.top()->val);
+            cur = st.top()->right;
+            st.pop();
+        }
+    }
+    return inorder;
+}
 ```
 
 ### [PreOrder Traversal using stacks](https://www.interviewbit.com/problems/preorder-traversal/)
@@ -690,6 +709,21 @@ vector<int> Solution::postorderTraversal(TreeNode* root) {
         }
     }
     return post_order;
+}
+
+// Method 3 (yet better implementation)
+vector<int> Solution::postorderTraversal(TreeNode* root) {
+    stack<TreeNode*> st; st.push(root);
+    vector<int> postOrder;
+    while(!st.empty()) {
+        TreeNode* node = st.top();
+        st.pop();
+        postOrder.push_back(node->val);
+        if(node->left) st.push(node->left);
+        if(node->right) st.push(node->right);
+    }
+    reverse(postOrder.begin(), postOrder.end());
+    return postOrder;
 }
 ```
 
@@ -871,6 +905,29 @@ void Solution::connect(TreeLinkNode* root) {
             }
             else break;
         }
+    }
+    return;
+}
+
+// Method 3 (easiest implementation using deque)
+/**
+ * Definition for binary tree with next pointer.
+ * struct TreeLinkNode {
+ *  int val;
+ *  TreeLinkNode *left, *right, *next;
+ *  TreeLinkNode(int x) : val(x), left(NULL), right(NULL), next(NULL) {}
+ * };
+ */
+void Solution::connect(TreeLinkNode* root) {
+    deque<pair<TreeLinkNode*, int>> dq; dq.push_front({root, 0});
+    while(!dq.empty()) {
+        auto [cur, lvl] = dq.back();
+        dq.pop_back();
+        if(!dq.empty()) {
+            if(dq.back().second == lvl) dq.back().first->next = cur;
+        }
+        if(cur->right) dq.push_front({cur->right, lvl + 1});
+        if(cur->left) dq.push_front({cur->left, lvl + 1});
     }
     return;
 }
