@@ -34,6 +34,48 @@ int func(int a) {
 int Solution::solve(int a) {
     return func(a);
 }
+
+// easier implementation
+long long ncr(int n, int r){
+    // ncr = n-1cr-1 + n-1cr
+    vector<long long> c(n + 1, 0); c[0] = 1;
+    for(int i = 1; i <= n; i++) {
+        for(int j = i; j >= 1; j--) {
+            c[j] = c[j] + c[j - 1];
+            c[j] %= 1000000007;
+        }
+    }
+    return c[r];
+}
+
+int calc(int a) {
+    int cur = 0, h = 0;
+    while((cur + (1<<h)) < a) {
+        cur += (1<<h);
+        h++;
+    }
+    int rem = a - cur;
+    cur -= 1;
+    cur /= 2;
+    if(rem >= (1<<(pow - 1))) return cur+(1<<(pow - 1));
+    else return cur + rem;
+}
+
+int func(int a) {
+    if(a == 1 || a == 2) return 1;
+    if(a == 3) return 2;
+    int l = calc(a);
+    int ans1 = func(l);
+    int ans2 = func(a - l - 1);
+    long long fct = ncr(a - 1, l);
+    long long ans = 1LL*fct * ((1LL*ans1 * ans2)%1000000007); ans %= 1000000007;
+    int ret = (int)ans;
+    return ret;
+}
+
+int Solution::solve(int a) {
+    return func(a);
+}
 ```
 
 ### [N max pair combinations](https://www.interviewbit.com/problems/n-max-pair-combinations/)
@@ -319,6 +361,42 @@ void LRUCache::set(int key, int value) {
     mp2[key] = value;
     return;
 }
+
+// clean, concise implementation
+class LRUCache {
+public:
+    list<pair<int,int>> cache;
+    unordered_map<int, list<pair<int,int>>::iterator> mp;
+    int sze;
+
+    LRUCache(int capacity) {
+        sze = capacity;
+        return;
+    }
+
+    int get(int key) {
+        if(mp.find(key) == mp.end()) return -1;
+        cache.splice(cache.begin(), cache, mp[key]);
+        return cache.front().second;
+    }
+
+    void put(int key, int value) {
+        if(mp.find(key) == mp.end()) {
+            if(cache.size() == sze) {
+                mp.erase(cache.back().first);
+                cache.pop_back();
+            }
+            cache.push_front({key, value});
+            mp[key] = cache.begin();
+        }
+        else {
+            cache.splice(cache.begin(), cache, mp[key]);
+            cache.begin()->second = value;
+            mp[key] = cache.begin();
+        }
+        return;
+    }
+};
 ```
 
 ## LeetCode Heaps Hard Problems
@@ -575,7 +653,13 @@ public:
 
 ```cpp
 /*
-i couldn't solve this question so i read the solution in the discussion forum. basically what they say is let's just eliminate one type of operation. and the way we do it is multiplying every odd number by 2. so now we can only perform one type of operation to minimize the deviation, i.e division by 2. now they have said that we can just maintain the maximum and the minimum number and if the maximum number is odd we will terminate our program, otherwise we will divide the maximum number by 2.
+i couldn't solve this question so i read the solution in the discussion forum.
+basically what they say is let's just eliminate one type of operation.
+and the way we do it is multiplying every odd number by 2.
+so now we can only perform one type of operation to minimize the deviation,
+i.e division by 2. now they have said that we can just maintain
+the maximum and the minimum number and if the maximum number is odd
+we will terminate our program, otherwise we will divide the maximum number by 2.
 */
 class Solution {
 public:

@@ -144,6 +144,35 @@ int Solution::isScramble(const string a, const string b) {
     map<pair<string, string>, int> mp;
     return recur(a, b, mp);
 }
+
+// same idea but removed unecessary parts
+int recur(string a, string b, map<pair<string, string>, int> &mp) {
+    int n = a.size() - 1;
+    if(a == b) return mp[{a, b}] = 1;
+    if(n == 0) return mp[{a, b}] = 0;
+
+    for(int k = 0; k < n; k++) {
+        string a1 = a.substr(0, k + 1), a2 = a.substr(k + 1);
+        string b1 = b.substr(0, k + 1), b2 = b.substr(k + 1);
+        string b3 = b.substr(n - k), b4 = b.substr(0, n - k);
+
+        if(mp.find({a1, b1}) == mp.end()) recur(a1, b1, mp);
+        if(mp.find({a2, b2}) == mp.end()) recur(a2, b2, mp);
+        if(mp[{a1, b1}] && mp[{a2, b2}]) return mp[{a, b}] = 1;
+
+        if(mp.find({a1, b3}) == mp.end()) recur(a1, b3, mp);
+        if(mp.find({a2, b4}) == mp.end()) recur(a2, b4, mp);
+        if(mp[{a1, b3}] && mp[{a2, b4}]) return mp[{a, b}] = 1;
+    }
+    return mp[{a, b}] = 0;
+}
+
+int Solution::isScramble(const string a, const string b) {
+    int n = a.size(), m = b.size();
+    if(n != m) return 0;
+    map<pair<string, string>, int> mp;
+    return recur(a, b, mp);
+}
 ```
 
 ### [Regular Expression Match (Star Marked)](https://www.interviewbit.com/problems/regular-expression-match/)
@@ -220,6 +249,37 @@ int Solution::isMatch(const string a, const string b) {
                 else {
                     if(j + 1 < m && b[j + 1] == '*') dp[i][j] = dp[i][j + 1];
                 }
+            }
+        }
+    }
+    return dp[0][0];
+}
+
+// simpler implementation
+int Solution::isMatch(const string a, const string b) {
+    int n = a.size(), m = b.size(); vector<vector<int>> dp(n + 1, vector<int> (m + 1, 0));
+    dp[n][m] = 1;
+
+    int i = m - 1;
+    while(i >= 0) {
+        if(b[i] != '*') break;
+        else {
+            dp[n][i - 1] = 1;
+            i -= 2;
+        }
+    }
+
+    for(int i = n - 1; i >= 0; i--) {
+        for(int j = m - 1; j >= 0; j--) {
+            if(a[i] == b[j] || b[j] == '.') {
+                if(j + 1 < m) {
+                    if(b[j + 1] == '*') dp[i][j] = (dp[i + 1][j] || dp[i][j + 2]);
+                    else dp[i][j] = dp[i + 1][j + 1];
+                }
+                else dp[i][j] = dp[i + 1][j + 1];
+            }
+            else {
+                if(j + 1 < m && b[j + 1] == '*') dp[i][j] = dp[i][j + 2];
             }
         }
     }

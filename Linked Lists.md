@@ -107,6 +107,35 @@ ListNode* Solution::insertionSortList(ListNode* a) {
     }
     return dummy.next;
 }
+
+// A bit smaller code
+ListNode* Solution::insertionSortList(ListNode* a) {
+    if(!a->next) return a;
+    ListNode dummy(-1);
+    ListNode* head = &dummy;
+    while(a) {
+        ListNode* prev = NULL;
+        ListNode* cur = head;
+        ListNode* correctNxt = a->next;
+        while(cur) {
+            if(a->val <= cur->val) {
+                if(a->val >= prev->val) {
+                    prev->next = a;
+                    a->next = cur;
+                    break;
+                }
+            }
+            prev = cur;
+            cur = cur->next;
+        }
+        if(!cur) {
+            prev->next = a;
+            a->next = NULL;
+        }
+        a = correctNxt;
+    }
+    return dummy.next;
+}
 ```
 
 ### [Amazing Subarrays](https://www.interviewbit.com/problems/amazing-subarrays/)
@@ -666,6 +695,38 @@ ListNode* Solution::reverseBetween(ListNode* a, int b, int c) {
         pre = iter;
         iter = iter->next;
     }
+}
+
+// shorter code
+ListNode* reversell(ListNode* head, ListNode* tail) {
+    if(head == tail) return head;
+    ListNode* sh = reversell(head->next, tail);
+    ListNode* st = head->next;
+    st->next = head;
+    st = st->next;
+    st->next = NULL;
+    return sh;
+}
+
+ListNode* mov(ListNode* head, int mv) {
+    if(mv == 0) return NULL;
+    for(int i = 0; i < (mv - 1); i++) {
+        if(!head) return NULL;
+        head = head->next;
+    }
+    return head;
+}
+
+ListNode* Solution::reverseBetween(ListNode* a, int b, int c) {
+    ListNode* newHead = mov(a, b);
+    ListNode* prevHead = mov(a, b - 1);
+    ListNode* newTail = mov(a, c);
+    ListNode* nxtTail = mov(a, c + 1);
+    ListNode* head = reversell(newHead, newTail);
+    if(prevHead) prevHead->next = head;
+    if(nxtTail) newHead->next = nxtTail;
+    if(b == 1) return head;
+    else return a;
 }
 ```
 
