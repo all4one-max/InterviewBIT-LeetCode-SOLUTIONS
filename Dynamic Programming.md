@@ -916,6 +916,25 @@ int Solution::solve(vector<int> &a, int k) {
     }
     return dp[0][k];
 }
+
+// shorter and easier code
+class Solution {
+public:
+    int maxProfit(int k, vector<int>& a) {
+//         dp[i][j] = max profit with k trans
+        int n = a.size();
+        vector<vector<int>> dp(n + 1, vector<int> (k + 1, 0));
+        for(int j = 1; j <= k; j++) {
+            int mx = 0;
+            for(int i = n - 1; i >= 0; i--) {
+                dp[i][j] = max(dp[i][j], dp[i + 1][j]);
+                dp[i][j] = max(dp[i][j], mx - a[i]);
+                mx = max(mx, a[i] + dp[i + 1][j - 1]);
+            }
+        }
+        return dp[0][k];
+    }
+};
 ```
 
 ### [Evaluate Expression To True (Star Marked)](https://www.interviewbit.com/problems/evaluate-expression-to-true/)
