@@ -54,8 +54,14 @@ int main() {
     }
     else if(funcation_call_format == FUNCTION_POINTER) {
         cout<<"function pointer comparator priority queue"<<endl;
-        bool (*comp_func_ptr)(pair<int,int>&, pair<int,int>&){ &comp_func };
-        priority_queue<pair<int,int>,  vector<pair<int,int>>, bool (*)(pair<int,int>&, pair<int,int>&)> pq(comp_func_ptr);
+        
+        // 1. raw function pointer
+        // bool (*comp_func_ptr)(pair<int,int>&, pair<int,int>&){ comp_func };
+        // priority_queue<pair<int,int>,  vector<pair<int,int>>, bool (*)(pair<int,int>&, pair<int,int>&)> pq(comp_func_ptr);
+        
+        // 2. std::function<T> function pointer
+        std::function<bool(pair<int,int>&, pair<int,int>&)> comp_func_ptr = comp_func;
+        priority_queue<pair<int,int>,  vector<pair<int,int>>, std::function<bool(pair<int,int>&, pair<int,int>&)>> pq(comp_func_ptr);
         
         pq.push({1,3});
         pq.push({1, 1});
