@@ -2,6 +2,10 @@
 #include <iostream>
 #include <cstring>
 
+/*
+this code snippet will help undestanding how const lvalue reference extends the lifetime of rvalue(or temporary objects)
+*/
+
 class String {
 private:
     char* m_Data;
@@ -35,6 +39,8 @@ private:
     String m_Name;
 public:
     Entity(const String& name): m_Name(name) {
+        // the rvalue will be destroyed after this scope, i.e after this constructor call because const lvalue reference 
+        // name exists until the constructor's end of scope
         std::cout<<"temp object not destroyed"<<std::endl;
         std::cout<<"temp object not destroyed"<<std::endl;
         std::cout<<"temp object not destroyed"<<std::endl;
