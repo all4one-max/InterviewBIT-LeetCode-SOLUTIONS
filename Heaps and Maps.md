@@ -397,6 +397,147 @@ public:
         return;
     }
 };
+
+// better put function
+class LRUCache {
+public:
+    list<pair<int,int>> cache;
+    unordered_map<int, list<pair<int,int>>::iterator> mp;
+    int sze;
+
+    LRUCache(int capacity) {
+        sze = capacity;
+        return;
+    }
+
+    int get(int key) {
+        if(mp.find(key) == mp.end()) return -1;
+        cache.splice(cache.begin(), cache, mp[key]);
+        return cache.front().second;
+    }
+
+    void put(int key, int value) {
+        if(mp.find(key) != mp.end()) cache.erase(mp[key]);
+        else {
+            if(cache.size() == sze) {
+                mp.erase(cache.back().first);
+                cache.pop_back();
+            }
+        }
+        cache.push_front({key, value});
+        mp[key] = cache.begin();
+        return;
+    }
+};
+```
+
+### [Time Based Cache](https://leetcode.com/discuss/interview-experience/5634790/Confluent-or-SSE-or-Bengaluru-(Remote))
+
+```cpp
+/*
+
+Phone Screen: Key-value store with expiration. Functions: put(key, value), get(key), and get_average() (average of non-expired values). Data streamed in order of increasing timestamps.
+
+You're given a time based kv store,
+window = 5 sec
+
+time
+1 put("foo", 1)
+3 put("bar", 2)
+4 get("foo") -> 1
+5 getAverage() -> 1.5
+7 get("foo") -> -1 (since key expired)
+8 getAverage() -> 2 (since foo expired)
+
+expectation was to optimize get() and getAverage()
+
+// you can think in such a way that this cache's eviction policy is
+time based rather than least recently used one
+
+// all queries come in increasing order of timestamp
+
+*/
+#include <iostream>
+#include <bits/stdc++.h>
+using namespace std;
+
+struct CacheElement {
+  string key;
+  int value;
+  int entry_time;
+  
+  CacheElement(string k, int v, int t): key(k), value(v), entry_time(t) {}
+};
+
+struct TimeBasedCache {
+    int expiry_time; // which we need for calculating average
+    map<string, list<CacheElement>::iterator> cache_mp;
+    list<CacheElement> cache;
+    int cache_sum;
+    
+    TimeBasedCache(int expiry_time): expiry_time(expiry_time), cache_sum(0) {
+        cache_mp.clear();
+        cache.clear();
+    }
+    
+    void erase_cache_element(list<CacheElement>::iterator itr) {
+        cache_sum -= itr->value;
+        cache_mp.erase(itr->key);
+        cache.erase(itr);
+    }
+    
+    void insert_cache_element(CacheElement element) {
+        cache_sum += element.value;
+        cache.push_back(element);
+        cache_mp[element.key] = prev(cache.end());
+    }
+    
+    void cleanup_cache(int cur_time) {
+        while(true) {
+            if(cache.size() && (cur_time - cache.front().entry_time > expiry_time)) {
+                cache_sum -= cache.front().value;
+                cache.pop_front();
+            }
+            else break;
+        }
+    }
+    
+    void put(string key, int value, int cur_time) {
+        if(cache_mp.find(key) != cache_mp.end()) erase_cache_element(cache_mp[key]);
+        insert_cache_element(CacheElement(key, value, cur_time));
+        cleanup_cache(cur_time);
+    }
+    
+    int get(string key, int cur_time) {
+        if(cache_mp.find(key) == cache_mp.end()) return -1;
+        auto cur_pos = cache_mp[key];
+        if(cur_time - cur_pos->entry_time >= expiry_time) {
+            return -1;
+        }
+        return cur_pos->value;
+    }
+    
+    double get_avg(int cur_time) {
+        if(!cache.size()) return -1;
+        cleanup_cache(cur_time);
+        double average = (double)cache_sum/cache.size();
+        return average;
+    }
+};
+
+int main() {
+    TimeBasedCache time_based_cache(5);
+    time_based_cache.put("foo", 1, 1);
+    time_based_cache.put("hello", 5, 2);
+    time_based_cache.put("bar", 2, 3);
+    cout<< time_based_cache.get("foo", 4) << endl;
+    cout<< time_based_cache.get_avg(5) << endl;
+    cout<< time_based_cache.get("foo", 7) << endl;
+    time_based_cache.put("me", 4, 6);
+    cout<< time_based_cache.get_avg(8) << endl;
+
+    return 0;
+}
 ```
 
 ## LeetCode Heaps Hard Problems
