@@ -1803,3 +1803,127 @@ public:
     }
 };
 ```
+
+```cpp
+/*
+You are asked to build the autocomplete feature for a programming IDE
+Lets say the classes available are :
+
+
+Container
+Panel
+AutoPanel
+RidePrinter
+ResumePanel
+RegularContainer
+ConcurrentHashMap
+CeraHiMac
+The class names are camel case
+The upper case letters in the pattern match the different segments of the class names
+AutoComplete("R") - > ["ResumePanel", "RegularContainer", "RidePrinter"]
+AutoComplete("Re") - > ["ResumePanel", "RegularContainer"]
+AutoComplete("RP") - > ["ResumePanel", "RidePrinter"]
+AutoComplete("RPr") - > ["RidePrinter"]
+AutoComplete("CHM") -> [CeraHiMac, ConcurrentHashMap]
+AutoComplete("CHiMa") -> [CeraHiMac]
+AutoComplete("CHMa") -> [CeraHiMac, ConcurrentHashMap]
+
+*/
+#include <iostream>
+#include <bits/stdc++.h>
+using namespace std;
+
+struct Trie {
+    char c;
+    map<char, Trie*> next_char_mp;
+    bool terminal;
+    
+    Trie(char c): c(c), terminal(false) {}
+    
+    void insert(const string& str, int ind, int n) {
+        if(ind >= n) {
+            terminal = true;
+            return;
+        }
+        
+        if(next_char_mp.find(str[ind]) == next_char_mp.end()) {
+            next_char_mp[str[ind]] = new Trie(str[ind]);
+        }
+        
+        next_char_mp[str[ind]]->insert(str, ind + 1, n);
+    }
+};
+
+class AutoCompletor {
+private:
+    Trie* root;
+public:
+    AutoCompletor() {
+        root = new Trie('?');
+    }
+    
+    void add_class_name(const string& class_name) {
+        root->insert(class_name, 0, class_name.size());
+    }
+    
+    void find_matching_class_names(const string& str) {
+        vector<string> results;
+        string temp = "";
+        find_helper(str, 0, results, root, temp);
+        cout<<"[ ";
+        for(auto matched_class_name : results) cout<<matched_class_name<<" ";
+        cout<<" ]"<<endl;
+    }
+    
+    void find_helper(const string& str, int ind, vector<string>& results, Trie* cur_node, string& temp) {
+        if(ind >= str.size()) {
+            if(cur_node->terminal) results.push_back(temp);
+            for(auto [chr, chr_node] : cur_node->next_char_mp) {
+                temp.push_back(chr);
+                find_helper(str, ind, results, chr_node, temp);
+                temp.pop_back();
+            }
+        }
+        
+        if(cur_node->next_char_mp.find(str[ind]) == cur_node->next_char_mp.end()) {
+            if(ind == 0) return;
+            if(str[ind] >= 'A' && str[ind] <= 'Z') {
+                for(auto [chr, chr_node] : cur_node->next_char_mp) {
+                    temp.push_back(chr);
+                    find_helper(str, ind, results, chr_node, temp);
+                    temp.pop_back();
+                }
+            }
+            else return;
+        }
+        else {
+            temp.push_back(str[ind]);
+            find_helper(str, ind + 1, results, cur_node->next_char_mp[str[ind]], temp);
+            temp.pop_back();
+        }
+    }
+    
+    ~AutoCompletor() {
+        delete root;
+    }
+};
+
+int main() {
+    AutoCompletor auto_completor;
+
+    vector<string> class_names = {"Container", "Panel", "AutoPanel", 
+    "RidePrinter", "ResumePanel", "RegularContainer", "ConcurrentHashMap","CeraHiMac"};
+    
+    for(auto class_name : class_names) auto_completor.add_class_name(class_name);
+    
+    auto_completor.find_matching_class_names("R");
+    auto_completor.find_matching_class_names("Re");
+    auto_completor.find_matching_class_names("RPr");
+    auto_completor.find_matching_class_names("CHM");
+    auto_completor.find_matching_class_names("CHiMa");;
+    auto_completor.find_matching_class_names("CHMa");
+    auto_completor.find_matching_class_names("Ma");
+    auto_completor.find_matching_class_names("Pr");
+    return 0;
+}
+```
