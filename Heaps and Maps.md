@@ -496,6 +496,7 @@ struct TimeBasedCache {
         while(true) {
             if(cache.size() && (cur_time - cache.front().entry_time > expiry_time)) {
                 cache_sum -= cache.front().value;
+                cache_mp.erase(cache.front().key);
                 cache.pop_front();
             }
             else break;
