@@ -431,7 +431,7 @@ public:
 };
 ```
 
-### [Time Based Cache](https://leetcode.com/discuss/interview-experience/5634790/Confluent-or-SSE-or-Bengaluru-(Remote))
+### [Time Based Cache (Star Marked)](https://leetcode.com/discuss/interview-experience/5634790/Confluent-or-SSE-or-Bengaluru-(Remote))
 
 ```cpp
 /*
