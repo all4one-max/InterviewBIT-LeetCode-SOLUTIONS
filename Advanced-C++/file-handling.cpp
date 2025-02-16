@@ -1,6 +1,5 @@
 #include <iostream>
 #include <fstream>
-#include <string>
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -12,6 +11,7 @@ using namespace std;
     4. getline(basic_istream<_CharT, _Traits>& __is, basic_string<_CharT, _Traits, _Allocator>& __str)
     so the first argument can be a derived class of istream such cin or fstrea, ifstream, ofstream, and second one would
     obviously be the string.
+    5. when we do getline() or get() it basically moves the read position
 */
 
 class FileOperations
