@@ -1,0 +1,18 @@
+{
+    "files.associations": {
+        "istream": "cpp",
+        "iostream": "cpp",
+        "fstream": "cpp",
+        "ios": "cpp",
+        "ostream": "cpp",
+        "__config": "cpp",
+        "__tree": "cpp",
+        "exception": "cpp",
+        "new": "cpp",
+        "optional": "cpp",
+        "stdexcept": "cpp",
+        "system_error": "cpp",
+        "typeinfo": "cpp",
+        "variant": "cpp"
+    }
+}
