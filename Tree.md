@@ -2018,3 +2018,24 @@ int main() {
 ```
 
 ### [find varadiac function name by funcation signature query](https://leetcode.com/discuss/interview-experience/5634790/Confluent-or-SSE-or-Bengaluru-(Remote))
+```cpp
+/*
+Follow-up: Supporting Variadic Functions
+Now, some functions are variadic, meaning they can accept additional arguments beyond their explicitly listed parameters.
+
+If a function is variadic, it can accept any number of additional parameters of the last specified type.
+
+Given a query, return all functions that can accept the parameter list, either as an exact match or through their variadic behavior.
+
+Example:
+functions = {
+    "funA": (["int", "bool"], True),  # Variadic function
+    "funB": (["int", "int", "int"], True),  # Variadic function
+    "funC": (["int", "int"], False)  # Non-variadic function
+}
+Queries and expected outputs:
+
+['int', 'int'] → ["funC"] (Exact match)
+['int', 'int', 'int', 'int'] → ["funB"] (Variadic match)
+*/
+```
