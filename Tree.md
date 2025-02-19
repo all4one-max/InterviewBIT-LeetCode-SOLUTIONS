@@ -2038,4 +2038,77 @@ Queries and expected outputs:
 ['int', 'int'] → ["funC"] (Exact match)
 ['int', 'int', 'int', 'int'] → ["funB"] (Variadic match)
 */
+
+#include <iostream>
+#include <bits/stdc++.h>
+using namespace std;
+
+struct TrieNode {
+    string data_type;
+    map<string, TrieNode*> children_mp;
+    vector<string> possible_function;
+    bool is_variadic;
+    TrieNode(string d_type): data_type(d_type), is_variadic(false) {
+        children_mp.clear();
+        possible_function.clear();
+    }
+};
+
+class Trie {
+TrieNode* root;
+public:
+    Trie() {
+        root = new TrieNode("?");
+    }
+    
+    void insert(vector<string> function_signature, string func_name, bool is_variadic_func) {
+        insert_helper(root, 0, function_signature, func_name, is_variadic_func);
+    }
+    
+    void insert_helper(TrieNode* cur_node, int ind, const vector<string>& function_signature, const string& func_name, bool is_variadic_func) {
+        if(ind >= function_signature.size()) {
+            cur_node->possible_function.push_back(func_name);
+            cur_node->is_variadic = is_variadic_func;
+            return;
+        }
+        if(cur_node->children_mp.find(function_signature[ind]) == cur_node->children_mp.end()) {
+            cur_node->children_mp[function_signature[ind]] = new TrieNode(function_signature[ind]);
+        }
+        insert_helper(cur_node->children_mp[function_signature[ind]], ind+1, function_signature, func_name, is_variadic_func);
+    }
+    
+    void get_func_name( vector<string> function_signature) {
+        vector<string> possible_funcs;
+        get_func_name_helper(root, 0, function_signature, possible_funcs);
+        if(!possible_funcs.size()) cout<<"No funcs found"<<endl;
+        else {
+            for(auto func_name : possible_funcs) cout<<func_name<<" ";
+            cout<<endl;
+        }
+    }
+    
+    void get_func_name_helper(TrieNode* cur_node, int ind, const vector<string>& function_signature, vector<string>& possible_funcs) {
+        if(ind >= function_signature.size() || cur_node->is_variadic) {
+            for(auto func_name : cur_node->possible_function) {
+                possible_funcs.push_back(func_name);
+            }
+        }
+        if(ind >= function_signature.size()) return;
+        if(cur_node->children_mp.find(function_signature[ind]) == cur_node->children_mp.end()) return;
+        get_func_name_helper(cur_node->children_mp[function_signature[ind]], ind+1, function_signature, possible_funcs);
+    }
+};
+
+int main() {
+    Trie trie;
+    trie.insert({"int", "int"}, "funcA", false);
+    trie.insert({"int", "bool"}, "funcB", true);
+    trie.insert({"int", "bool", "string"}, "funcC", true);
+    
+    trie.get_func_name({"int", "int"});
+    trie.get_func_name({"int", "bool"});
+    trie.get_func_name({"int", "bool", "string"});
+    trie.get_func_name({"int", "bool", "float"});
+    return 0;
+}
 ```
