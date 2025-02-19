@@ -1929,3 +1929,92 @@ int main() {
     return 0;
 }
 ```
+
+### [find function name by funcation signature query](https://leetcode.com/discuss/interview-experience/5634790/Confluent-or-SSE-or-Bengaluru-(Remote))
+```cpp
+/*
+Problem Statement
+You are given a set of functions, each with:
+
+A name (e.g., funA, funB, etc.).
+A list of parameter types (e.g., ['int', 'bool']).
+An optional flag (isVariadic) indicating whether the function accepts a variable number of arguments.
+Basic Query (Without Variadic Functions)
+Given a list of parameter types (e.g., ['int', 'int']), return all functions that exactly match the given parameter list
+
+Example:
+functions = {
+    "funA": ["int", "bool"],
+    "funB": ["int", "int"]
+}
+query = ["int", "int"]
+Output: ["funB"]
+*/
+
+#include <iostream>
+#include <bits/stdc++.h>
+using namespace std;
+
+struct TrieNode {
+    string data_type;
+    map<string, TrieNode*> children_mp;
+    vector<string> possible_function;
+    TrieNode(string d_type): data_type(d_type) {
+        children_mp.clear();
+        possible_function.clear();
+    }
+};
+
+class Trie {
+TrieNode* root;
+public:
+    Trie() {
+        root = new TrieNode("?");
+    }
+    
+    void insert(vector<string> function_signature, string func_name) {
+        insert_helper(root, 0, function_signature, func_name);
+    }
+    
+    void insert_helper(TrieNode* cur_node, int ind, const vector<string>& function_signature, const string& func_name) {
+        if(ind >= function_signature.size()) {
+            cur_node->possible_function.push_back(func_name);
+            return;
+        }
+        if(cur_node->children_mp.find(function_signature[ind]) == cur_node->children_mp.end()) {
+            cur_node->children_mp[function_signature[ind]] = new TrieNode(function_signature[ind]);
+        }
+        insert_helper(cur_node->children_mp[function_signature[ind]], ind+1, function_signature, func_name);
+    }
+    
+    void get_func_name( vector<string> function_signature) {
+        auto possible_funcs = get_func_name_helper(root, 0, function_signature);
+        if(!possible_funcs.size()) cout<<"No funcs found"<<endl;
+        else {
+            for(auto func_name : possible_funcs) cout<<func_name<<" ";
+            cout<<endl;
+        }
+    }
+    
+    vector<string> get_func_name_helper(TrieNode* cur_node, int ind, const vector<string>& function_signature) {
+        if(ind >= function_signature.size()) return cur_node->possible_function;
+        if(cur_node->children_mp.find(function_signature[ind]) == cur_node->children_mp.end()) return {};
+        return get_func_name_helper(cur_node->children_mp[function_signature[ind]], ind+1, function_signature);
+    }
+};
+
+int main() {
+    Trie trie;
+    trie.insert({"int", "int"}, "funcA");
+    trie.insert({"int", "bool"}, "funcB");
+    trie.insert({"int", "bool", "string"}, "funcC");
+    
+    trie.get_func_name({"int", "int"});
+    trie.get_func_name({"int", "bool"});
+    trie.get_func_name({"int", "bool", "string"});
+    trie.get_func_name({"int", "bool", "float"});
+    return 0;
+}
+```
+
+### [find varadiac function name by funcation signature query](https://leetcode.com/discuss/interview-experience/5634790/Confluent-or-SSE-or-Bengaluru-(Remote))
