@@ -911,7 +911,6 @@ signed main()
 
 ### [LC 44. Wildcard Matching (Star Marked)](https://leetcode.com/problems/wildcard-matching/description/)
 ```cpp
-// tough solution
 class Solution {
 public:
     bool isMatch(string s, string p) {
@@ -939,7 +938,8 @@ public:
 ```
 
 ### [LC 10. Regular Expression Matching (Star Marked)](https://leetcode.com/problems/regular-expression-matching/description/)
-```cppclass Solution {
+```cpp
+class Solution {
 public:
     bool isMatch(string s, string p) {
         int n = s.size(), m = p.size();
@@ -963,6 +963,30 @@ public:
                             dp[i][j] = dp[i][j] | dp[i][j-1] | dp[i - 1][j];
                         }
                     }
+                }
+            }
+        }
+        return dp[n][m];
+    }
+};
+
+// bit cleaner
+class Solution {
+public:
+    bool isMatch(string s, string p) {
+        int n = s.size(), m = p.size();
+        vector<vector<int>> dp(n + 1, vector<int> (m + 1, 0));
+        dp[0][0] = 1;
+        for(int i = 0; i <= n; i++) {
+            for(int j = 1; j <= m; j++) {
+                if(p[j - 1] == '*') {
+                    dp[i][j] = dp[i][j - 2];
+                    if(i > 0 && (s[i - 1] == p[j - 2] || p[j - 2] == '.')) {
+                        dp[i][j] = dp[i][j] | dp[i][j-1] | dp[i - 1][j];
+                    }
+                }
+                else {
+                    if(i > 0 && ((s[i - 1] == p[j - 1]) || p[j - 1] == '.')) dp[i][j] = dp[i - 1][j - 1];
                 }
             }
         }
