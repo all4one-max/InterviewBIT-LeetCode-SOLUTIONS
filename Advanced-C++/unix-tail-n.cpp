@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <deque>
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -12,9 +13,10 @@ class TailNCommand
 {
 private:
     fstream file;
+    const int buffer_size;
 
 public:
-    TailNCommand(const string &file_name)
+    TailNCommand(const string &file_name, int buf_size) : buffer_size(buf_size)
     {
         file.open(file_name, ios::in);
         if (!file)
@@ -77,15 +79,53 @@ public:
         for (auto line : ans)
             cout << line << endl;
     }
+
+    void implement_tail_n_using_buffer(int n)
+    {
+        file.clear();
+        char read_buffer[buffer_size];
+        deque<string> lines;
+        string cur_line = "";
+
+        file.seekg(0, ios::beg);
+        while (file)
+        {
+            file.read(read_buffer, sizeof(read_buffer));
+            for (int i = 0; i < file.gcount(); i++)
+            {
+                if (read_buffer[i] == '\n')
+                {
+                    if (lines.size() >= n)
+                        lines.pop_front();
+                    lines.push_back(cur_line);
+                    cur_line = "";
+                }
+                else
+                    cur_line.push_back(read_buffer[i]);
+            }
+        }
+        if (cur_line != "")
+        {
+            if (lines.size() >= n)
+                lines.pop_front();
+            lines.push_back(cur_line);
+        }
+        while (!lines.empty())
+        {
+            cout << lines.front() << endl;
+            lines.pop_front();
+        }
+    }
 };
 
 int main()
 {
     int n;
     cout << "Number of lines to read" << endl;
-    ;
     cin >> n;
 
-    TailNCommand tail_n_op("example.txt");
-    tail_n_op.tail_n_from_file_end(n);
+    TailNCommand tail_n_op("example.txt", 10);
+    // tail_n_op.tail_n_from_file_end(n);
+
+    tail_n_op.implement_tail_n_using_buffer(n);
 }
