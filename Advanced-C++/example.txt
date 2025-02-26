@@ -1,0 +1,28 @@
+now
+check it correctly
+MY NAME IS SAURAV
+I AM PREPARING FOR CONFLUENT
+Screening
+When was the last time a production incident happen, and how did you handle it
+Implement pattern matching with at most one wildcard * (star)
+Follow up: what if there were multiple stars
+Round 1: DS/Algo
+given a list of function names and the arguments they accept, implement a fast search for a function with certain args
+used trie and provided full implementation
+Round 2: DS/Algo
+Design time based LRU cache
+I was told code is not as important as coming up with the right implementation
+I think I was able to come up with the right implementation. Required hints from the interviewer.
+I didn't find time to code it in the end
+Round 3: Design Kafka as a Service (exactly what confluent is)
+prepared ppt
+based on K8s
+got a pretty positive feedback for this round
+Round 4: Tech deep dive
+what was your most challenging project
+explain product + biz + technology + engg. practices + deployment
+I had to give it on the go. I wasn’t prepared
+Recruiter did tell me before screening round about this round, but I forgot and didn't prepare for it - bad decision
+Round 5: Hiring manager
+questions on work and expectations
+behavioural round + general know-the-work call, no technical questions

@@ -1039,3 +1039,65 @@ public:
     }
 };
 ```
+
+### [https://leetcode.com/problems/maximum-frequency-stack/description/ (Star Marked)](https://leetcode.com/problems/maximum-frequency-stack/description/)
+```cpp
+class FreqStack {
+public:
+    set<vector<int>> st;
+    unordered_map<int,int> freq;
+    unordered_map<int,deque<int>> element_entry_time;
+    int entry_time;
+    FreqStack() {
+        st.clear();
+        entry_time = 1;
+        freq.clear();element_entry_time.clear();
+    }
+    
+    void push(int val) {
+        if(freq[val]) {
+            st.erase(st.find({freq[val], element_entry_time[val].back(), val}));
+        }
+        freq[val]++;
+        element_entry_time[val].push_back(entry_time++);
+        st.insert({freq[val], element_entry_time[val].back(), val});
+    }
+    
+    int pop() {
+        auto it = prev(st.end());
+        int val = (*it)[2];
+        st.erase(it);
+        freq[val]--;
+        element_entry_time[val].pop_back();
+        if(freq[val] > 0) {
+            st.insert({freq[val], element_entry_time[val].back(), val});
+        }
+        return val;
+    }
+};
+
+// simpler implementation O(1)
+class FreqStack {
+public:
+    unordered_map<int,int> element_frequency;
+    unordered_map<int, stack<int>> freq_element;
+    int cur_max_freq;
+
+    FreqStack() {
+        element_frequency.clear(); freq_element.clear();
+        cur_max_freq = 0;
+    }
+    
+    void push(int val) {
+        cur_max_freq = max(cur_max_freq, ++element_frequency[val]);
+        freq_element[element_frequency[val]].push(val);
+    }
+    
+    int pop() {
+        int ans = freq_element[cur_max_freq].top();
+        freq_element[cur_max_freq].pop(); element_frequency[ans]--;
+        if (!freq_element[cur_max_freq].size()) cur_max_freq--;
+        return ans;
+    }
+};
+```
