@@ -363,6 +363,49 @@ int Solution::compareVersion(string a, string b) {
     if (swp) return 1;
     return -1;
 }
+
+// better implementation
+class Solution {
+public:
+    string get_num(const string& version, int& ind) {
+        if(ind >= version.size()) return "0";
+        string num = "";
+        while(ind < version.size() && isdigit(version[ind])) {
+            int digit = version[ind++] - '0';
+            if(digit == 0 && num.size() == 0) continue;
+            else num.push_back(digit + '0');
+        }
+        ind++;
+        if(!num.size()) return "0";
+        return num;
+    }
+
+    int comp(string& num1, string& num2) {
+        if(num1.size() > num2.size()) return 1;
+        else if(num1.size() < num2.size()) return -1;
+        int i = 0, j = 0;
+        while(i < num1.size() || j < num2.size()) {
+            if(i >= num1.size()) return -1;
+            else if(j >= num2.size()) return 1;
+            if((num1[i] - '0') > num2[j] - '0') return 1;
+            if((num1[i] - '0') < num2[j] - '0') return -1;
+            i++; j++;
+        }
+        return 0;
+    }
+
+    int compareVersion(string version1, string version2) {
+        int n = version1.size(), m = version2.size();
+        int i = 0, j = 0;
+        while(i < n || j < m) {
+            string n1 = get_num(version1, i);
+            string n2 = get_num(version2, j);
+            int val = comp(n1, n2);
+            if(val) return val;
+        }
+        return 0;
+    }
+};
 ```
 
 ### [Valid Number (Star Marked)](https://www.interviewbit.com/problems/valid-number/)

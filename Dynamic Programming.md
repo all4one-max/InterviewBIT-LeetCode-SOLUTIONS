@@ -1016,6 +1016,15 @@ int Solution::maxProfit(const vector<int> &a) {
 ### [Longest valid Parentheses (Star Marked)](https://www.interviewbit.com/problems/longest-valid-parentheses/)
 
 ```cpp
+/*
+Lets construct longest[i] where longest[i] denotes the longest set of parenthesis ending at index i.
+
+If s[i] is ‘(‘, set longest[i] to 0, because any string end with ‘(‘ cannot be a valid one.
+Else if s[i] is ‘)’
+If s[i-1] is ‘(‘, longest[i] = longest[i-2] + 2
+Else if s[i-1] is ‘)’ and s[i-longest[i-1]-1] == ‘(‘, longest[i] = longest[i-1] + 2 + longest[i-longest[i-1]-2]
+Now that we know the longest set of parenthesis ending at each i , we can simply take its maximum and return it as the answer.
+*/
 // Method 1 (O(N^2) solution Gives TLE)
 int Solution::longestValidParentheses(string a) {
     int n = a.size();
