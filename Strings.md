@@ -368,7 +368,7 @@ int Solution::compareVersion(string a, string b) {
 class Solution {
 public:
     string get_num(const string& version, int& ind) {
-        if(ind >= version.size()) return "0";
+        if(ind >= version.size()) return "";
         string num = "";
         while(ind < version.size() && isdigit(version[ind])) {
             int digit = version[ind++] - '0';
@@ -376,7 +376,6 @@ public:
             else num.push_back(digit + '0');
         }
         ind++;
-        if(!num.size()) return "0";
         return num;
     }
 
